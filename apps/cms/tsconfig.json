@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "noEmit": false,
+    "types": ["node"],
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "payload.config.ts",
+    "src"
+  ]
+}
+
