@@ -1,0 +1,6 @@
+export const eslintConfig = {
+  extends: [],
+};
+
+
+

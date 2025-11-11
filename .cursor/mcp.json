@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "github-personal": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer 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",
+        "X-MCP-Toolsets": "default,actions"
+      }
+    },
+    "Linear": {
+      "url": "https://mcp.linear.app/sse",
+      "headers": {}
+    },
+    "Sentry": {
+      "url": "https://mcp.sentry.dev/mcp"
+    }
+  }
+}
