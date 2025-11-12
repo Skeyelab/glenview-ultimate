@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   const {DIRECTUS_URL} = process.env;
   const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
 
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     // Other errors
     return NextResponse.json(
-      { error: errorData?.errors?.[0]?.message || `Directus error: ${res.status} ${res.statusText}` },
+      { error: errorData?.errors?.[0]?.message ?? `Directus error: ${res.status} ${res.statusText}` },
       { status: res.status >= 400 && res.status < 500 ? res.status : 500 }
     );
   }
