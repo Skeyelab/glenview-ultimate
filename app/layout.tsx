@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 
@@ -11,6 +12,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen antialiased bg-brand-green text-white">
+        <Script
+          src="https://umami.apps.stereorail.com/script.js"
+          data-website-id="12909e0c-7500-4496-9a7d-498e13ceac79"
+          strategy="afterInteractive"
+        />
         <header className="border-b border-white/20">
           <Navbar />
         </header>
