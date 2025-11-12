@@ -127,20 +127,3 @@ export function getDirectusAssetUrl(fileId: string | null | undefined): string |
   if (!baseUrl) return null;
   return `${baseUrl}/assets/${fileId}`;
 }
-
-// Asset URL helper
-export function getDirectusAssetUrl(fileId: string | null | undefined): string | null {
-  if (!fileId) {
-    return null;
-  }
-
-  // Use NEXT_PUBLIC_DIRECTUS_URL when available (for client-side)
-  // Fallback to DIRECTUS_URL (for server-side)
-  const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || process.env.DIRECTUS_URL;
-
-  if (!baseUrl) {
-    return null;
-  }
-
-  return `${baseUrl}/assets/${fileId}`;
-}

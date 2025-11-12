@@ -28,6 +28,7 @@ export default function RegisterPage() {
   const [parent1_name, setP1Name] = useState("");
   const [parent1_email, setP1Email] = useState("");
   const [parent1_phone, setP1Phone] = useState("");
+  const [hasParent2, setHasParent2] = useState(false);
   const [parent2_name, setP2Name] = useState("");
   const [parent2_email, setP2Email] = useState("");
   const [parent2_phone, setP2Phone] = useState("");
@@ -54,6 +55,18 @@ export default function RegisterPage() {
     setChildren(prev => prev.filter((_, idx) => idx !== i));
   }
 
+  function addParent2() {
+    setHasParent2(true);
+  }
+
+  function removeParent2() {
+    setHasParent2(false);
+    setP2Name("");
+    setP2Email("");
+    setP2Phone("");
+    if (errorField === "parent2_email") setErrorField(null);
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -70,7 +83,7 @@ export default function RegisterPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           parent1_name, parent1_email, parent1_phone,
-          parent2_name, parent2_email, parent2_phone,
+          ...(hasParent2 && { parent2_name, parent2_email, parent2_phone }),
           children, notes, marketing_opt_in,
           turnstile_token: turnstileToken,
         }),
@@ -153,29 +166,38 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="card grid gap-4">
-            <h2 className="text-lg font-semibold text-white">Parent / Guardian 2 (optional)</h2>
-            <div>
-              <label className="label">Full Name</label>
-              <input className="input" value={parent2_name} onChange={e=>{ setP2Name(e.target.value); }} />
+          {hasParent2 ? (
+            <div className="card grid gap-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-white">Parent / Guardian 2</h2>
+                <button type="button" className="button secondary" onClick={removeParent2}>Remove</button>
+              </div>
+              <div>
+                <label className="label">Full Name</label>
+                <input className="input" value={parent2_name} onChange={e=>{ setP2Name(e.target.value); }} />
+              </div>
+              <div>
+                <label className="label">Email</label>
+                <input
+                  className={`input ${errorField === "parent2_email" ? "border-red-500" : ""}`}
+                  type="email"
+                  value={parent2_email}
+                  onChange={e=>{
+                    setP2Email(e.target.value);
+                    if (errorField === "parent2_email") setErrorField(null);
+                  }}
+                />
+              </div>
+              <div>
+                <label className="label">Cell</label>
+                <input className="input" value={parent2_phone} onChange={e=>{ setP2Phone(e.target.value); }} />
+              </div>
             </div>
-            <div>
-              <label className="label">Email</label>
-              <input
-                className={`input ${errorField === "parent2_email" ? "border-red-500" : ""}`}
-                type="email"
-                value={parent2_email}
-                onChange={e=>{
-                  setP2Email(e.target.value);
-                  if (errorField === "parent2_email") setErrorField(null);
-                }}
-              />
+          ) : (
+            <div className="card flex items-center justify-center">
+              <button type="button" className="button secondary" onClick={addParent2}>+ Add second parent / guardian</button>
             </div>
-            <div>
-              <label className="label">Cell</label>
-              <input className="input" value={parent2_phone} onChange={e=>{ setP2Phone(e.target.value); }} />
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="card grid gap-4">
