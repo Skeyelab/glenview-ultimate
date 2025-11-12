@@ -1,21 +1,6 @@
 'use client';
 
-import { useState, useRef } from "react";
-import Script from "next/script";
-
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (element: HTMLElement | string, options: {
-        sitekey: string;
-        callback?: (token: string) => void;
-        'error-callback'?: () => void;
-        'expired-callback'?: () => void;
-      }) => string;
-      reset: (widgetId?: string) => void;
-    };
-  }
-}
+import { useState } from "react";
 
 interface Child {
   full_name: string;
@@ -37,8 +22,6 @@ export default function RegisterPage() {
   const [marketing_opt_in, setOptIn] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileRef = useRef<HTMLDivElement>(null);
 
   const weekdays = ["Mon","Tue","Wed","Thu","Fri"];
 
@@ -83,19 +66,12 @@ export default function RegisterPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    // Only require token if Turnstile is configured
-    if (siteKey && !turnstileToken) {
-      setStatus("❌ Please complete the verification");
-      return;
-    }
     setStatus("Submitting...");
     setErrorField(null);
     try {
       // Map parents array to parent1_* and parent2_* fields
       const payload: Record<string, unknown> = {
         children, notes, marketing_opt_in,
-        turnstile_token: turnstileToken,
       };
 
       // Always include parent1 fields (at least one parent required)
@@ -127,44 +103,13 @@ export default function RegisterPage() {
       }
       setStatus("✅ Thanks! Your registration was received.");
       setErrorField(null);
-      setTurnstileToken(null);
-      // Reset Turnstile widget
-      if (window.turnstile) {
-        window.turnstile.reset();
-      }
     } catch (err:any) {
       setStatus("❌ " + err.message);
-      // Reset Turnstile on error
-      if (window.turnstile) {
-        window.turnstile.reset();
-        setTurnstileToken(null);
-      }
     }
   }
 
   return (
     <div className="space-y-6">
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-          if (window.turnstile && turnstileRef.current && siteKey) {
-            window.turnstile.render(turnstileRef.current, {
-              sitekey: siteKey,
-              callback: (token: string) => {
-                setTurnstileToken(token);
-              },
-              'error-callback': () => {
-                setTurnstileToken(null);
-              },
-              'expired-callback': () => {
-                setTurnstileToken(null);
-              },
-            });
-          }
-        }}
-      />
       <h1 className="text-3xl font-bold text-white">Registration</h1>
       <p className="text-white/90">Tell us about your family. You can add up to three kids.</p>
 
@@ -280,11 +225,6 @@ export default function RegisterPage() {
             />
             I agree to receive updates about the club.
           </label>
-        </div>
-
-        <div className="card">
-          <label className="label mb-2">Verification</label>
-          <div ref={turnstileRef}></div>
         </div>
 
         <div className="flex items-center gap-3">
