@@ -1,18 +1,22 @@
-import { getHomePage, getPartners, getPeople } from "@/lib/directus";
+import { getHomePage, getPartners, getPeople, getCurrentSeason } from "@/lib/directus";
+import Link from "next/link";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [home, partners, people] = await Promise.all([
+  const [home, partners, people, season] = await Promise.all([
     getHomePage(),
     getPartners(),
     getPeople(),
+    getCurrentSeason(),
   ]);
 
-  const title = home?.hero_title ?? "The Fun Starts — Spring 2026";
-  const subtitle = home?.hero_subtitle ?? "Introducing Glenview’s very first Youth Ultimate Frisbee Club — 5th–8th Grade, Co-ed. Everyone is welcome. Everyone plays.";
+  const title = home?.hero_title ?? "Glenview Youth Ultimate";
+  const subtitle = home?.hero_subtitle ?? "Co-ed, 5th–8th Grade. Everyone is welcome. Everyone plays.";
   const ctaLabel = home?.cta_label ?? "Pre-Register";
   const ctaUrl = home?.cta_url ?? "/register";
+
+  const highlights = season?.highlights ?? [];
 
   return (
     <div className="space-y-10">
@@ -20,19 +24,25 @@ export default async function HomePage() {
         <h1 className="text-3xl md:text-5xl font-bold">{title}</h1>
         <p className="text-lg text-slate-700 max-w-2xl mx-auto">{subtitle}</p>
         <div className="mt-4">
-          <a className="button" href={ctaUrl}>{ctaLabel}</a>
+          <Link className="button" href={ctaUrl}>{ctaLabel}</Link>
         </div>
+        {season && (
+          <p className="text-sm text-slate-500 mt-2">
+            {season.title || `${season.year} Season`} ({season.start_month || "Mar"}–{season.end_month || "May"})
+          </p>
+        )}
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         <div className="card">
-          <h2 className="text-xl font-semibold mb-2">2026 Season (At-a-glance)</h2>
-          <ul className="list-disc ps-5 space-y-1 text-slate-700">
-            <li>Nov 2025 — Pre-registration opens</li>
-            <li>Jan 2026 — Fields assigned; schedule announced</li>
-            <li>Feb 2026 — Final registration & uniform orders due</li>
-            <li>Mar–May 2026 — 12 weeks of practice • Skills, drills, scrimmages • 3–4 tournaments</li>
-          </ul>
+          <h2 className="text-xl font-semibold mb-3">Season Highlights</h2>
+          {highlights?.length ? (
+            <ul className="list-disc ps-5 space-y-1 text-slate-700">
+              {highlights.map((h, i) => <li key={i}>{h}</li>)}
+            </ul>
+          ) : (
+            <p className="text-slate-700">Highlights coming soon.</p>
+          )}
         </div>
         <div className="card">
           <h2 className="text-xl font-semibold mb-2">Leadership</h2>

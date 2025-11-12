@@ -92,3 +92,39 @@ can be managed from Directus.
 - Host Next.js on Vercel, Fly.io, Render, or your own infra.
 
 Happy building!
+
+---
+
+## Directus: new collections for Homepage & News
+
+### `seasons`
+- `year` (integer, unique or sortable)
+- `title` (string, optional) — e.g., "Spring 2026"
+- `highlights` (JSON, array of strings) — e.g., ["12 weeks of practice", "3–4 tournaments"]
+- `start_month` (string, optional) — e.g., "March"
+- `end_month` (string, optional) — e.g., "May"
+
+> The homepage reads the **latest** season by `year` and prints `highlights` as bullets.
+
+### `news`
+- `title` (string, required)
+- `slug` (string, unique, required)
+- `published_at` (datetime, required)
+- `excerpt` (text, optional)
+- `content` (text, required) — supports **Markdown**; rendered with `marked` and styled via Tailwind **typography** (`prose`).
+
+Routes:
+- `/news` — lists posts (newest first)
+- `/news/[slug]` — post detail
+
+> To use Markdown links/images, just write standard Markdown in `content`.
+
+## shadcn/ui-style components
+
+Included lightweight components inspired by shadcn/ui:
+- `components/ui/button.tsx` (with `class-variance-authority`)
+- `components/ui/input.tsx`, `components/ui/textarea.tsx`, `components/ui/label.tsx`
+- `components/ui/card.tsx`
+- `components/navbar.tsx` (adds a top nav)
+
+These are zero-config and Tailwind-native. You can swap in full shadcn/ui CLI components later if you prefer.
