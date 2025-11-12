@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [notes, setNotes] = useState("");
   const [marketing_opt_in, setOptIn] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string | null>(null);
 
   const weekdays = ["Mon","Tue","Wed","Thu","Fri"];
 
@@ -39,6 +40,7 @@ export default function RegisterPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("Submitting...");
+    setErrorField(null);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -50,8 +52,15 @@ export default function RegisterPage() {
         }),
       });
       const body = await res.json();
-      if (!res.ok) throw new Error(body?.error || "Failed");
-      setStatus("✅ Thanks! Your pre-registration was received.");
+      if (!res.ok) {
+        // Handle duplicate email error
+        if (body?.code === "DUPLICATE_EMAIL" && body?.field) {
+          setErrorField(body.field);
+        }
+        throw new Error(body?.error || "Failed");
+      }
+      setStatus("✅ Thanks! Your pre‑registration was received.");
+      setErrorField(null);
     } catch (err:any) {
       setStatus("❌ " + err.message);
     }
@@ -59,43 +68,58 @@ export default function RegisterPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Pre-Registration</h1>
+      <h1 className="text-3xl font-bold">Pre‑Registration</h1>
       <p className="text-slate-700">Tell us about your family. You can add up to three kids.</p>
 
       <form onSubmit={submit} className="grid gap-6">
-        <div className="card grid gap-4">
-          <h2 className="text-lg font-semibold">Parent / Guardian 1</h2>
-          <div className="grid-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="card grid gap-4">
+            <h2 className="text-lg font-semibold">Parent / Guardian 1</h2>
             <div>
               <label className="label">Full Name</label>
               <input className="input" value={parent1_name} onChange={e=>setP1Name(e.target.value)} required />
             </div>
             <div>
               <label className="label">Email</label>
-              <input className="input" type="email" value={parent1_email} onChange={e=>setP1Email(e.target.value)} required />
+              <input
+                className={`input ${errorField === "parent1_email" ? "border-red-500" : ""}`}
+                type="email"
+                value={parent1_email}
+                onChange={e=>{
+                  setP1Email(e.target.value);
+                  if (errorField === "parent1_email") setErrorField(null);
+                }}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Cell</label>
+              <input className="input" value={parent1_phone} onChange={e=>setP1Phone(e.target.value)} />
             </div>
           </div>
-          <div>
-            <label className="label">Cell</label>
-            <input className="input" value={parent1_phone} onChange={e=>setP1Phone(e.target.value)} />
-          </div>
-        </div>
 
-        <div className="card grid gap-4">
-          <h2 className="text-lg font-semibold">Parent / Guardian 2 (optional)</h2>
-          <div className="grid-2">
+          <div className="card grid gap-4">
+            <h2 className="text-lg font-semibold">Parent / Guardian 2 (optional)</h2>
             <div>
               <label className="label">Full Name</label>
               <input className="input" value={parent2_name} onChange={e=>setP2Name(e.target.value)} />
             </div>
             <div>
               <label className="label">Email</label>
-              <input className="input" type="email" value={parent2_email} onChange={e=>setP2Email(e.target.value)} />
+              <input
+                className={`input ${errorField === "parent2_email" ? "border-red-500" : ""}`}
+                type="email"
+                value={parent2_email}
+                onChange={e=>{
+                  setP2Email(e.target.value);
+                  if (errorField === "parent2_email") setErrorField(null);
+                }}
+              />
             </div>
-          </div>
-          <div>
-            <label className="label">Cell</label>
-            <input className="input" value={parent2_phone} onChange={e=>setP2Phone(e.target.value)} />
+            <div>
+              <label className="label">Cell</label>
+              <input className="input" value={parent2_phone} onChange={e=>setP2Phone(e.target.value)} />
+            </div>
           </div>
         </div>
 
@@ -106,7 +130,7 @@ export default function RegisterPage() {
           </div>
           {children.map((child, i) => (
             <div key={i} className="border rounded p-3 grid gap-3">
-              <div className="grid-2">
+              <div className="grid grid-2">
                 <div>
                   <label className="label">Child Full Name</label>
                   <input className="input" value={child.full_name} onChange={e=>updateChild(i, { full_name: e.target.value })} required />
@@ -116,7 +140,7 @@ export default function RegisterPage() {
                   <input className="input" value={child.age||""} onChange={e=>updateChild(i, { age: e.target.value })} />
                 </div>
               </div>
-              <div className="grid-2">
+              <div className="grid grid-2">
                 <div>
                   <label className="label">Experience</label>
                   <select className="select" value={child.experience||""} onChange={e=>updateChild(i, { experience: e.target.value as any })}>
@@ -159,7 +183,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" className="button">Submit Pre-Registration</button>
+          <button type="submit" className="button">Submit Pre‑Registration</button>
           {status && <span className="text-sm">{status}</span>}
         </div>
       </form>
