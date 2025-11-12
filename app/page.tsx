@@ -79,19 +79,30 @@ export default async function HomePage() {
 
       <section className="card">
         <h2 className="text-xl font-semibold mb-3 text-white">Partners</h2>
-        <div className="grid gap-3" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'}}>
-          {(partners?.length ? partners : [
-            { id: 1, name: "Illinois Ultimate", url: "https://illinoisultimate.org" },
-            { id: 2, name: "Chicago Union (UFA)", url: "https://watchufa.com/union" },
-            { id: 3, name: "Glenview Park District", url: "https://glenviewparks.org" },
-            { id: 4, name: "USA Ultimate", url: "https://usaultimate.org" },
-            { id: 5, name: "Ultimate Chicago", url: "https://ultimatechicago.org" },
-          ]).map((p) => (
-            <a key={p.id} className="border border-white/20 rounded p-3 text-white/90 hover:text-white hover:border-white/40 transition-colors" href={p.url} target="_blank" rel="noreferrer">
-              {p.name}
-            </a>
-          ))}
-        </div>
+        {partners?.length ? (
+          <div className="grid gap-3" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'}}>
+            {partners.map((p) => {
+              const logoUrl = getDirectusAssetUrl(p.logo);
+              return (
+                <a key={p.id} className="border border-white/20 rounded p-3 text-white/90 hover:text-white hover:border-white/40 transition-colors flex flex-col items-center justify-center" href={p.url} target="_blank" rel="noreferrer">
+                  {logoUrl ? (
+                    <Image
+                      src={logoUrl}
+                      alt={p.name}
+                      width={120}
+                      height={60}
+                      className="h-auto w-auto max-w-full max-h-[60px] object-contain"
+                    />
+                  ) : (
+                    <span>{p.name}</span>
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-white/90">Partners coming soon.</p>
+        )}
       </section>
     </div>
   );

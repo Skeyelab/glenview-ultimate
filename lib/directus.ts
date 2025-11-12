@@ -95,7 +95,7 @@ export async function getPeople(): Promise<Person[]> {
 
 export async function getPartners(): Promise<Partner[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch(`/items/partners?fields=*`);
+  const data = await directusFetch(`/items/partners?fields=*&sort[]=name`);
   return data?.data ?? [];
 }
 
