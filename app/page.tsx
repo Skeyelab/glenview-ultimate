@@ -13,10 +13,14 @@ export default async function HomePage() {
     getCurrentSeason(),
   ]);
 
-  const title = home?.hero_title ?? "Glenview Youth Ultimate";
-  const subtitle = home?.hero_subtitle ?? "Co-ed, 5th–8th Grade. Everyone is welcome. Everyone plays.";
+  const heroTitle = home?.hero_title ?? "The Fun Starts - Spring 2026";
+  const heroSubtitle = home?.hero_subtitle ?? "Introducing Glenview's very first Youth Ultimate Frisbee Club";
+  const heroTagline = home?.hero_tagline ?? "5th-8th Grade. Boys & Girls.";
+  const heroMessage1 = home?.hero_message1 ?? "Everyone is Welcome. Everyone Plays.";
+  const heroMessage2 = home?.hero_message2 ?? "Come play with us. Join our team.";
   const ctaLabel = home?.cta_label ?? "Register";
   const ctaUrl = home?.cta_url ?? "/register";
+  const preRegistrationText = home?.pre_registration_text ?? "Pre-Registration is now open";
 
   const highlights = season?.highlights ?? [];
   const logoUrl = getDirectusAssetUrl(LOGO_ID);
@@ -36,11 +40,15 @@ export default async function HomePage() {
             />
           </div>
         )}
-        <h1 className="text-3xl md:text-5xl font-bold text-white">{title}</h1>
-        <p className="text-lg text-white/90 max-w-2xl mx-auto">{subtitle}</p>
+        <h1 className="text-3xl md:text-5xl font-bold text-white">{heroTitle}</h1>
+        <p className="text-lg text-white/90 max-w-2xl mx-auto">{heroSubtitle}</p>
+        <p className="text-lg text-white/90 max-w-2xl mx-auto">{heroTagline}</p>
+        <p className="text-lg text-white/90 max-w-2xl mx-auto">{heroMessage1}</p>
+        <p className="text-lg text-white/90 max-w-2xl mx-auto">{heroMessage2}</p>
         <div className="mt-4">
           <Link className="button" href={ctaUrl}>{ctaLabel}</Link>
         </div>
+        <p className="text-sm text-white/70 mt-2">{preRegistrationText}</p>
         {season && (
           <p className="text-sm text-white/70 mt-2">
             {season.title || `${season.year} Season`} ({season.start_month || "Mar"}–{season.end_month || "May"})
