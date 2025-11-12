@@ -236,12 +236,12 @@ export default function RegisterPage() {
           <label className="label">Notes (optional)</label>
           <textarea className="textarea" rows={4} value={notes} onChange={e=>{ setNotes(e.target.value); }} />
           <label htmlFor="marketing-opt-in" className="text-sm text-white/90 flex items-center gap-2 cursor-pointer">
-            <input 
+            <input
               id="marketing-opt-in"
-              type="checkbox" 
-              checked={marketing_opt_in} 
-              onChange={e=>{ setOptIn(e.target.checked); }} 
-            /> 
+              type="checkbox"
+              checked={marketing_opt_in}
+              onChange={e=>{ setOptIn(e.target.checked); }}
+            />
             I agree to receive updates about the club.
           </label>
         </div>
