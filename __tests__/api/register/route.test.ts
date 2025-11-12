@@ -56,99 +56,7 @@ describe('/api/register', () => {
       body: JSON.stringify(body),
     })
 
-  describe('Turnstile verification', () => {
-    it('should reject request without Turnstile token', async () => {
-      const req = createRequest({
-        parent1_name: 'Test Parent',
-        parent1_email: 'test@example.com',
-      })
-
-      const response = await POST(req)
-      const data = await response.json()
-
-      expect(response.status).toBe(400)
-      expect(data.error).toBe('Verification token missing')
-    })
-
-    it('should reject request with invalid Turnstile token', async () => {
-      process.env.TURNSTILE_SECRET_KEY = 'test-secret'
-
-      // Mock Turnstile verification failure
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: false }),
-      })
-
-      const req = createRequest({
-        parent1_name: 'Test Parent',
-        parent1_email: 'test@example.com',
-        turnstile_token: 'invalid-token',
-      })
-
-      const response = await POST(req)
-      const data = await response.json()
-
-      expect(response.status).toBe(400)
-      expect(data.error).toBe('Verification failed. Please try again.')
-    })
-
-    it('should accept request with valid Turnstile token', async () => {
-      process.env.TURNSTILE_SECRET_KEY = 'test-secret'
-
-      // Mock Turnstile verification success
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
-        // Mock Directus success
-        .mockResolvedValueOnce({
-          ok: true,
-          text: async () => JSON.stringify({ data: { id: 1 } }),
-        })
-
-      const req = createRequest({
-        parent1_name: 'Test Parent',
-        parent1_email: 'test@example.com',
-        turnstile_token: 'valid-token',
-      })
-
-      const response = await POST(req)
-      const data = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(data.ok).toBe(true)
-    })
-
-    it('should skip verification when TURNSTILE_SECRET_KEY is not set', async () => {
-      delete process.env.TURNSTILE_SECRET_KEY
-
-      // Mock Directus success
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        text: async () => JSON.stringify({ data: { id: 1 } }),
-      })
-
-      const req = createRequest({
-        parent1_name: 'Test Parent',
-        parent1_email: 'test@example.com',
-        turnstile_token: 'any-token',
-      })
-
-      const response = await POST(req)
-      const data = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(data.ok).toBe(true)
-      // Should not call Turnstile API (only Directus)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
-
   describe('Directus integration', () => {
-    beforeEach(() => {
-      process.env.TURNSTILE_SECRET_KEY = 'test-secret'
-    })
 
     it('should return error when Directus credentials are missing', async () => {
       delete process.env.DIRECTUS_URL
@@ -156,7 +64,6 @@ describe('/api/register', () => {
       const req = createRequest({
         parent1_name: 'Test Parent',
         parent1_email: 'test@example.com',
-        turnstile_token: 'valid-token',
       })
 
       const response = await POST(req)
@@ -166,47 +73,9 @@ describe('/api/register', () => {
       expect(data.error).toBe('Server missing Directus credentials')
     })
 
-    it('should remove turnstile_token from payload before sending to Directus', async () => {
-      // Mock Turnstile verification success
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
-        // Mock Directus success
-        .mockResolvedValueOnce({
-          ok: true,
-          text: async () => JSON.stringify({ data: { id: 1 } }),
-        })
-
-      const req = createRequest({
-        parent1_name: 'Test Parent',
-        parent1_email: 'test@example.com',
-        turnstile_token: 'valid-token',
-        children: [],
-      })
-
-      await POST(req)
-
-      // Check that Directus was called without turnstile_token
-      const directusCall = (global.fetch as jest.Mock).mock.calls.find(
-        (call) => typeof call[0] === 'string' && call[0].includes('/items/registrations')
-      )
-      expect(directusCall).toBeDefined()
-      const requestBody = JSON.parse(directusCall![1].body as string)
-      expect(requestBody.turnstile_token).toBeUndefined()
-      expect(requestBody.parent1_name).toBe('Test Parent')
-    })
-
     it('should handle duplicate email error', async () => {
-      // Mock Turnstile verification success
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
-        // Mock Directus duplicate error
-        .mockResolvedValueOnce({
+      // Mock Directus duplicate error
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: false,
           status: 400,
           text: async () =>
@@ -226,7 +95,6 @@ describe('/api/register', () => {
       const req = createRequest({
         parent1_name: 'Test Parent',
         parent1_email: 'test@example.com',
-        turnstile_token: 'valid-token',
       })
 
       const response = await POST(req)
@@ -238,14 +106,8 @@ describe('/api/register', () => {
     })
 
     it('should handle successful registration', async () => {
-      // Mock Turnstile verification success
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
-        // Mock Directus success
-        .mockResolvedValueOnce({
+      // Mock Directus success
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
           text: async () => JSON.stringify({ data: { id: 123 } }),
         })
@@ -253,7 +115,6 @@ describe('/api/register', () => {
       const req = createRequest({
         parent1_name: 'Test Parent',
         parent1_email: 'test@example.com',
-        turnstile_token: 'valid-token',
         children: [{ full_name: 'Child 1' }],
       })
 
