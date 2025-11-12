@@ -11,6 +11,8 @@ export interface Page {
   cta_label?: string | null;
   cta_url?: string | null;
   content?: string | null;
+  club_description?: string | null;
+  what_kids_learn?: string[] | null;
 }
 
 export interface Partner {
@@ -101,6 +103,12 @@ async function directusFetch<T>(path: string, init?: RequestInit): Promise<Direc
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
   const data = await directusFetch<Page>(`/items/pages?filter[slug][_eq]=home&limit=1&fields=*`);
+  return data.data[0] ?? null;
+}
+
+export async function getAboutPage(): Promise<Page | null> {
+  if (!haveEnv()) return null;
+  const data = await directusFetch<Page>(`/items/pages?filter[slug][_eq]=about&limit=1&fields=*`);
   return data.data[0] ?? null;
 }
 
