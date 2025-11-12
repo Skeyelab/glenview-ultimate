@@ -62,9 +62,21 @@ can be managed from Directus.
 1. Copy `.env.example` to `.env.local` and fill:
    ```ini
    DIRECTUS_URL=https://your-directus.example.com
+   NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
    DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
    NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+   NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+   TURNSTILE_SECRET_KEY=your_turnstile_secret_key
    ```
+
+   **Note:** `NEXT_PUBLIC_DIRECTUS_URL` is needed for client components (like the navbar logo) to access Directus assets. It should match `DIRECTUS_URL`.
+
+   **Cloudflare Turnstile** (bot protection):
+   - Get your keys from https://dash.cloudflare.com → Turnstile
+   - Create a site and copy the Site Key and Secret Key
+   - Add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public, used in frontend)
+   - Add `TURNSTILE_SECRET_KEY` (private, used for server-side verification)
+   - If keys are not set, the form will still work but verification will be skipped (development mode)
 2. Install and run:
    ```bash
    npm i
@@ -85,7 +97,7 @@ can be managed from Directus.
 ## 4) Hardening & production notes
 
 - Create a **separate static token** with the minimum scope (create on `registrations` only).
-- Turn on **rate limiting**/bot protection (Cloudflare Turnstile or hCaptcha on the form, add server-side verification in `/api/register`).
+- **Cloudflare Turnstile** is already integrated on the registration form with server-side verification in `/api/register`.
 - Add field **validation** in Directus (required, email format, etc.).
 - Add **CORS** settings in Directus if you later move to direct client reads.
 - Use **revalidate** or on-demand revalidation webhooks for fresher content.
