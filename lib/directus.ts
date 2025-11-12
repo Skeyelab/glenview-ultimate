@@ -38,9 +38,9 @@ export interface NewsPost {
   id: number;
   slug: string;
   title: string;
-  published_at?: string | null;
+  published_at: string;
   excerpt?: string | null;
-  content?: string | null; // markdown or HTML
+  content: string; // markdown or HTML
 }
 
 function getDirectusUrl(): string {

@@ -1,4 +1,5 @@
 import { getHomePage, getPartners, getPeople, getCurrentSeason, getDirectusAssetUrl } from "@/lib/directus";
+import { LOGO_ID } from "@/lib/config";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,8 +19,6 @@ export default async function HomePage() {
   const ctaUrl = home?.cta_url ?? "/register";
 
   const highlights = season?.highlights ?? [];
-
-  const LOGO_ID = "c3db7679-c7b9-4d7d-add9-761a96e59b86";
   const logoUrl = getDirectusAssetUrl(LOGO_ID);
 
   return (
