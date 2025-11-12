@@ -35,11 +35,9 @@ Tests are located in the `__tests__` directory, mirroring the source structure:
 ### ✅ Implemented
 
 1. **API Route Tests** (`__tests__/api/register/route.test.ts`)
-   - Turnstile token verification (valid/invalid/missing)
    - Missing Directus credentials handling
    - Successful registration flow
    - Duplicate email error handling
-   - Payload sanitization (removing turnstile_token)
 
 2. **Directus Helper Tests** (`__tests__/lib/directus.test.ts`)
    - `getDirectusAssetUrl()` function
@@ -50,10 +48,10 @@ Tests are located in the `__tests__` directory, mirroring the source structure:
 
 1. **Registration Form Component** (`app/register/page.tsx`)
    - Form validation
-   - Turnstile widget integration
    - Form submission flow
    - Error message display
    - Child addition/removal
+   - Parent addition/removal
 
 2. **Navbar Component** (`components/navbar.tsx`)
    - Logo rendering
@@ -113,7 +111,6 @@ describe('/api/register', () => {
 ## Mocking
 
 - **Next.js Router**: Mocked in `jest.setup.js`
-- **Turnstile**: Mocked in `jest.setup.js`
 - **Fetch API**: Mocked per test using `global.fetch = jest.fn()`
 - **Environment Variables**: Set/unset per test using `process.env`
 

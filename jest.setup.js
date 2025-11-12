@@ -19,10 +19,3 @@ jest.mock('next/navigation', () => ({
     return '/'
   },
 }))
-
-// Mock window.turnstile for tests
-global.window = global.window || {}
-global.window.turnstile = {
-  render: jest.fn(() => 'widget-id'),
-  reset: jest.fn(),
-}
