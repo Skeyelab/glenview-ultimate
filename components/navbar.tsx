@@ -1,4 +1,5 @@
 'use client';
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -13,7 +14,7 @@ const links = [
   { href: "/news", label: "News" },
 ];
 
-export function Navbar() {
+export function Navbar(): React.JSX.Element {
   const pathname = usePathname();
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
   const logoUrl = directusUrl ? getDirectusAssetUrl(LOGO_ID) : null;

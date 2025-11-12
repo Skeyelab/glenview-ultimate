@@ -1,3 +1,4 @@
+import React from "react";
 import { getNewsBySlug } from "@/lib/directus";
 import { marked } from "marked";
 import { notFound } from "next/navigation";
@@ -5,7 +6,7 @@ import sanitizeHtml from "sanitize-html";
 
 export const revalidate = 300;
 
-export default async function NewsPostPage({ params }: { params: { slug: string } }) {
+export default async function NewsPostPage({ params }: { params: { slug: string } }): Promise<React.JSX.Element> {
   const post = await getNewsBySlug(params.slug);
   if (!post) return notFound();
 
