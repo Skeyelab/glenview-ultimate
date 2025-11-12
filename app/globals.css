@@ -6,20 +6,25 @@
 :root { color-scheme: light; }
 
 @layer base {
-  html, body { @apply min-h-screen bg-white text-slate-900 antialiased; }
+  html, body {
+    @apply min-h-screen antialiased;
+    background-color: #175230;
+    color: #ffffff;
+  }
   a { @apply text-inherit no-underline; }
   *, *::before, *::after { @apply box-border; }
   input, select, textarea, button { @apply font-sans; }
 }
 
 @layer components {
-  .button { @apply inline-flex items-center justify-center rounded-lg border border-slate-900 bg-slate-900 px-4 py-2 text-white text-sm font-medium; }
-  .button.secondary { @apply bg-white text-slate-900; }
-  .input { @apply w-full rounded-lg border-slate-300 px-3 py-2; }
-  .select { @apply w-full rounded-lg border-slate-300 px-3 py-2; }
-  .textarea { @apply w-full rounded-lg border-slate-300 px-3 py-2; }
-  .label { @apply block text-slate-800 text-sm mb-1; }
-  .card { @apply rounded-xl border border-slate-200 p-4; }
-  .notice { @apply rounded-lg border border-slate-200 bg-slate-50 p-4; }
+  .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-[#175230] text-sm font-medium hover:bg-white/90 transition-colors; }
+  .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10; }
+  .input { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
+  .select { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2; }
+  .select option { @apply bg-[#175230] text-white; }
+  .textarea { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
+  .label { @apply block text-white text-sm mb-1; }
+  .card { @apply rounded-xl border border-white/20 bg-white/5 p-4; }
+  .notice { @apply rounded-lg border border-white/20 bg-white/10 p-4; }
   .grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
 }

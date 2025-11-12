@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-white text-slate-900 antialiased">
-        <header className="border-b">
+      <body className="min-h-screen antialiased" style={{ backgroundColor: '#175230', color: '#ffffff' }}>
+        <header className="border-b border-white/20">
           <Navbar />
         </header>
         <main className="container py-10">{children}</main>
-        <footer className="border-t mt-16">
-          <div className="container py-8 text-sm text-slate-600">
+        <footer className="border-t border-white/20 mt-16">
+          <div className="container py-8 text-sm text-white/70">
             © {new Date().getFullYear()} Glenview Ultimate
           </div>
         </footer>

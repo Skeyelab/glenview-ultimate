@@ -71,6 +71,7 @@ async function directusFetch(path: string, init?: RequestInit) {
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
   const data = await directusFetch(`/items/pages?filter[slug][_eq]=home&limit=1&fields=*`);
+  if (!data) return null;
   return data?.data?.[0] ?? null;
 }
 
@@ -104,4 +105,13 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   if (!haveEnv()) return null;
   const data = await directusFetch(`/items/news?filter[slug][_eq]=${encodeURIComponent(slug)}&limit=1&fields=*`);
   return data?.data?.[0] ?? null;
+}
+
+// Helper to get Directus asset URL from file UUID
+// Use NEXT_PUBLIC_DIRECTUS_URL for client components, DIRECTUS_URL for server components
+export function getDirectusAssetUrl(fileId: string | null | undefined): string | null {
+  if (!fileId) return null;
+  const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || DIRECTUS_URL;
+  if (!baseUrl) return null;
+  return `${baseUrl}/assets/${fileId}`;
 }
