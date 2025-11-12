@@ -14,7 +14,7 @@ export default async function HomePage() {
 
   const title = home?.hero_title ?? "Glenview Youth Ultimate";
   const subtitle = home?.hero_subtitle ?? "Co-ed, 5th–8th Grade. Everyone is welcome. Everyone plays.";
-  const ctaLabel = home?.cta_label ?? "Pre-Register";
+  const ctaLabel = home?.cta_label ?? "Register";
   const ctaUrl = home?.cta_url ?? "/register";
 
   const highlights = season?.highlights ?? [];

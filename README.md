@@ -3,7 +3,7 @@
 [![CI](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml)
 
 This is a minimal, production-ready starter that connects a Next.js front-end to a Directus CMS back-end.
-It includes a pre-registration form that writes to a `registrations` collection and public pages that
+It includes a registration form that writes to a `registrations` collection and public pages that
 can be managed from Directus.
 
 ## 1) Directus quick setup

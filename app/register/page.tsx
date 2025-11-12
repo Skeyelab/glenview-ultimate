@@ -17,12 +17,12 @@ declare global {
   }
 }
 
-type Child = {
+interface Child {
   full_name: string;
   age?: string;
   experience?: "beginner" | "intermediate" | "advanced";
   availability?: string[];
-};
+}
 
 export default function RegisterPage() {
   const [parent1_name, setP1Name] = useState("");
@@ -81,7 +81,7 @@ export default function RegisterPage() {
         }
         throw new Error(body?.error || "Failed");
       }
-      setStatus("✅ Thanks! Your pre‑registration was received.");
+      setStatus("✅ Thanks! Your registration was received.");
       setErrorField(null);
       setTurnstileToken(null);
       // Reset Turnstile widget
@@ -120,16 +120,16 @@ export default function RegisterPage() {
           }
         }}
       />
-      <h1 className="text-3xl font-bold text-white">Pre‑Registration</h1>
+      <h1 className="text-3xl font-bold text-white">Registration</h1>
       <p className="text-white/90">Tell us about your family. You can add up to three kids.</p>
 
-      <form onSubmit={submit} className="grid gap-6">
+      <form onSubmit={(e) => { e.preventDefault(); void submit(e); }} className="grid gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="card grid gap-4">
             <h2 className="text-lg font-semibold text-white">Parent / Guardian 1</h2>
             <div>
               <label className="label">Full Name</label>
-              <input className="input" value={parent1_name} onChange={e=>setP1Name(e.target.value)} required />
+              <input className="input" value={parent1_name} onChange={e=>{ setP1Name(e.target.value); }} required />
             </div>
             <div>
               <label className="label">Email</label>
@@ -146,7 +146,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label className="label">Cell</label>
-              <input className="input" value={parent1_phone} onChange={e=>setP1Phone(e.target.value)} />
+              <input className="input" value={parent1_phone} onChange={e=>{ setP1Phone(e.target.value); }} />
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function RegisterPage() {
             <h2 className="text-lg font-semibold text-white">Parent / Guardian 2 (optional)</h2>
             <div>
               <label className="label">Full Name</label>
-              <input className="input" value={parent2_name} onChange={e=>setP2Name(e.target.value)} />
+              <input className="input" value={parent2_name} onChange={e=>{ setP2Name(e.target.value); }} />
             </div>
             <div>
               <label className="label">Email</label>
@@ -170,7 +170,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label className="label">Cell</label>
-              <input className="input" value={parent2_phone} onChange={e=>setP2Phone(e.target.value)} />
+              <input className="input" value={parent2_phone} onChange={e=>{ setP2Phone(e.target.value); }} />
             </div>
           </div>
         </div>
@@ -185,17 +185,20 @@ export default function RegisterPage() {
               <div className="grid grid-2">
                 <div>
                   <label className="label">Child Full Name</label>
-                  <input className="input" value={child.full_name} onChange={e=>updateChild(i, { full_name: e.target.value })} required />
+                  <input className="input" value={child.full_name} onChange={e=>{ updateChild(i, { full_name: e.target.value }); }} required />
                 </div>
                 <div>
                   <label className="label">Age</label>
-                  <input className="input" value={child.age||""} onChange={e=>updateChild(i, { age: e.target.value })} />
+                  <input className="input" value={child.age||""} onChange={e=>{ updateChild(i, { age: e.target.value }); }} />
                 </div>
               </div>
               <div className="grid grid-2">
                 <div>
                   <label className="label">Experience</label>
-                  <select className="select" value={child.experience||""} onChange={e=>updateChild(i, { experience: e.target.value as any })}>
+                  <select className="select" value={child.experience||""} onChange={e=>{
+                    const {value} = e.target;
+                    updateChild(i, { experience: (value === "beginner" || value === "intermediate" || value === "advanced") ? value : undefined });
+                  }}>
                     <option value="">Select…</option>
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
@@ -221,16 +224,16 @@ export default function RegisterPage() {
                   </div>
                 </div>
               </div>
-              {children.length > 1 && <button type="button" className="button secondary" onClick={()=>removeChild(i)}>Remove</button>}
+              {children.length > 1 && <button type="button" className="button secondary" onClick={()=>{ removeChild(i); }}>Remove</button>}
             </div>
           ))}
         </div>
 
         <div className="card grid gap-3">
           <label className="label">Notes (optional)</label>
-          <textarea className="textarea" rows={4} value={notes} onChange={e=>setNotes(e.target.value)} />
+          <textarea className="textarea" rows={4} value={notes} onChange={e=>{ setNotes(e.target.value); }} />
           <label className="text-sm text-white/90">
-            <input type="checkbox" checked={marketing_opt_in} onChange={e=>setOptIn(e.target.checked)} /> I agree to receive updates about the club.
+            <input type="checkbox" checked={marketing_opt_in} onChange={e=>{ setOptIn(e.target.checked); }} /> I agree to receive updates about the club.
           </label>
         </div>
 
@@ -240,7 +243,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" className="button">Submit Pre‑Registration</button>
+          <button type="submit" className="button">Submit Registration</button>
           {status && <span className="text-sm text-white/90">{status}</span>}
         </div>
       </form>

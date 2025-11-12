@@ -1,5 +1,3 @@
-import { getDirectusAssetUrl } from '@/lib/directus'
-
 describe('getDirectusAssetUrl', () => {
   const originalEnv = process.env
 
