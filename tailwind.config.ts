@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'brand-green': '#175230',
+      },
       container: {
         center: true,
         padding: "1rem",

@@ -25,7 +25,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run linter
-        run: yarn lint
+        run: yarn standard:check
 
       - name: Run tests
         run: yarn test --coverage --watchAll=false --ci
@@ -55,6 +55,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'yarn'
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package.json') }}-
+            ${{ runner.os }}-nextjs-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile

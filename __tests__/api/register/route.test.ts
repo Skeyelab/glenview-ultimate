@@ -1,5 +1,8 @@
 // Mock fetch before importing route to avoid Request/Response issues
 // This needs to happen before Next.js server code is loaded
+import { POST } from '@/app/api/register/route'
+import { NextRequest } from 'next/server'
+
 global.fetch = jest.fn()
 
 // Mock Next.js server modules that use Web APIs
@@ -31,9 +34,6 @@ jest.mock('next/server', () => ({
   },
 }))
 
-import { POST } from '@/app/api/register/route'
-import { NextRequest } from 'next/server'
-
 describe('/api/register', () => {
   const originalEnv = process.env
 
@@ -50,18 +50,14 @@ describe('/api/register', () => {
     process.env = originalEnv
   })
 
-  const createRequest = (body: any) => {
-    return new NextRequest('http://localhost/api/register', {
+  const createRequest = (body: any) => new NextRequest('http://localhost/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-  }
 
   describe('Turnstile verification', () => {
     it('should reject request without Turnstile token', async () => {
-      process.env.TURNSTILE_SECRET_KEY = 'test-secret'
-
       const req = createRequest({
         parent1_name: 'Test Parent',
         parent1_email: 'test@example.com',
