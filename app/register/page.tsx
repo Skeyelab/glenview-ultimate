@@ -56,7 +56,9 @@ export default function RegisterPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!turnstileToken) {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    // Only require token if Turnstile is configured
+    if (siteKey && !turnstileToken) {
       setStatus("❌ Please complete the verification");
       return;
     }
@@ -104,9 +106,10 @@ export default function RegisterPage() {
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         strategy="lazyOnload"
         onLoad={() => {
-          if (window.turnstile && turnstileRef.current) {
+          const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+          if (window.turnstile && turnstileRef.current && siteKey) {
             window.turnstile.render(turnstileRef.current, {
-              sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
+              sitekey: siteKey,
               callback: (token: string) => {
                 setTurnstileToken(token);
               },
@@ -232,8 +235,14 @@ export default function RegisterPage() {
         <div className="card grid gap-3">
           <label className="label">Notes (optional)</label>
           <textarea className="textarea" rows={4} value={notes} onChange={e=>{ setNotes(e.target.value); }} />
-          <label className="text-sm text-white/90">
-            <input type="checkbox" checked={marketing_opt_in} onChange={e=>{ setOptIn(e.target.checked); }} /> I agree to receive updates about the club.
+          <label htmlFor="marketing-opt-in" className="text-sm text-white/90 flex items-center gap-2 cursor-pointer">
+            <input 
+              id="marketing-opt-in"
+              type="checkbox" 
+              checked={marketing_opt_in} 
+              onChange={e=>{ setOptIn(e.target.checked); }} 
+            /> 
+            I agree to receive updates about the club.
           </label>
         </div>
 

@@ -2,9 +2,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { LOGO_ID } from "@/lib/config";
+import { getDirectusAssetUrl } from "@/lib/directus";
 
 const links = [
   { href: "/", label: "Home" },
@@ -12,18 +13,10 @@ const links = [
   { href: "/news", label: "News" },
 ];
 
-const LOGO_ID = "c3db7679-c7b9-4d7d-add9-761a96e59b86";
-
 export function Navbar() {
   const pathname = usePathname();
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
-    if (directusUrl) {
-      setLogoUrl(`${directusUrl}/assets/${LOGO_ID}`);
-    }
-  }, []);
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+  const logoUrl = directusUrl ? getDirectusAssetUrl(LOGO_ID) : null;
 
   return (
     <div className="container py-4 flex items-center justify-between">
