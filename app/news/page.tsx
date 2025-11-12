@@ -1,9 +1,10 @@
+import React from "react";
 import Link from "next/link";
 import { getNewsList } from "@/lib/directus";
 
 export const revalidate = 300;
 
-export default async function NewsIndex() {
+export default async function NewsIndex(): Promise<React.JSX.Element> {
   const posts = await getNewsList();
 
   return (

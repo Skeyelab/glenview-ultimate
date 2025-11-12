@@ -15,7 +15,7 @@ interface Parent {
   phone: string;
 }
 
-export default function RegisterPage() {
+export default function RegisterPage(): React.JSX.Element {
   const [parents, setParents] = useState<Parent[]>([{ name: "", email: "", phone: "" }]);
   const [children, setChildren] = useState<Child[]>([{ full_name: "", availability: [] }]);
   const [notes, setNotes] = useState("");
@@ -25,20 +25,20 @@ export default function RegisterPage() {
 
   const weekdays = ["Mon","Tue","Wed","Thu","Fri"];
 
-  function updateChild(i: number, patch: Partial<Child>) {
+  function updateChild(i: number, patch: Partial<Child>): void {
     setChildren(prev => prev.map((c, idx) => idx === i ? { ...c, ...patch } : c));
   }
 
-  function addChild() {
+  function addChild(): void {
     if (children.length >= 3) return;
     setChildren(prev => [...prev, { full_name: "", availability: [] }]);
   }
 
-  function removeChild(i: number) {
+  function removeChild(i: number): void {
     setChildren(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  function updateParent(i: number, patch: Partial<Parent>) {
+  function updateParent(i: number, patch: Partial<Parent>): void {
     setParents(prev => prev.map((p, idx) => idx === i ? { ...p, ...patch } : p));
     // Clear error field if editing the parent that had an error
     if (errorField && patch.email !== undefined) {
@@ -49,12 +49,12 @@ export default function RegisterPage() {
     }
   }
 
-  function addParent() {
+  function addParent(): void {
     if (parents.length >= 2) return;
     setParents(prev => [...prev, { name: "", email: "", phone: "" }]);
   }
 
-  function removeParent(i: number) {
+  function removeParent(i: number): void {
     if (parents.length <= 1) return; // Require at least one parent
     // Clear error field if removing the parent that had an error
     const fieldName = i === 0 ? "parent1_email" : "parent2_email";
@@ -64,7 +64,7 @@ export default function RegisterPage() {
     setParents(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     setStatus("Submitting...");
     setErrorField(null);
@@ -93,18 +93,20 @@ export default function RegisterPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const body = await res.json();
+      const body: unknown = await res.json();
       if (!res.ok) {
         // Handle duplicate email error
-        if (body?.code === "DUPLICATE_EMAIL" && body?.field) {
+        if (typeof body === 'object' && body !== null && 'code' in body && body.code === "DUPLICATE_EMAIL" && 'field' in body && typeof body.field === 'string') {
           setErrorField(body.field);
         }
-        throw new Error(body?.error || "Failed");
+        const errorMessage = (typeof body === 'object' && body !== null && 'error' in body && typeof body.error === 'string') ? body.error : "Failed";
+        throw new Error(errorMessage);
       }
       setStatus("✅ Thanks! Your registration was received.");
       setErrorField(null);
-    } catch (err:any) {
-      setStatus("❌ " + err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      setStatus("❌ " + errorMessage);
     }
   }
 
@@ -173,13 +175,13 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label className="label">Age</label>
-                  <input className="input" value={child.age||""} onChange={e=>{ updateChild(i, { age: e.target.value }); }} />
+                  <input className="input" value={child.age ?? ""} onChange={e=>{ updateChild(i, { age: e.target.value }); }} />
                 </div>
               </div>
               <div className="grid grid-2">
                 <div>
                   <label className="label">Experience</label>
-                  <select className="select" value={child.experience||""} onChange={e=>{
+                  <select className="select" value={child.experience ?? ""} onChange={e=>{
                     const {value} = e.target;
                     updateChild(i, { experience: (value === "beginner" || value === "intermediate" || value === "advanced") ? value : undefined });
                   }}>
@@ -196,9 +198,9 @@ export default function RegisterPage() {
                       <label key={day} className="text-sm text-white/90">
                         <input
                           type="checkbox"
-                          checked={child.availability?.includes(day) || false}
+                          checked={child.availability?.includes(day) ?? false}
                           onChange={(e)=>{
-                            const current = new Set(child.availability || []);
+                            const current = new Set(child.availability ?? []);
                             if (e.target.checked) current.add(day); else current.delete(day);
                             updateChild(i, { availability: Array.from(current) });
                           }}

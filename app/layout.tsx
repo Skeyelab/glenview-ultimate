@@ -4,11 +4,11 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_SITE_NAME || "Glenview Ultimate",
+  title: process.env.NEXT_PUBLIC_SITE_NAME ?? "Glenview Ultimate",
   description: "Youth Ultimate Frisbee in Glenview, IL",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
     <html lang="en">
       <body className="min-h-screen antialiased bg-brand-green text-white">
