@@ -1,7 +1,9 @@
 # Glenview Ultimate — Next.js + Directus starter (Tailwind)
 
+[![CI](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml)
+
 This is a minimal, production-ready starter that connects a Next.js front-end to a Directus CMS back-end.
-It includes a pre-registration form that writes to a `registrations` collection and public pages that
+It includes a registration form that writes to a `registrations` collection and public pages that
 can be managed from Directus.
 
 ## 1) Directus quick setup
@@ -62,9 +64,21 @@ can be managed from Directus.
 1. Copy `.env.example` to `.env.local` and fill:
    ```ini
    DIRECTUS_URL=https://your-directus.example.com
+   NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
    DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
    NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+   NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+   TURNSTILE_SECRET_KEY=your_turnstile_secret_key
    ```
+
+   **Note:** `NEXT_PUBLIC_DIRECTUS_URL` is needed for client components (like the navbar logo) to access Directus assets. It should match `DIRECTUS_URL`.
+
+   **Cloudflare Turnstile** (bot protection):
+   - Get your keys from https://dash.cloudflare.com → Turnstile
+   - Create a site and copy the Site Key and Secret Key
+   - Add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public, used in frontend)
+   - Add `TURNSTILE_SECRET_KEY` (private, used for server-side verification)
+   - If keys are not set, the form will still work but verification will be skipped (development mode)
 2. Install and run:
    ```bash
    npm i
@@ -85,10 +99,46 @@ can be managed from Directus.
 ## 4) Hardening & production notes
 
 - Create a **separate static token** with the minimum scope (create on `registrations` only).
-- Turn on **rate limiting**/bot protection (Cloudflare Turnstile or hCaptcha on the form, add server-side verification in `/api/register`).
+- **Cloudflare Turnstile** is already integrated on the registration form with server-side verification in `/api/register`.
 - Add field **validation** in Directus (required, email format, etc.).
 - Add **CORS** settings in Directus if you later move to direct client reads.
 - Use **revalidate** or on-demand revalidation webhooks for fresher content.
 - Host Next.js on Vercel, Fly.io, Render, or your own infra.
 
 Happy building!
+
+---
+
+## Directus: new collections for Homepage & News
+
+### `seasons`
+- `year` (integer, unique or sortable)
+- `title` (string, optional) — e.g., "Spring 2026"
+- `highlights` (JSON, array of strings) — e.g., ["12 weeks of practice", "3–4 tournaments"]
+- `start_month` (string, optional) — e.g., "March"
+- `end_month` (string, optional) — e.g., "May"
+
+> The homepage reads the **latest** season by `year` and prints `highlights` as bullets.
+
+### `news`
+- `title` (string, required)
+- `slug` (string, unique, required)
+- `published_at` (datetime, required)
+- `excerpt` (text, optional)
+- `content` (text, required) — supports **Markdown**; rendered with `marked` and styled via Tailwind **typography** (`prose`).
+
+Routes:
+- `/news` — lists posts (newest first)
+- `/news/[slug]` — post detail
+
+> To use Markdown links/images, just write standard Markdown in `content`.
+
+## shadcn/ui-style components
+
+Included lightweight components inspired by shadcn/ui:
+- `components/ui/button.tsx` (with `class-variance-authority`)
+- `components/ui/input.tsx`, `components/ui/textarea.tsx`, `components/ui/label.tsx`
+- `components/ui/card.tsx`
+- `components/navbar.tsx` (adds a top nav)
+
+These are zero-config and Tailwind-native. You can swap in full shadcn/ui CLI components later if you prefer.
