@@ -4,6 +4,10 @@ export interface Page {
   title: string;
   hero_title?: string | null;
   hero_subtitle?: string | null;
+  hero_tagline?: string | null;
+  hero_message1?: string | null;
+  hero_message2?: string | null;
+  pre_registration_text?: string | null;
   cta_label?: string | null;
   cta_url?: string | null;
   content?: string | null;
