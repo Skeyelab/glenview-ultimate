@@ -24,14 +24,14 @@ interface Child {
   availability?: string[];
 }
 
+interface Parent {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export default function RegisterPage() {
-  const [parent1_name, setP1Name] = useState("");
-  const [parent1_email, setP1Email] = useState("");
-  const [parent1_phone, setP1Phone] = useState("");
-  const [hasParent2, setHasParent2] = useState(false);
-  const [parent2_name, setP2Name] = useState("");
-  const [parent2_email, setP2Email] = useState("");
-  const [parent2_phone, setP2Phone] = useState("");
+  const [parents, setParents] = useState<Parent[]>([{ name: "", email: "", phone: "" }]);
   const [children, setChildren] = useState<Child[]>([{ full_name: "", availability: [] }]);
   const [notes, setNotes] = useState("");
   const [marketing_opt_in, setOptIn] = useState(false);
@@ -55,16 +55,30 @@ export default function RegisterPage() {
     setChildren(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  function addParent2() {
-    setHasParent2(true);
+  function updateParent(i: number, patch: Partial<Parent>) {
+    setParents(prev => prev.map((p, idx) => idx === i ? { ...p, ...patch } : p));
+    // Clear error field if editing the parent that had an error
+    if (errorField && patch.email !== undefined) {
+      const fieldName = i === 0 ? "parent1_email" : "parent2_email";
+      if (errorField === fieldName) {
+        setErrorField(null);
+      }
+    }
   }
 
-  function removeParent2() {
-    setHasParent2(false);
-    setP2Name("");
-    setP2Email("");
-    setP2Phone("");
-    if (errorField === "parent2_email") setErrorField(null);
+  function addParent() {
+    if (parents.length >= 2) return;
+    setParents(prev => [...prev, { name: "", email: "", phone: "" }]);
+  }
+
+  function removeParent(i: number) {
+    if (parents.length <= 1) return; // Require at least one parent
+    // Clear error field if removing the parent that had an error
+    const fieldName = i === 0 ? "parent1_email" : "parent2_email";
+    if (errorField === fieldName) {
+      setErrorField(null);
+    }
+    setParents(prev => prev.filter((_, idx) => idx !== i));
   }
 
   async function submit(e: React.FormEvent) {
@@ -78,15 +92,30 @@ export default function RegisterPage() {
     setStatus("Submitting...");
     setErrorField(null);
     try {
+      // Map parents array to parent1_* and parent2_* fields
+      const payload: Record<string, unknown> = {
+        children, notes, marketing_opt_in,
+        turnstile_token: turnstileToken,
+      };
+
+      // Always include parent1 fields (at least one parent required)
+      if (parents[0]) {
+        payload.parent1_name = parents[0].name;
+        payload.parent1_email = parents[0].email;
+        payload.parent1_phone = parents[0].phone;
+      }
+
+      // Include parent2 fields if second parent exists
+      if (parents[1]) {
+        payload.parent2_name = parents[1].name;
+        payload.parent2_email = parents[1].email;
+        payload.parent2_phone = parents[1].phone;
+      }
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          parent1_name, parent1_email, parent1_phone,
-          ...(hasParent2 && { parent2_name, parent2_email, parent2_phone }),
-          children, notes, marketing_opt_in,
-          turnstile_token: turnstileToken,
-        }),
+        body: JSON.stringify(payload),
       });
       const body = await res.json();
       if (!res.ok) {
@@ -140,64 +169,49 @@ export default function RegisterPage() {
       <p className="text-white/90">Tell us about your family. You can add up to three kids.</p>
 
       <form onSubmit={(e) => { e.preventDefault(); void submit(e); }} className="grid gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card grid gap-4">
-            <h2 className="text-lg font-semibold text-white">Parent / Guardian 1</h2>
-            <div>
-              <label className="label">Full Name</label>
-              <input className="input" value={parent1_name} onChange={e=>{ setP1Name(e.target.value); }} required />
-            </div>
-            <div>
-              <label className="label">Email</label>
-              <input
-                className={`input ${errorField === "parent1_email" ? "border-red-500" : ""}`}
-                type="email"
-                value={parent1_email}
-                onChange={e=>{
-                  setP1Email(e.target.value);
-                  if (errorField === "parent1_email") setErrorField(null);
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label className="label">Cell</label>
-              <input className="input" value={parent1_phone} onChange={e=>{ setP1Phone(e.target.value); }} />
-            </div>
+        <div className="card grid gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Parents / Guardians</h2>
+            {parents.length < 2 && <button type="button" className="button secondary" onClick={addParent}>+ Add second parent / guardian</button>}
           </div>
-
-          {hasParent2 ? (
-            <div className="card grid gap-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white">Parent / Guardian 2</h2>
-                <button type="button" className="button secondary" onClick={removeParent2}>Remove</button>
-              </div>
-              <div>
-                <label className="label">Full Name</label>
-                <input className="input" value={parent2_name} onChange={e=>{ setP2Name(e.target.value); }} />
-              </div>
-              <div>
-                <label className="label">Email</label>
-                <input
-                  className={`input ${errorField === "parent2_email" ? "border-red-500" : ""}`}
-                  type="email"
-                  value={parent2_email}
-                  onChange={e=>{
-                    setP2Email(e.target.value);
-                    if (errorField === "parent2_email") setErrorField(null);
-                  }}
-                />
+          {parents.map((parent, i) => (
+            <div key={i} className="border border-white/20 rounded p-3 grid gap-3">
+              <div className="grid grid-2">
+                <div>
+                  <label className="label">Full Name</label>
+                  <input
+                    className="input"
+                    value={parent.name}
+                    onChange={e=>{ updateParent(i, { name: e.target.value }); }}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="label">Email</label>
+                  <input
+                    className={`input ${errorField === (i === 0 ? "parent1_email" : "parent2_email") ? "border-red-500" : ""}`}
+                    type="email"
+                    value={parent.email}
+                    onChange={e=>{
+                      updateParent(i, { email: e.target.value });
+                      const fieldName = i === 0 ? "parent1_email" : "parent2_email";
+                      if (errorField === fieldName) setErrorField(null);
+                    }}
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label className="label">Cell</label>
-                <input className="input" value={parent2_phone} onChange={e=>{ setP2Phone(e.target.value); }} />
+                <input
+                  className="input"
+                  value={parent.phone}
+                  onChange={e=>{ updateParent(i, { phone: e.target.value }); }}
+                />
               </div>
+              {parents.length > 1 && <button type="button" className="button secondary" onClick={()=>{ removeParent(i); }}>Remove</button>}
             </div>
-          ) : (
-            <div className="card flex items-center justify-center">
-              <button type="button" className="button secondary" onClick={addParent2}>+ Add second parent / guardian</button>
-            </div>
-          )}
+          ))}
         </div>
 
         <div className="card grid gap-4">
