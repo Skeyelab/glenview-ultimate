@@ -1,4 +1,4 @@
-export type Page = {
+export interface Page {
   id: number;
   slug: string;
   title: string;
@@ -7,65 +7,77 @@ export type Page = {
   cta_label?: string | null;
   cta_url?: string | null;
   content?: string | null;
-};
+}
 
-export type Partner = {
+export interface Partner {
   id: number;
   name: string;
   url: string;
   logo?: string | null;
-};
+}
 
-export type Person = {
+export interface Person {
   id: number;
   name: string;
   role: string;
   email?: string | null;
   bio?: string | null;
   photo?: string | null;
-};
+}
 
-export type Season = {
+export interface Season {
   id: number;
   year: number;
   title?: string | null;
   highlights?: string[] | null; // array of bullet points
   start_month?: string | null;  // e.g., "March"
   end_month?: string | null;    // e.g., "May"
-};
+}
 
-export type NewsPost = {
+export interface NewsPost {
   id: number;
   slug: string;
   title: string;
   published_at?: string | null;
   excerpt?: string | null;
   content?: string | null; // markdown or HTML
-};
+}
 
-const DIRECTUS_URL = process.env.DIRECTUS_URL!;
-const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
+function getDirectusUrl(): string {
+  const url = process.env.DIRECTUS_URL;
+  if (!url) throw new Error("DIRECTUS_URL not configured");
+  return url;
+}
+
+function getDirectusToken(): string | undefined {
+  return process.env.DIRECTUS_STATIC_TOKEN;
+}
 
 function haveEnv() {
-  return Boolean(DIRECTUS_URL && DIRECTUS_TOKEN);
+  return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
 async function directusFetch(path: string, init?: RequestInit) {
-  if(!DIRECTUS_URL) throw new Error("DIRECTUS_URL not configured");
-  const res = await fetch(`${DIRECTUS_URL}${path}`, {
+  const url = getDirectusUrl();
+  const token = getDirectusToken();
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    ...(token ? { "authorization": `Bearer ${token}` } : {}),
+  };
+  // Merge init headers if provided and it's a plain object
+  if (init?.headers && typeof init.headers === 'object' && !Array.isArray(init.headers) && !(init.headers instanceof Headers)) {
+    Object.assign(headers, init.headers);
+  }
+  const res = await fetch(`${url}${path}`, {
     ...init,
-    headers: {
-      "content-type": "application/json",
-      ...(init?.headers || {}),
-      ...(DIRECTUS_TOKEN ? { "authorization": `Bearer ${DIRECTUS_TOKEN}` } : {}),
-    },
+    headers,
     cache: "no-store"
   });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Directus error: ${res.status} ${res.statusText} - ${text}`);
   }
-  return res.json();
+  return await res.json();
 }
 
 export async function getHomePage(): Promise<Page | null> {
@@ -111,7 +123,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
 // Use NEXT_PUBLIC_DIRECTUS_URL for client components, DIRECTUS_URL for server components
 export function getDirectusAssetUrl(fileId: string | null | undefined): string | null {
   if (!fileId) return null;
-  const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || DIRECTUS_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL || process.env.DIRECTUS_URL;
   if (!baseUrl) return null;
   return `${baseUrl}/assets/${fileId}`;
 }

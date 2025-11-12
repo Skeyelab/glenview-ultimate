@@ -10,7 +10,6 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/news", label: "News" },
-  { href: "/register", label: "Register" },
 ];
 
 const LOGO_ID = "c3db7679-c7b9-4d7d-add9-761a96e59b86";
@@ -47,7 +46,7 @@ export function Navbar() {
           </Link>
         ))}
       </nav>
-      <Button asChild><Link href="/register">Pre-Register</Link></Button>
+      <Button asChild><Link href="/register">Register</Link></Button>
     </div>
   );
 }

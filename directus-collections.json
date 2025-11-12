@@ -1600,9 +1600,10 @@
         "collection": "news",
         "field": "slug",
         "special": null,
-        "interface": "input",
+        "interface": "input-slug",
         "options": {
-          "iconRight": "link"
+          "mirrored": "title",
+          "slugify": true
         },
         "display": null,
         "display_options": null,
@@ -1742,7 +1743,7 @@
         "collection": "news",
         "field": "content",
         "special": null,
-        "interface": "input-multiline",
+        "interface": "input-rich-text-html",
         "options": null,
         "display": null,
         "display_options": null,

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 async function verifyTurnstileToken(token: string): Promise<boolean> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
@@ -22,7 +22,7 @@ async function verifyTurnstileToken(token: string): Promise<boolean> {
 }
 
 export async function POST(req: NextRequest) {
-  const DIRECTUS_URL = process.env.DIRECTUS_URL;
+  const {DIRECTUS_URL} = process.env;
   const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
 
   if (!DIRECTUS_URL || !DIRECTUS_TOKEN) {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     // Handle duplicate email error (400 Bad Request with RECORD_NOT_UNIQUE)
     if (res.status === 400 && errorData?.errors?.[0]?.extensions?.code === "RECORD_NOT_UNIQUE") {
-      const field = errorData.errors[0].extensions.field;
+      const {field} = errorData.errors[0].extensions;
       const email = errorData.errors[0].extensions.value;
       return NextResponse.json(
         {
