@@ -32,13 +32,36 @@ export interface TeamMember {
   photo?: string | null;
 }
 
-export interface ScheduleEntry {
+export type ScheduleEventType =
+  | "season_start"
+  | "season_end"
+  | "registration_open"
+  | "registration_close"
+  | "game"
+  | "practice"
+  | "tournament"
+  | "other";
+
+export interface ScheduleEvent {
   id: number;
+  season_year: number;
+  event_type: ScheduleEventType;
+  title: string;
+  date: string;
+  end_date: string | null;
+  location: string | null;
+  description: string | null;
+  highlight: boolean | null;
+}
+
+export interface SeasonSchedule {
+  season_year: number;
   year: number;
-  title?: string | null;
-  highlights?: string[] | null; // array of bullet points
-  start_month?: string | null;  // e.g., "March"
-  end_month?: string | null;    // e.g., "May"
+  title: string;
+  start_month?: string | null;
+  end_month?: string | null;
+  highlights: string[];
+  events: ScheduleEvent[];
 }
 
 export interface NewsPost {
@@ -60,7 +83,7 @@ export interface DirectusSchema {
   Pages: Page[];
   Team: TeamMember[];
   Partners: Partner[];
-  Schedule: ScheduleEntry[];
+  Schedule: ScheduleEvent[];
   News: NewsPost[];
   About: About[];
   Registrations: Registration[];
@@ -154,17 +177,93 @@ export async function getPartners(): Promise<Partner[]> {
   );
 }
 
-export async function getSchedule(): Promise<ScheduleEntry | null> {
-  if (!haveEnv()) return null;
+const START_EVENT_TYPES: ScheduleEventType[] = ["season_start", "practice", "game", "tournament"];
+const END_EVENT_TYPES: ScheduleEventType[] = ["season_end", "tournament", "game", "practice"];
+
+const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
+  {
+    id: 1,
+    season_year: 2026,
+    event_type: "registration_open",
+    title: "Pre-Registration Opens",
+    date: "2025-11-01T15:00:00.000Z",
+    end_date: null,
+    location: null,
+    description: null,
+    highlight: true,
+  },
+  {
+    id: 2,
+    season_year: 2026,
+    event_type: "registration_close",
+    title: "Registration & Uniform Orders Due",
+    date: "2026-02-15T15:00:00.000Z",
+    end_date: null,
+    location: null,
+    description: null,
+    highlight: true,
+  },
+  {
+    id: 3,
+    season_year: 2026,
+    event_type: "season_start",
+    title: "Spring Season Kickoff Practice",
+    date: "2026-03-01T21:30:00.000Z",
+    end_date: null,
+    location: "TBD",
+    description: "Weekly practices begin (12 weeks). Time & location currently TBD.",
+    highlight: true,
+  },
+  {
+    id: 4,
+    season_year: 2026,
+    event_type: "practice",
+    title: "Weekly Practices Continue",
+    date: "2026-03-08T21:30:00.000Z",
+    end_date: "2026-05-24T21:30:00.000Z",
+    location: "TBD",
+    description: "Skills, drills, and scrimmages.",
+    highlight: null,
+  },
+  {
+    id: 5,
+    season_year: 2026,
+    event_type: "tournament",
+    title: "Tournament Opportunities",
+    date: "2026-04-01T15:00:00.000Z",
+    end_date: "2026-05-31T22:00:00.000Z",
+    description: "Opportunity to attend 3-4 tournaments.",
+    location: null,
+    highlight: null,
+  },
+];
+
+const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(DEFAULT_SCHEDULE_EVENTS);
+
+export async function getSchedule(): Promise<SeasonSchedule> {
+  if (!haveEnv()) return DEFAULT_SCHEDULE;
   const client = getDirectusClient();
-  const data = await client.request(
+  const events = await client.request(
     readItems("Schedule", {
-      limit: 1,
-      sort: ["-year"],
-      fields: ["*"],
+      fields: ["id", "season_year", "event_type", "title", "date", "end_date", "location", "description", "highlight"],
+      sort: ["-season_year", "date"],
     }),
   );
-  return data[0] ?? null;
+
+  if (!events || events.length === 0) {
+    return DEFAULT_SCHEDULE;
+  }
+
+  const latestSeasonYear = events[0]?.season_year ?? DEFAULT_SCHEDULE.season_year;
+  const latestSeasonEvents = events
+    .filter((event) => event.season_year === latestSeasonYear && Boolean(event.date))
+    .map(normalizeScheduleEvent);
+
+  if (latestSeasonEvents.length === 0) {
+    return DEFAULT_SCHEDULE;
+  }
+
+  return buildSeasonSchedule(latestSeasonEvents);
 }
 
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
@@ -223,4 +322,63 @@ export async function submitRegistration(payload: RegistrationInsert): Promise<R
   return await client.request(
     createItem("Registrations", payload),
   );
+}
+
+function buildSeasonSchedule(events: ScheduleEvent[]): SeasonSchedule {
+  const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const seasonYear = sortedEvents[0]?.season_year ?? DEFAULT_SCHEDULE_EVENTS[0].season_year;
+  const title = `${seasonYear} Season Schedule`;
+
+  const seasonStartSource =
+    sortedEvents.find((event) => START_EVENT_TYPES.includes(event.event_type)) ?? sortedEvents[0];
+  const seasonEndSource =
+    [...sortedEvents]
+      .reverse()
+      .find((event) => END_EVENT_TYPES.includes(event.event_type)) ?? sortedEvents[sortedEvents.length - 1];
+
+  const startMonth = getMonthLabel(seasonStartSource?.date);
+  const endMonth = getMonthLabel(seasonEndSource?.end_date ?? seasonEndSource?.date);
+
+  const highlights = sortedEvents
+    .filter((event) => event.highlight)
+    .map((event) => `${formatMonthYear(event.date)} - ${event.title}${event.location ? ` (${event.location})` : ""}`);
+
+  return {
+    season_year: seasonYear,
+    year: seasonYear,
+    title,
+    start_month: startMonth,
+    end_month: endMonth,
+    highlights,
+    events: sortedEvents,
+  };
+}
+
+function getMonthLabel(isoDate: string | null | undefined): string | null {
+  const date = parseDate(isoDate);
+  if (!date) return null;
+  return new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+}
+
+function formatMonthYear(isoDate: string): string {
+  const date = parseDate(isoDate);
+  if (!date) return "Date TBD";
+  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date);
+}
+
+function parseDate(isoDate: string | null | undefined): Date | null {
+  if (!isoDate) return null;
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+}
+
+function normalizeScheduleEvent(event: ScheduleEvent): ScheduleEvent {
+  return {
+    ...event,
+    end_date: event.end_date ?? null,
+    location: event.location ?? null,
+    description: event.description ?? null,
+    highlight: event.highlight ?? null,
+  };
 }

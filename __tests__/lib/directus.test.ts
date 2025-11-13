@@ -53,3 +53,28 @@ describe('getDirectusAssetUrl', () => {
   })
 })
 
+describe('getSchedule', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    jest.resetModules()
+    delete require.cache[require.resolve('@/lib/directus')]
+    process.env = { ...originalEnv }
+    delete process.env.DIRECTUS_URL
+    delete process.env.DIRECTUS_STATIC_TOKEN
+  })
+
+  afterAll(() => {
+    process.env = originalEnv
+  })
+
+  it('returns a default schedule when Directus is not configured', async () => {
+    const { getSchedule } = require('@/lib/directus')
+    const schedule = await getSchedule()
+
+    expect(schedule).toBeTruthy()
+    expect(schedule.events.length).toBeGreaterThan(0)
+    expect(schedule.title).toMatch(/Season Schedule/i)
+  })
+})
+
