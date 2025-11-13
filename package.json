@@ -2,6 +2,9 @@
   "name": "glenview-ultimate-web",
   "private": true,
   "version": "0.1.0",
+  "engines": {
+    "node": "22.19.0"
+  },
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
