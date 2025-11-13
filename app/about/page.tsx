@@ -78,18 +78,9 @@ export default async function AboutPage(): Promise<React.JSX.Element> {
     getTeam(),
   ]);
 
-  // Prioritize Directus data - only use fallbacks in development if data is missing
-  const clubDescription = about?.club_description ?? (process.env.NODE_ENV === "development"
-    ? "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin Carrigan, his sister, and his father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'."
-    : null);
-
-  const whatKidsLearn = about?.what_kids_learn ?? (process.env.NODE_ENV === "development"
-    ? [
-        "Rules of Ultimate",
-        "Proper way to throw a backhand & forehand",
-        "How to run multiple types of offense & defense",
-      ]
-    : []);
+  // Use Directus data only - no fallbacks
+  const clubDescription = about?.club_description ?? null;
+  const whatKidsLearn = about?.what_kids_learn ?? [];
 
   const leadershipRoles = ["boys_team_captain", "girls_team_captain", "head_coach"];
   const allLeadershipMembers = teamMembers.filter(member => {
