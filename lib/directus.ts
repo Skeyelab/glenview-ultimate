@@ -1,4 +1,4 @@
-import { createDirectus, readItems, rest, staticToken } from "@directus/sdk";
+import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 
 export interface Page {
@@ -51,12 +51,12 @@ export interface NewsPost {
 }
 
 export interface DirectusSchema {
-  Pages: Page;
-  Team: TeamMember;
-  Partners: Partner;
-  Schedule: ScheduleEntry;
-  News: NewsPost;
-  Registrations: Record<string, unknown>;
+  Pages: Page[];
+  Team: TeamMember[];
+  Partners: Partner[];
+  Schedule: ScheduleEntry[];
+  News: NewsPost[];
+  Registrations: Registration[];
 }
 
 // Removed AuthenticatedRestClient - not used
@@ -80,6 +80,30 @@ function haveEnv(): boolean {
 
 type DirectusRestClient = DirectusClient<DirectusSchema> & StaticTokenClient<DirectusSchema> & RestClient<DirectusSchema>;
 
+export interface RegistrationChild {
+  full_name: string;
+  age?: string | null;
+  experience?: "beginner" | "intermediate" | "advanced" | null;
+  availability?: string[] | null;
+}
+
+export interface RegistrationInsert {
+  parent1_name: string;
+  parent1_email: string;
+  parent1_phone?: string | null;
+  parent2_name?: string | null;
+  parent2_email?: string | null;
+  parent2_phone?: string | null;
+  children?: RegistrationChild[] | null;
+  notes?: string | null;
+  marketing_opt_in?: boolean | null;
+}
+
+export interface Registration extends RegistrationInsert {
+  id: number;
+  date_created?: string | null;
+}
+
 let directusClient: DirectusRestClient | null = null;
 
 function initDirectusClient(): DirectusRestClient {
@@ -90,28 +114,19 @@ function initDirectusClient(): DirectusRestClient {
 }
 
 function getDirectusClient(): DirectusRestClient {
-  if (!directusClient) {
-    directusClient = initDirectusClient();
-  }
+  directusClient ??= initDirectusClient();
   return directusClient;
-}
-
-type RestRequest = Parameters<DirectusRestClient["request"]>[0];
-
-async function directusRequest<T>(request: RestRequest): Promise<T> {
-  const client = getDirectusClient();
-  return await client.request(request) as T;
 }
 
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
   const client = getDirectusClient();
-  const data = await client.request<Page[]>(
-    (readItems as any)('Pages', {
-      filter: { slug: { _eq: 'home' } },
+  const data = await client.request(
+    readItems("Pages", {
+      filter: { slug: { _eq: "home" } },
       limit: 1,
-      fields: ['*']
-    })
+      fields: ["*"],
+    }),
   );
   return data[0] ?? null;
 }
@@ -119,28 +134,28 @@ export async function getHomePage(): Promise<Page | null> {
 export async function getTeam(): Promise<TeamMember[]> {
   if (!haveEnv()) return [];
   const client = getDirectusClient();
-  return await client.request<TeamMember[]>(
-    (readItems as any)('Team', { fields: ['*'] })
+  return await client.request(
+    readItems("Team", { fields: ["*"] }),
   );
 }
 
 export async function getPartners(): Promise<Partner[]> {
   if (!haveEnv()) return [];
   const client = getDirectusClient();
-  return await client.request<Partner[]>(
-    (readItems as any)('Partners', { fields: ['*'] })
+  return await client.request(
+    readItems("Partners", { fields: ["*"] }),
   );
 }
 
 export async function getSchedule(): Promise<ScheduleEntry | null> {
   if (!haveEnv()) return null;
   const client = getDirectusClient();
-  const data = await client.request<ScheduleEntry[]>(
-    (readItems as any)('Schedule', {
+  const data = await client.request(
+    readItems("Schedule", {
       limit: 1,
-      sort: ['-year'],
-      fields: ['*']
-    })
+      sort: ["-year"],
+      fields: ["*"],
+    }),
   );
   return data[0] ?? null;
 }
@@ -148,24 +163,24 @@ export async function getSchedule(): Promise<ScheduleEntry | null> {
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
   if (!haveEnv()) return [];
   const client = getDirectusClient();
-  return await client.request<NewsPost[]>(
-    (readItems as any)('News', {
+  return await client.request(
+    readItems("News", {
       limit,
-      sort: ['-published_at'],
-      fields: ['*']
-    })
+      sort: ["-published_at"],
+      fields: ["*"],
+    }),
   );
 }
 
 export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   if (!haveEnv()) return null;
   const client = getDirectusClient();
-  const data = await client.request<NewsPost[]>(
-    (readItems as any)('News', {
+  const data = await client.request(
+    readItems("News", {
       filter: { slug: { _eq: slug } },
       limit: 1,
-      fields: ['*']
-    })
+      fields: ["*"],
+    }),
   );
   return data[0] ?? null;
 }
@@ -182,4 +197,11 @@ export function getDirectusAssetUrl(fileId: string | null | undefined): string |
 export function getDirectusRestClient(): DirectusRestClient {
   if (!haveEnv()) throw new Error("Directus not configured");
   return getDirectusClient();
+}
+
+export async function submitRegistration(payload: RegistrationInsert): Promise<Registration> {
+  const client = getDirectusRestClient();
+  return await client.request(
+    createItem("Registrations", payload),
+  );
 }
