@@ -1,4 +1,4 @@
-import { createDirectus, rest, staticToken, readItems } from '@directus/sdk';
+import { createDirectus, rest, staticToken, readItems, type DirectusClient, type RestClient } from '@directus/sdk';
 
 export interface Page {
   id: number;
@@ -63,12 +63,18 @@ function haveEnv(): boolean {
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Directus SDK uses any for schema type when not defined
+let client: (DirectusClient<any> & RestClient<any>) | null = null;
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- Return type is inferred from client variable
 function getDirectusClient() {
-  const url = getDirectusUrl();
-  const token = getDirectusToken();
-  const client = createDirectus(url).with(rest());
-  if (token) {
-    return client.with(staticToken(token));
+  if (!client) {
+    const url = getDirectusUrl();
+    const token = getDirectusToken();
+    client = createDirectus(url).with(rest());
+    if (token) {
+      client = client.with(staticToken(token));
+    }
   }
   return client;
 }
@@ -83,7 +89,6 @@ export async function getHomePage(): Promise<Page | null> {
       fields: ['*'],
     })
   );
-
   return (data as Page[])[0] ?? null;
 }
 
@@ -95,7 +100,6 @@ export async function getPeople(): Promise<Person[]> {
       fields: ['*'],
     })
   );
-
   return data as Person[];
 }
 
@@ -107,7 +111,6 @@ export async function getPartners(): Promise<Partner[]> {
       fields: ['*'],
     })
   );
-
   return data as Partner[];
 }
 
@@ -122,7 +125,6 @@ export async function getCurrentSeason(): Promise<Season | null> {
       fields: ['*'],
     })
   );
-
   return (data as Season[])[0] ?? null;
 }
 
@@ -137,7 +139,6 @@ export async function getNewsList(limit = 20): Promise<NewsPost[]> {
       fields: ['*'],
     })
   );
-
   return data as NewsPost[];
 }
 
@@ -151,7 +152,6 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
       fields: ['*'],
     })
   );
-
   return (data as NewsPost[])[0] ?? null;
 }
 
