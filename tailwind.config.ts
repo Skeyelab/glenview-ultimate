@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'brand-green': '#175230',
+        'brand-green': '#175030',
       },
       container: {
         center: true,
