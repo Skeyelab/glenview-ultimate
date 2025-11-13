@@ -12,6 +12,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/news", label: "News" },
+  { href: "/schedule", label: "Schedule" },
 ];
 
 export function Navbar(): React.JSX.Element {
