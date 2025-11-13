@@ -18,6 +18,26 @@ function handleDuplicateEmailError(extensions: Record<string, unknown>): NextRes
   );
 }
 
+// Singleton Directus client for registration endpoint
+ 
+let registrationClient: any = null;
+
+function getRegistrationClient(): any {
+  if (!registrationClient) {
+    const {DIRECTUS_URL} = process.env;
+    const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
+    
+    if (!DIRECTUS_URL || !DIRECTUS_TOKEN) {
+      throw new Error("Server missing Directus credentials");
+    }
+    
+    registrationClient = createDirectus(DIRECTUS_URL)
+      .with(rest())
+      .with(staticToken(DIRECTUS_TOKEN));
+  }
+  return registrationClient;
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const {DIRECTUS_URL} = process.env;
   const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
@@ -29,9 +49,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const payload = await req.json();
 
   try {
-    const client = createDirectus(DIRECTUS_URL)
-      .with(rest())
-      .with(staticToken(DIRECTUS_TOKEN));
+    const client = getRegistrationClient();
 
     const data = await client.request(createItem('registrations', payload));
     return NextResponse.json({ ok: true, data });
