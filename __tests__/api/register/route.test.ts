@@ -3,11 +3,6 @@ jest.mock('@/lib/directus', () => ({
   submitRegistration: jest.fn(),
 }))
 
-import { POST } from '@/app/api/register/route'
-import { NextRequest } from 'next/server'
-import { submitRegistration } from '@/lib/directus'
-import type { DirectusError } from '@directus/sdk'
-
 // Mock Next.js server modules that use Web APIs
 jest.mock('next/server', () => ({
   NextRequest: class MockNextRequest {
@@ -35,6 +30,15 @@ jest.mock('next/server', () => ({
     },
   },
 }))
+
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import { POST } from '@/app/api/register/route'
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import { NextRequest } from 'next/server'
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import { submitRegistration } from '@/lib/directus'
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import type { DirectusError } from '@directus/sdk'
 
 describe('/api/register', () => {
   const originalEnv = process.env
@@ -78,6 +82,7 @@ describe('/api/register', () => {
     })
 
     it('should handle duplicate email error', async () => {
+      const mockResponse = { status: 400 } satisfies Partial<Response>;
       const duplicateError: DirectusError = {
         message: 'Duplicate entry',
         errors: [
@@ -90,7 +95,7 @@ describe('/api/register', () => {
             },
           },
         ],
-        response: { status: 400 } as Response,
+        response: mockResponse,
       }
       ;(submitRegistration as jest.Mock).mockRejectedValueOnce(duplicateError)
 
