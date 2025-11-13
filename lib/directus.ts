@@ -63,14 +63,20 @@ function haveEnv(): boolean {
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
+// Singleton Directus client instance
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Directus SDK client type is complex and varies based on chained methods
+let directusClient: any = null;
+
 function getDirectusClient() {
-  const url = getDirectusUrl();
-  const token = getDirectusToken();
-  const client = createDirectus(url).with(rest());
-  if (token) {
-    return client.with(staticToken(token));
+  if (!directusClient) {
+    const url = getDirectusUrl();
+    const token = getDirectusToken();
+    directusClient = createDirectus(url).with(rest());
+    if (token) {
+      directusClient = directusClient.with(staticToken(token));
+    }
   }
-  return client;
+  return directusClient;
 }
 
 export async function getHomePage(): Promise<Page | null> {

@@ -1,6 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createDirectus, rest, staticToken, createItem } from '@directus/sdk';
 
+// Helper function to handle duplicate email errors
+function handleDuplicateEmailError(extensions: Record<string, unknown>): NextResponse {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Field name from Directus error
+  const field = extensions.field as string;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Email value from Directus error
+  const email = extensions.value as string;
+  return NextResponse.json(
+    {
+      error: "This email address has already been registered. Please use a different email or contact us if you need to update your registration.",
+      code: "DUPLICATE_EMAIL",
+      field,
+      email
+    },
+    { status: 409 } // Conflict
+  );
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const {DIRECTUS_URL} = process.env;
   const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
@@ -36,27 +53,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
           // Handle duplicate email error (RECORD_NOT_UNIQUE)
           if (extensions.code === "RECORD_NOT_UNIQUE") {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Field name from Directus error
-            const field = extensions.field as string;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Email value from Directus error
-            const email = extensions.value as string;
-            return NextResponse.json(
-              {
-                error: "This email address has already been registered. Please use a different email or contact us if you need to update your registration.",
-                code: "DUPLICATE_EMAIL",
-                field,
-                email
-              },
-              { status: 409 } // Conflict
-            );
+            return handleDuplicateEmailError(extensions);
           }
         }
 
         // Other Directus errors
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Error message from Directus SDK
-        const message = firstError.message as string || 'Directus error';
+        const message = (firstError.message as string | undefined) ?? 'Directus error';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Status code from Directus SDK
-        const status = (firstError.status as number) || 500;
+        const status = (firstError.status as number | undefined) ?? 500;
         return NextResponse.json(
           { error: message },
           { status: status >= 400 && status < 500 ? status : 500 }
@@ -68,28 +73,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Error extensions structure from Directus SDK
         const extensions = errorObj.extensions as Record<string, unknown>;
         if (extensions.code === "RECORD_NOT_UNIQUE") {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Field name from Directus error
-          const field = extensions.field as string;
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Email value from Directus error
-          const email = extensions.value as string;
-          return NextResponse.json(
-            {
-              error: "This email address has already been registered. Please use a different email or contact us if you need to update your registration.",
-              code: "DUPLICATE_EMAIL",
-              field,
-              email
-            },
-            { status: 409 }
-          );
+          return handleDuplicateEmailError(extensions);
         }
       }
 
       // Handle status code directly on error
       if ('status' in errorObj) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Status code from Directus SDK
-        const status = errorObj.status as number;
+        const status = (errorObj.status as number | undefined) ?? 500;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Error message from Directus SDK
-        const message = (errorObj.message as string) || 'Directus error';
+        const message = (errorObj.message as string | undefined) ?? 'Directus error';
         return NextResponse.json(
           { error: message },
           { status: status >= 400 && status < 500 ? status : 500 }
