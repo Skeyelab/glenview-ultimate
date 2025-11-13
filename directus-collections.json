@@ -157,6 +157,32 @@
           "schema": null
       },
       {
+          "collection": "About",
+          "meta": {
+              "collection": "About",
+              "icon": "info",
+              "note": null,
+              "display_template": null,
+              "hidden": false,
+              "singleton": true,
+              "translations": null,
+              "archive_field": null,
+              "archive_app_filter": true,
+              "archive_value": null,
+              "unarchive_value": null,
+              "sort_field": null,
+              "accountability": "all",
+              "color": null,
+              "item_duplication_fields": null,
+              "sort": 3,
+              "group": "Website",
+              "collapse": "open",
+              "preview_url": null,
+              "versioning": false
+          },
+          "schema": {}
+      },
+      {
           "collection": "Partners",
           "meta": {
               "collection": "Partners",
@@ -2010,6 +2036,146 @@
           }
       },
       {
+          "collection": "About",
+          "field": "id",
+          "type": "integer",
+          "schema": {
+              "name": "id",
+              "table": "About",
+              "data_type": "integer",
+              "default_value": "nextval('\"About_id_seq\"'::regclass)",
+              "generation_expression": null,
+              "max_length": null,
+              "numeric_precision": 32,
+              "numeric_scale": 0,
+              "is_generated": false,
+              "is_nullable": false,
+              "is_unique": true,
+              "is_indexed": false,
+              "is_primary_key": true,
+              "has_auto_increment": true,
+              "foreign_key_schema": null,
+              "foreign_key_table": null,
+              "foreign_key_column": null,
+              "comment": null
+          },
+          "meta": {
+              "collection": "About",
+              "field": "id",
+              "special": null,
+              "interface": "numeric",
+              "options": null,
+              "display": null,
+              "display_options": null,
+              "readonly": true,
+              "hidden": true,
+              "sort": 1,
+              "width": "full",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
+      },
+      {
+          "collection": "About",
+          "field": "club_description",
+          "type": "text",
+          "schema": {
+              "name": "club_description",
+              "table": "About",
+              "data_type": "text",
+              "default_value": null,
+              "generation_expression": null,
+              "max_length": null,
+              "numeric_precision": null,
+              "numeric_scale": null,
+              "is_generated": false,
+              "is_nullable": true,
+              "is_unique": false,
+              "is_indexed": false,
+              "is_primary_key": false,
+              "has_auto_increment": false,
+              "foreign_key_schema": null,
+              "foreign_key_table": null,
+              "foreign_key_column": null,
+              "comment": null
+          },
+          "meta": {
+              "collection": "About",
+              "field": "club_description",
+              "special": null,
+              "interface": "input-multiline",
+              "options": null,
+              "display": null,
+              "display_options": null,
+              "readonly": false,
+              "hidden": false,
+              "sort": 2,
+              "width": "full",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
+      },
+      {
+          "collection": "About",
+          "field": "what_kids_learn",
+          "type": "json",
+          "schema": {
+              "name": "what_kids_learn",
+              "table": "About",
+              "data_type": "json",
+              "default_value": null,
+              "generation_expression": null,
+              "max_length": null,
+              "numeric_precision": null,
+              "numeric_scale": null,
+              "is_generated": false,
+              "is_nullable": true,
+              "is_unique": false,
+              "is_indexed": false,
+              "is_primary_key": false,
+              "has_auto_increment": false,
+              "foreign_key_schema": null,
+              "foreign_key_table": null,
+              "foreign_key_column": null,
+              "comment": null
+          },
+          "meta": {
+              "collection": "About",
+              "field": "what_kids_learn",
+              "special": [
+                  "cast-json"
+              ],
+              "interface": "input-code",
+              "options": null,
+              "display": null,
+              "display_options": null,
+              "readonly": false,
+              "hidden": false,
+              "sort": 3,
+              "width": "full",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
+      },
+      {
           "collection": "Partners",
           "field": "id",
           "type": "integer",
@@ -2168,9 +2334,9 @@
               "is_indexed": false,
               "is_primary_key": false,
               "has_auto_increment": false,
-              "foreign_key_schema": null,
-              "foreign_key_table": null,
-              "foreign_key_column": null,
+              "foreign_key_schema": "public",
+              "foreign_key_table": "directus_files",
+              "foreign_key_column": "id",
               "comment": null
           },
           "meta": {
@@ -2180,7 +2346,9 @@
                   "file"
               ],
               "interface": "file-image",
-              "options": null,
+              "options": {
+                  "folder": "6329562c-9613-4904-a242-2720e8ebc63e"
+              },
               "display": null,
               "display_options": null,
               "readonly": false,
@@ -2194,7 +2362,7 @@
               "group": null,
               "validation": null,
               "validation_message": null,
-              "searchable": false
+              "searchable": true
           }
       },
       {
@@ -2320,7 +2488,7 @@
               "display_options": null,
               "readonly": false,
               "hidden": false,
-              "sort": 1,
+              "sort": 2,
               "width": "half",
               "translations": null,
               "note": "Type of scheduled event",
@@ -2366,7 +2534,7 @@
               "display_options": null,
               "readonly": false,
               "hidden": false,
-              "sort": 2,
+              "sort": 3,
               "width": "half",
               "translations": null,
               "note": "Event title or description",
@@ -2414,7 +2582,7 @@
               },
               "readonly": false,
               "hidden": false,
-              "sort": 3,
+              "sort": 4,
               "width": "half",
               "translations": null,
               "note": "Event date and time",
@@ -2462,7 +2630,7 @@
               },
               "readonly": false,
               "hidden": false,
-              "sort": 4,
+              "sort": 5,
               "width": "half",
               "translations": null,
               "note": "End date/time (for events that span time, e.g., games, tournaments)",
@@ -2502,18 +2670,77 @@
               "collection": "Schedule",
               "field": "season_year",
               "special": null,
-              "interface": "input",
-              "options": null,
+              "interface": "select-dropdown",
+              "options": {
+                  "choices": [
+                      {
+                          "text": "2025",
+                          "value": 2025
+                      },
+                      {
+                          "text": "2026",
+                          "value": 2026
+                      }
+                  ]
+              },
               "display": null,
               "display_options": null,
               "readonly": false,
               "hidden": false,
-              "sort": 5,
+              "sort": 6,
               "width": "half",
               "translations": null,
               "note": "Season year (e.g., 2026)",
               "conditions": null,
               "required": true,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
+      },
+      {
+          "collection": "Schedule",
+          "field": "highlight",
+          "type": "boolean",
+          "schema": {
+              "name": "highlight",
+              "table": "Schedule",
+              "data_type": "boolean",
+              "default_value": false,
+              "generation_expression": null,
+              "max_length": null,
+              "numeric_precision": null,
+              "numeric_scale": null,
+              "is_generated": false,
+              "is_nullable": true,
+              "is_unique": false,
+              "is_indexed": false,
+              "is_primary_key": false,
+              "has_auto_increment": false,
+              "foreign_key_schema": null,
+              "foreign_key_table": null,
+              "foreign_key_column": null,
+              "comment": null
+          },
+          "meta": {
+              "collection": "Schedule",
+              "field": "highlight",
+              "special": [
+                  "cast-boolean"
+              ],
+              "interface": "boolean",
+              "options": null,
+              "display": null,
+              "display_options": null,
+              "readonly": false,
+              "hidden": false,
+              "sort": 7,
+              "width": "half",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
               "group": null,
               "validation": null,
               "validation_message": null,
@@ -2554,7 +2781,7 @@
               "display_options": null,
               "readonly": false,
               "hidden": false,
-              "sort": 6,
+              "sort": 8,
               "width": "half",
               "translations": null,
               "note": "Location (e.g., field name, venue)",
@@ -2600,7 +2827,7 @@
               "display_options": null,
               "readonly": false,
               "hidden": false,
-              "sort": 7,
+              "sort": 9,
               "width": "full",
               "translations": null,
               "note": "Additional details or notes about the event",
@@ -2611,7 +2838,80 @@
               "validation_message": null,
               "searchable": true
           }
+      },
+      {
+          "collection": "Schedule",
+          "field": "year",
+          "type": "string",
+          "schema": {
+              "name": "year",
+              "table": "Schedule",
+              "data_type": "character varying",
+              "default_value": null,
+              "generation_expression": null,
+              "max_length": 255,
+              "numeric_precision": null,
+              "numeric_scale": null,
+              "is_generated": false,
+              "is_nullable": true,
+              "is_unique": false,
+              "is_indexed": false,
+              "is_primary_key": false,
+              "has_auto_increment": false,
+              "foreign_key_schema": null,
+              "foreign_key_table": null,
+              "foreign_key_column": null,
+              "comment": null
+          },
+          "meta": {
+              "collection": "Schedule",
+              "field": "year",
+              "special": null,
+              "interface": "input",
+              "options": null,
+              "display": null,
+              "display_options": null,
+              "readonly": false,
+              "hidden": false,
+              "sort": 10,
+              "width": "full",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
       }
   ],
-  "relations": []
+  "relations": [
+      {
+          "collection": "Partners",
+          "field": "logo",
+          "related_collection": "directus_files",
+          "schema": {
+              "constraint_name": "partners_logo_foreign",
+              "table": "Partners",
+              "column": "logo",
+              "foreign_key_schema": "public",
+              "foreign_key_table": "directus_files",
+              "foreign_key_column": "id",
+              "on_update": "NO ACTION",
+              "on_delete": "SET NULL"
+          },
+          "meta": {
+              "many_collection": "Partners",
+              "many_field": "logo",
+              "one_collection": "directus_files",
+              "one_field": null,
+              "one_collection_field": null,
+              "one_allowed_collections": null,
+              "junction_field": null,
+              "sort_field": null,
+              "one_deselect_action": "nullify"
+          }
+      }
+  ]
 }
