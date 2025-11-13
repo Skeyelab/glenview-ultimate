@@ -1102,54 +1102,6 @@
       },
       {
           "collection": "Team",
-          "field": "photo",
-          "type": "uuid",
-          "schema": {
-              "name": "photo",
-              "table": "Team",
-              "data_type": "uuid",
-              "default_value": null,
-              "generation_expression": null,
-              "max_length": null,
-              "numeric_precision": null,
-              "numeric_scale": null,
-              "is_generated": false,
-              "is_nullable": true,
-              "is_unique": false,
-              "is_indexed": false,
-              "is_primary_key": false,
-              "has_auto_increment": false,
-              "foreign_key_schema": null,
-              "foreign_key_table": null,
-              "foreign_key_column": null,
-              "comment": null
-          },
-          "meta": {
-              "collection": "Team",
-              "field": "photo",
-              "special": [
-                  "file"
-              ],
-              "interface": "file-image",
-              "options": null,
-              "display": null,
-              "display_options": null,
-              "readonly": false,
-              "hidden": false,
-              "sort": 5,
-              "width": "half",
-              "translations": null,
-              "note": null,
-              "conditions": null,
-              "required": false,
-              "group": null,
-              "validation": null,
-              "validation_message": null,
-              "searchable": false
-          }
-      },
-      {
-          "collection": "Team",
           "field": "bio",
           "type": "text",
           "schema": {
@@ -1183,6 +1135,56 @@
               "readonly": false,
               "hidden": false,
               "sort": 6,
+              "width": "full",
+              "translations": null,
+              "note": null,
+              "conditions": null,
+              "required": false,
+              "group": null,
+              "validation": null,
+              "validation_message": null,
+              "searchable": true
+          }
+      },
+      {
+          "collection": "Team",
+          "field": "photo",
+          "type": "uuid",
+          "schema": {
+              "name": "photo",
+              "table": "Team",
+              "data_type": "uuid",
+              "default_value": null,
+              "generation_expression": null,
+              "max_length": null,
+              "numeric_precision": null,
+              "numeric_scale": null,
+              "is_generated": false,
+              "is_nullable": true,
+              "is_unique": false,
+              "is_indexed": false,
+              "is_primary_key": false,
+              "has_auto_increment": false,
+              "foreign_key_schema": "public",
+              "foreign_key_table": "directus_files",
+              "foreign_key_column": "id",
+              "comment": null
+          },
+          "meta": {
+              "collection": "Team",
+              "field": "photo",
+              "special": [
+                  "file"
+              ],
+              "interface": "file-image",
+              "options": {
+                  "letterbox": true
+              },
+              "display": null,
+              "display_options": null,
+              "readonly": false,
+              "hidden": false,
+              "sort": 7,
               "width": "full",
               "translations": null,
               "note": null,
@@ -2887,6 +2889,32 @@
       }
   ],
   "relations": [
+      {
+          "collection": "Team",
+          "field": "photo",
+          "related_collection": "directus_files",
+          "schema": {
+              "constraint_name": "team_photo_foreign",
+              "table": "Team",
+              "column": "photo",
+              "foreign_key_schema": "public",
+              "foreign_key_table": "directus_files",
+              "foreign_key_column": "id",
+              "on_update": "NO ACTION",
+              "on_delete": "SET NULL"
+          },
+          "meta": {
+              "many_collection": "Team",
+              "many_field": "photo",
+              "one_collection": "directus_files",
+              "one_field": null,
+              "one_collection_field": null,
+              "one_allowed_collections": null,
+              "junction_field": null,
+              "sort_field": null,
+              "one_deselect_action": "nullify"
+          }
+      },
       {
           "collection": "Partners",
           "field": "logo",
