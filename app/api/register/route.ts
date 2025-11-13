@@ -8,14 +8,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   let client;
   try {
-    client = await getDirectusRestClient();
+    client = getDirectusRestClient();
   } catch {
     return NextResponse.json({ error: "Server missing Directus credentials" }, { status: 500 });
   }
 
   try {
     const data = await client.request(
-      createItem('registrations', payload)
+      createItem('Registrations', payload)
     );
     return NextResponse.json({ ok: true, data });
   } catch (error: unknown) {
