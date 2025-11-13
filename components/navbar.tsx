@@ -65,7 +65,9 @@ export function Navbar(): React.JSX.Element {
           className="inline-flex items-center justify-center rounded-md border border-white/30 p-2 text-white hover:bg-white/10 focus:outline-none focus-visible:ring focus-visible:ring-white/50 md:hidden"
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
-          onClick={() => setMenuOpen((prev) => !prev)}
+          onClick={() => {
+            setMenuOpen((prev) => !prev);
+          }}
         >
           <span className="sr-only">Toggle navigation</span>
           <svg
