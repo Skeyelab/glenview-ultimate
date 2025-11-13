@@ -48,10 +48,10 @@ export interface ScheduleEvent {
   event_type: ScheduleEventType;
   title: string;
   date: string;
-  end_date?: string | null;
-  location?: string | null;
-  description?: string | null;
-  highlight?: boolean | null;
+  end_date: string | null;
+  location: string | null;
+  description: string | null;
+  highlight: boolean | null;
 }
 
 export interface SeasonSchedule {
@@ -187,6 +187,9 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
     event_type: "registration_open",
     title: "Pre-Registration Opens",
     date: "2025-11-01T15:00:00.000Z",
+    end_date: null,
+    location: null,
+    description: null,
     highlight: true,
   },
   {
@@ -195,6 +198,9 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
     event_type: "registration_close",
     title: "Registration & Uniform Orders Due",
     date: "2026-02-15T15:00:00.000Z",
+    end_date: null,
+    location: null,
+    description: null,
     highlight: true,
   },
   {
@@ -203,6 +209,7 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
     event_type: "season_start",
     title: "Spring Season Kickoff Practice",
     date: "2026-03-01T21:30:00.000Z",
+    end_date: null,
     location: "TBD",
     description: "Weekly practices begin (12 weeks). Time & location currently TBD.",
     highlight: true,
@@ -216,6 +223,7 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
     end_date: "2026-05-24T21:30:00.000Z",
     location: "TBD",
     description: "Skills, drills, and scrimmages.",
+    highlight: null,
   },
   {
     id: 5,
@@ -225,6 +233,8 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
     date: "2026-04-01T15:00:00.000Z",
     end_date: "2026-05-31T22:00:00.000Z",
     description: "Opportunity to attend 3-4 tournaments.",
+    location: null,
+    highlight: null,
   },
 ];
 
@@ -246,15 +256,8 @@ export async function getSchedule(): Promise<SeasonSchedule> {
 
   const latestSeasonYear = events[0]?.season_year ?? DEFAULT_SCHEDULE.season_year;
   const latestSeasonEvents = events
-    .filter((event): event is ScheduleEvent => event.season_year === latestSeasonYear && Boolean(event.date))
-    .map((event) => ({
-      ...event,
-      // Normalise empty strings to undefined for optional fields
-      end_date: event.end_date ?? null,
-      location: event.location ?? null,
-      description: event.description ?? null,
-      highlight: event.highlight ?? null,
-    }));
+    .filter((event) => event.season_year === latestSeasonYear && Boolean(event.date))
+    .map(normalizeScheduleEvent);
 
   if (latestSeasonEvents.length === 0) {
     return DEFAULT_SCHEDULE;
@@ -368,4 +371,14 @@ function parseDate(isoDate: string | null | undefined): Date | null {
   const date = new Date(isoDate);
   if (Number.isNaN(date.getTime())) return null;
   return date;
+}
+
+function normalizeScheduleEvent(event: ScheduleEvent): ScheduleEvent {
+  return {
+    ...event,
+    end_date: event.end_date ?? null,
+    location: event.location ?? null,
+    description: event.description ?? null,
+    highlight: event.highlight ?? null,
+  };
 }
