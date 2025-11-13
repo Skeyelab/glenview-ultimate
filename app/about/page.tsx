@@ -78,13 +78,18 @@ export default async function AboutPage(): Promise<React.JSX.Element> {
     getTeam(),
   ]);
 
-  const clubDescription = about?.club_description ?? "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin Carrigan, his sister, and his father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'.";
+  // Prioritize Directus data - only use fallbacks in development if data is missing
+  const clubDescription = about?.club_description ?? (process.env.NODE_ENV === "development"
+    ? "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin Carrigan, his sister, and his father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'."
+    : null);
 
-  const whatKidsLearn = about?.what_kids_learn ?? [
-    "Rules of Ultimate",
-    "Proper way to throw a backhand & forehand",
-    "How to run multiple types of offense & defense",
-  ];
+  const whatKidsLearn = about?.what_kids_learn ?? (process.env.NODE_ENV === "development"
+    ? [
+        "Rules of Ultimate",
+        "Proper way to throw a backhand & forehand",
+        "How to run multiple types of offense & defense",
+      ]
+    : []);
 
   const leadershipRoles = ["boys_team_captain", "girls_team_captain", "head_coach"];
   const allLeadershipMembers = teamMembers.filter(member => {
@@ -112,17 +117,25 @@ export default async function AboutPage(): Promise<React.JSX.Element> {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white">About Glenview Ultimate</h1>
-      <p className="text-white/90">
-        {clubDescription}
-      </p>
+      {clubDescription ? (
+        <p className="text-white/90">
+          {clubDescription}
+        </p>
+      ) : (
+        <p className="text-white/60 italic">Club description coming soon.</p>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-2xl font-bold text-white">What Kids Learn</h2>
-        <ul className="list-disc list-inside space-y-2 text-white/90">
-          {whatKidsLearn.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
+        {whatKidsLearn.length > 0 ? (
+          <ul className="list-disc list-inside space-y-2 text-white/90">
+            {whatKidsLearn.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-white/60 italic">Information about what kids learn coming soon.</p>
+        )}
       </section>
 
       <section className="space-y-4">
