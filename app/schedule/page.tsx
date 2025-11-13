@@ -30,7 +30,7 @@ const HIGHLIGHT_BADGE = "inline-flex items-center px-3 py-1 rounded-full text-xs
 
 export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();
-  const events = schedule.events;
+  const { events } = schedule;
   const upcomingEvents = selectUpcomingEvents(events);
   const upcomingDisplay = upcomingEvents.length > 0 ? upcomingEvents : events.slice(0, Math.min(3, events.length));
   const monthlyGroups = groupEventsByMonth(events);
@@ -253,10 +253,12 @@ function groupEventsByMonth(events: ScheduleEvent[]): Array<{ key: string; label
     const date = safeParseDate(event.date);
     const key = date ? `${date.getFullYear()}-${date.getMonth()}` : "tbd";
     const label = date ? formatter.format(date) : "Date TBD";
-    if (!buckets.has(key)) {
-      buckets.set(key, { label, events: [] });
+    const bucket = buckets.get(key);
+    if (bucket) {
+      bucket.events.push(event);
+    } else {
+      buckets.set(key, { label, events: [event] });
     }
-    buckets.get(key)!.events.push(event);
   });
 
   return Array.from(buckets.entries())
