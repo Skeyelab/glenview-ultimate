@@ -83,6 +83,7 @@ export async function getHomePage(): Promise<Page | null> {
       fields: ['*'],
     })
   );
+
   return (data as Page[])[0] ?? null;
 }
 
@@ -94,6 +95,7 @@ export async function getPeople(): Promise<Person[]> {
       fields: ['*'],
     })
   );
+
   return data as Person[];
 }
 
@@ -105,6 +107,7 @@ export async function getPartners(): Promise<Partner[]> {
       fields: ['*'],
     })
   );
+
   return data as Partner[];
 }
 
@@ -119,6 +122,7 @@ export async function getCurrentSeason(): Promise<Season | null> {
       fields: ['*'],
     })
   );
+
   return (data as Season[])[0] ?? null;
 }
 
@@ -133,6 +137,7 @@ export async function getNewsList(limit = 20): Promise<NewsPost[]> {
       fields: ['*'],
     })
   );
+
   return data as NewsPost[];
 }
 
@@ -146,6 +151,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
       fields: ['*'],
     })
   );
+
   return (data as NewsPost[])[0] ?? null;
 }
 

@@ -15,7 +15,7 @@ export default [
       // Allow console statements (common in Next.js)
       'no-console': 'warn',
       // Relax complexity limits
-      'complexity': ['error', { max: 25 }],
+      complexity: ['error', { max: 25 }],
       // Allow magic numbers (HTTP status codes, etc.)
       '@typescript-eslint/no-magic-numbers': ['error', {
         ignore: [-1, 0, 1, 2, 3, 4, 5, 10, 20, 100, 200, 400, 409, 500],
@@ -23,7 +23,7 @@ export default [
         ignoreDefaultValues: true,
         ignoreNumericLiteralTypes: true,
         ignoreReadonlyClassProperties: true,
-        ignoreTypeIndexes: true,
+        ignoreTypeIndexes: true
       }],
       // Relax strict boolean expressions
       '@typescript-eslint/strict-boolean-expressions': 'off',
@@ -36,12 +36,12 @@ export default [
         allowExpressions: true,
         allowTypedFunctionExpressions: true,
         allowHigherOrderFunctions: true,
-        allowDirectConstAssertionInArrowFunctions: true,
+        allowDirectConstAssertionInArrowFunctions: true
       }],
       // Relax naming conventions for API fields (snake_case is common)
       '@typescript-eslint/naming-convention': ['error', {
         selector: 'variable',
-        format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case'],
+        format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case']
       }],
       // Allow unsafe operations in API routes (dealing with request bodies)
       '@typescript-eslint/no-unsafe-assignment': 'warn',
@@ -51,7 +51,7 @@ export default [
       // Allow uninitialized variables
       '@typescript-eslint/init-declarations': 'off',
       // Relax unnecessary condition checks
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
+      '@typescript-eslint/no-unnecessary-condition': 'warn'
     }
   },
   {
@@ -61,14 +61,17 @@ export default [
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
     }
   },
   {
     files: ['lib/directus.ts'],
     rules: {
-      // Allow unsafe returns in directus library (dealing with API responses)
+      // Allow unsafe operations in directus library (dealing with API responses from SDK)
       '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off'
     }
   },
   {
@@ -90,7 +93,7 @@ export default [
       '@typescript-eslint/no-dynamic-delete': 'off',
       '@typescript-eslint/prefer-destructuring': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
-      'complexity': 'off',
+      complexity: 'off'
     }
   },
   {
@@ -113,4 +116,3 @@ export default [
     ]
   }
 ]
-
