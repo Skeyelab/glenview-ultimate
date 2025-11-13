@@ -50,7 +50,7 @@ export interface NewsPost {
   content: string; // markdown or HTML
 }
 
-interface DirectusSchema {
+export interface DirectusSchema {
   Pages: Page;
   Team: TeamMember;
   Partners: Partner;
@@ -105,8 +105,9 @@ async function directusRequest<T>(request: RestRequest): Promise<T> {
 
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
-  const data = await directusRequest<Page[]>(
-    readItems('Pages', {
+  const client = getDirectusClient();
+  const data = await client.request<Page[]>(
+    (readItems as any)('Pages', {
       filter: { slug: { _eq: 'home' } },
       limit: 1,
       fields: ['*']
@@ -117,22 +118,25 @@ export async function getHomePage(): Promise<Page | null> {
 
 export async function getTeam(): Promise<TeamMember[]> {
   if (!haveEnv()) return [];
-  return await directusRequest<TeamMember[]>(
-    readItems('Team', { fields: ['*'] })
+  const client = getDirectusClient();
+  return await client.request<TeamMember[]>(
+    (readItems as any)('Team', { fields: ['*'] })
   );
 }
 
 export async function getPartners(): Promise<Partner[]> {
   if (!haveEnv()) return [];
-  return await directusRequest<Partner[]>(
-    readItems('Partners', { fields: ['*'] })
+  const client = getDirectusClient();
+  return await client.request<Partner[]>(
+    (readItems as any)('Partners', { fields: ['*'] })
   );
 }
 
 export async function getSchedule(): Promise<ScheduleEntry | null> {
   if (!haveEnv()) return null;
-  const data = await directusRequest<ScheduleEntry[]>(
-    readItems('Schedule', {
+  const client = getDirectusClient();
+  const data = await client.request<ScheduleEntry[]>(
+    (readItems as any)('Schedule', {
       limit: 1,
       sort: ['-year'],
       fields: ['*']
@@ -143,8 +147,9 @@ export async function getSchedule(): Promise<ScheduleEntry | null> {
 
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
   if (!haveEnv()) return [];
-  return await directusRequest<NewsPost[]>(
-    readItems('News', {
+  const client = getDirectusClient();
+  return await client.request<NewsPost[]>(
+    (readItems as any)('News', {
       limit,
       sort: ['-published_at'],
       fields: ['*']
@@ -154,8 +159,9 @@ export async function getNewsList(limit = 20): Promise<NewsPost[]> {
 
 export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   if (!haveEnv()) return null;
-  const data = await directusRequest<NewsPost[]>(
-    readItems('News', {
+  const client = getDirectusClient();
+  const data = await client.request<NewsPost[]>(
+    (readItems as any)('News', {
       filter: { slug: { _eq: slug } },
       limit: 1,
       fields: ['*']
