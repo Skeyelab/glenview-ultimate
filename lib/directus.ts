@@ -50,12 +50,19 @@ export interface NewsPost {
   content: string; // markdown or HTML
 }
 
+export interface About {
+  id: number;
+  club_description?: string | null;
+  what_kids_learn?: string[] | null;
+}
+
 export interface DirectusSchema {
   Pages: Page[];
   Team: TeamMember[];
   Partners: Partner[];
   Schedule: ScheduleEntry[];
   News: NewsPost[];
+  About: About[];
   Registrations: Registration[];
 }
 
@@ -178,6 +185,18 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   const data = await client.request(
     readItems("News", {
       filter: { slug: { _eq: slug } },
+      limit: 1,
+      fields: ["*"],
+    }),
+  );
+  return data[0] ?? null;
+}
+
+export async function getAbout(): Promise<About | null> {
+  if (!haveEnv()) return null;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems("About", {
       limit: 1,
       fields: ["*"],
     }),
