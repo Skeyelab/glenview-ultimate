@@ -1,4 +1,5 @@
 import { createItem, isDirectusError } from "@directus/sdk";
+import type { DirectusSchema } from "@/lib/directus";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getDirectusRestClient } from "@/lib/directus";
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   try {
     const data = await client.request(
-      createItem('Registrations', payload)
+      (createItem as any)('Registrations', payload)
     );
     return NextResponse.json({ ok: true, data });
   } catch (error: unknown) {
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         );
       }
 
-      const message = duplicate?.message ?? error.errors[0]?.message ?? "Directus request failed";
+      const message = error.errors[0]?.message ?? "Directus request failed";
       const status = Number(error.response?.status) || 500;
       return NextResponse.json(
         { error: message },
