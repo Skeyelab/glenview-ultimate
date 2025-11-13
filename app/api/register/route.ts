@@ -1,57 +1,51 @@
+import { createItem, isDirectusError } from "@directus/sdk";
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  const {DIRECTUS_URL} = process.env;
-  const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
+import { getDirectusRestClient } from "@/lib/directus";
 
-  if (!DIRECTUS_URL || !DIRECTUS_TOKEN) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const payload = await req.json();
+
+  let client;
+  try {
+    client = await getDirectusRestClient();
+  } catch {
     return NextResponse.json({ error: "Server missing Directus credentials" }, { status: 500 });
   }
 
-  const payload = await req.json();
+  try {
+    const data = await client.request(
+      createItem('registrations', payload)
+    );
+    return NextResponse.json({ ok: true, data });
+  } catch (error: unknown) {
+    if (isDirectusError(error)) {
+      const duplicate = error.errors.find(err => err.extensions?.code === "RECORD_NOT_UNIQUE");
+      if (duplicate) {
+        const field = typeof duplicate.extensions.field === 'string' ? duplicate.extensions.field : undefined;
+        const email = duplicate.extensions.value;
+        return NextResponse.json(
+          {
+            error: "This email address has already been registered. Please use a different email or contact us if you need to update your registration.",
+            code: "DUPLICATE_EMAIL",
+            field,
+            email
+          },
+          { status: 409 }
+        );
+      }
 
-  const res = await fetch(`${DIRECTUS_URL}/items/registrations`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "authorization": `Bearer ${DIRECTUS_TOKEN}`
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    let errorData;
-    try {
-      errorData = JSON.parse(text);
-    } catch {
-      errorData = null;
-    }
-
-    // Handle duplicate email error (400 Bad Request with RECORD_NOT_UNIQUE)
-    if (res.status === 400 && errorData?.errors?.[0]?.extensions?.code === "RECORD_NOT_UNIQUE") {
-      const {field} = errorData.errors[0].extensions;
-      const email = errorData.errors[0].extensions.value;
+      const message = duplicate?.message ?? error.errors[0]?.message ?? "Directus request failed";
+      const status = Number(error.response?.status) || 500;
       return NextResponse.json(
-        {
-          error: "This email address has already been registered. Please use a different email or contact us if you need to update your registration.",
-          code: "DUPLICATE_EMAIL",
-          field,
-          email
-        },
-        { status: 409 } // Conflict
+        { error: message },
+        { status: status >= 400 && status < 600 ? status : 500 }
       );
     }
 
-    // Other errors
     return NextResponse.json(
-      { error: errorData?.errors?.[0]?.message ?? `Directus error: ${res.status} ${res.statusText}` },
-      { status: res.status >= 400 && res.status < 500 ? res.status : 500 }
+      { error: "Unexpected error while submitting registration." },
+      { status: 500 }
     );
   }
-
-  // Handle empty response (Directus may return empty body on success)
-  const text = await res.text();
-  const data = text.trim() ? JSON.parse(text) : null;
-  return NextResponse.json({ ok: true, data });
 }
