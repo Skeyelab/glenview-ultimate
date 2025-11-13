@@ -1,3 +1,5 @@
+import { createDirectus, rest, staticToken, readItems } from '@directus/sdk';
+
 export interface Page {
   id: number;
   slug: string;
@@ -61,79 +63,90 @@ function haveEnv(): boolean {
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
-interface DirectusResponse<T> {
-  data: T[];
-}
-
-function isDirectusResponse(value: unknown): value is { data: unknown[] } {
-  return typeof value === 'object' && value !== null && 'data' in value && Array.isArray(value.data);
-}
-
-async function directusFetch<T>(path: string, init?: RequestInit): Promise<DirectusResponse<T>> {
+function getDirectusClient() {
   const url = getDirectusUrl();
   const token = getDirectusToken();
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-    ...(token ? { "authorization": `Bearer ${token}` } : {}),
-  };
-  // Merge init headers if provided and it's a plain object
-  if (init?.headers && typeof init.headers === 'object' && !Array.isArray(init.headers) && !(init.headers instanceof Headers)) {
-    Object.assign(headers, init.headers);
+  const client = createDirectus(url).with(rest());
+  if (token) {
+    return client.with(staticToken(token));
   }
-  const res = await fetch(`${url}${path}`, {
-    ...init,
-    headers,
-    cache: "no-store"
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Directus error: ${res.status} ${res.statusText} - ${text}`);
-  }
-  const json: unknown = await res.json();
-  if (isDirectusResponse(json)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Directus API returns typed data, but we can't validate the generic type T at runtime
-    const response: DirectusResponse<T> = { data: json.data as T[] };
-    return response;
-  }
-  throw new Error('Invalid Directus response format');
+  return client;
 }
 
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<Page>(`/items/pages?filter[slug][_eq]=home&limit=1&fields=*`);
-  return data.data[0] ?? null;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('pages', {
+      filter: { slug: { _eq: 'home' } },
+      limit: 1,
+      fields: ['*'],
+    })
+  );
+  return (data as Page[])[0] ?? null;
 }
 
 export async function getPeople(): Promise<Person[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<Person>(`/items/people?fields=*`);
-  return data.data;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('people', {
+      fields: ['*'],
+    })
+  );
+  return data as Person[];
 }
 
 export async function getPartners(): Promise<Partner[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<Partner>(`/items/partners?fields=*`);
-  return data.data;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('partners', {
+      fields: ['*'],
+    })
+  );
+  return data as Partner[];
 }
 
 // Seasons
 export async function getCurrentSeason(): Promise<Season | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<Season>(`/items/seasons?limit=1&sort[]=-year&fields=*`);
-  return data.data[0] ?? null;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('seasons', {
+      limit: 1,
+      sort: ['-year'],
+      fields: ['*'],
+    })
+  );
+  return (data as Season[])[0] ?? null;
 }
 
 // News
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<NewsPost>(`/items/news?limit=${limit}&sort[]=-published_at&fields=*`);
-  return data.data;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('news', {
+      limit,
+      sort: ['-published_at'],
+      fields: ['*'],
+    })
+  );
+  return data as NewsPost[];
 }
 
 export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<NewsPost>(`/items/news?filter[slug][_eq]=${encodeURIComponent(slug)}&limit=1&fields=*`);
-  return data.data[0] ?? null;
+  const client = getDirectusClient();
+  const data = await client.request(
+    readItems('news', {
+      filter: { slug: { _eq: slug } },
+      limit: 1,
+      fields: ['*'],
+    })
+  );
+  return (data as NewsPost[])[0] ?? null;
 }
 
 // Helper to get Directus asset URL from file UUID
