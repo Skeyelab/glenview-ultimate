@@ -3,6 +3,8 @@ import { getAboutPage, getPeople, getDirectusAssetUrl } from "@/lib/directus";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 
+export const revalidate = 0;
+
 export default async function AboutPage(): Promise<React.JSX.Element> {
   const aboutPage = await getAboutPage();
   const allPeople = await getPeople();
