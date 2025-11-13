@@ -1,5 +1,5 @@
 import React from "react";
-import { getHomePage, getPartners, getTeam, getSchedule, getDirectusAssetUrl, type Page, type TeamMember, type Partner, type ScheduleEntry } from "@/lib/directus";
+import { getHomePage, getPartners, getTeam, getSchedule, getDirectusAssetUrl, type Page, type TeamMember, type Partner, type SeasonSchedule } from "@/lib/directus";
 import { LOGO_ID } from "@/lib/config";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,7 +8,7 @@ export const revalidate = 300;
 
 interface HeroSectionProps {
   home: Page | null;
-  season: ScheduleEntry | null;
+  season: SeasonSchedule | null;
   logoUrl: string | null;
 }
 
