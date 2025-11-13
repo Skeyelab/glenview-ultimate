@@ -1,3 +1,6 @@
+import { createDirectus, readItems, rest, staticToken } from "@directus/sdk";
+import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
+
 export interface Page {
   id: number;
   slug: string;
@@ -20,7 +23,7 @@ export interface Partner {
   logo?: string | null;
 }
 
-export interface Person {
+export interface TeamMember {
   id: number;
   name: string;
   role: string;
@@ -29,7 +32,7 @@ export interface Person {
   photo?: string | null;
 }
 
-export interface Season {
+export interface ScheduleEntry {
   id: number;
   year: number;
   title?: string | null;
@@ -47,93 +50,118 @@ export interface NewsPost {
   content: string; // markdown or HTML
 }
 
-function getDirectusUrl(): string {
-  const url = process.env.DIRECTUS_URL;
-  if (!url) throw new Error("DIRECTUS_URL not configured");
-  return url;
+type Collection<T> = T[];
+
+interface DirectusSchema {
+  Pages: Collection<Page>;
+  Team: Collection<TeamMember>;
+  Partners: Collection<Partner>;
+  Schedule: Collection<ScheduleEntry>;
+  News: Collection<NewsPost>;
+  Registrations: Collection<Record<string, unknown>>;
 }
 
-function getDirectusToken(): string | undefined {
-  return process.env.DIRECTUS_STATIC_TOKEN;
+interface DirectusConfig {
+  url: string;
+  token: string;
+}
+
+function getDirectusConfig(): DirectusConfig {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_STATIC_TOKEN;
+  if (!url) throw new Error("DIRECTUS_URL not configured");
+  if (!token) throw new Error("DIRECTUS_STATIC_TOKEN not configured");
+  return { url, token };
 }
 
 function haveEnv(): boolean {
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
-interface DirectusResponse<T> {
-  data: T[];
+type DirectusRestClient = DirectusClient<DirectusSchema> &
+  StaticTokenClient<DirectusSchema> &
+  RestClient<DirectusSchema>;
+
+let directusClient: DirectusRestClient | null = null;
+
+function initDirectusClient(): DirectusRestClient {
+  const { url, token } = getDirectusConfig();
+  return createDirectus<DirectusSchema>(url)
+    .with(staticToken(token))
+    .with(rest());
 }
 
-function isDirectusResponse(value: unknown): value is { data: unknown[] } {
-  return typeof value === 'object' && value !== null && 'data' in value && Array.isArray(value.data);
+function getDirectusClient(): DirectusRestClient {
+  directusClient ??= initDirectusClient();
+  return directusClient;
 }
 
-async function directusFetch<T>(path: string, init?: RequestInit): Promise<DirectusResponse<T>> {
-  const url = getDirectusUrl();
-  const token = getDirectusToken();
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-    ...(token ? { "authorization": `Bearer ${token}` } : {}),
-  };
-  // Merge init headers if provided and it's a plain object
-  if (init?.headers && typeof init.headers === 'object' && !Array.isArray(init.headers) && !(init.headers instanceof Headers)) {
-    Object.assign(headers, init.headers);
-  }
-  const res = await fetch(`${url}${path}`, {
-    ...init,
-    headers,
-    cache: "no-store"
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Directus error: ${res.status} ${res.statusText} - ${text}`);
-  }
-  const json: unknown = await res.json();
-  if (isDirectusResponse(json)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Directus API returns typed data, but we can't validate the generic type T at runtime
-    const response: DirectusResponse<T> = { data: json.data as T[] };
-    return response;
-  }
-  throw new Error('Invalid Directus response format');
+type RestRequest = Parameters<DirectusRestClient["request"]>[0];
+
+async function directusRequest<T>(request: RestRequest): Promise<T> {
+  const client = getDirectusClient();
+  return await client.request(request) as T;
 }
 
 export async function getHomePage(): Promise<Page | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<Page>(`/items/pages?filter[slug][_eq]=home&limit=1&fields=*`);
-  return data.data[0] ?? null;
+  const data = await directusRequest<Page[]>(
+    readItems("Pages", {
+      filter: { slug: { _eq: "home" } },
+      limit: 1,
+      fields: ["*"],
+    }),
+  );
+  return data[0] ?? null;
 }
 
-export async function getPeople(): Promise<Person[]> {
+export async function getTeam(): Promise<TeamMember[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<Person>(`/items/people?fields=*`);
-  return data.data;
+  return await directusRequest<TeamMember[]>(
+    readItems("Team", { fields: ["*"] }),
+  );
 }
 
 export async function getPartners(): Promise<Partner[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<Partner>(`/items/partners?fields=*`);
-  return data.data;
+  return await directusRequest<Partner[]>(
+    readItems("Partners", { fields: ["*"] }),
+  );
 }
 
-// Seasons
-export async function getCurrentSeason(): Promise<Season | null> {
+export async function getSchedule(): Promise<ScheduleEntry | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<Season>(`/items/seasons?limit=1&sort[]=-year&fields=*`);
-  return data.data[0] ?? null;
+  const data = await directusRequest<ScheduleEntry[]>(
+    readItems("Schedule", {
+      limit: 1,
+      sort: ["-year"],
+      fields: ["*"],
+    }),
+  );
+  return data[0] ?? null;
 }
 
-// News
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
   if (!haveEnv()) return [];
-  const data = await directusFetch<NewsPost>(`/items/news?limit=${limit}&sort[]=-published_at&fields=*`);
-  return data.data;
+  return await directusRequest<NewsPost[]>(
+    readItems("News", {
+      limit,
+      sort: ["-published_at"],
+      fields: ["*"],
+    }),
+  );
 }
 
 export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   if (!haveEnv()) return null;
-  const data = await directusFetch<NewsPost>(`/items/news?filter[slug][_eq]=${encodeURIComponent(slug)}&limit=1&fields=*`);
-  return data.data[0] ?? null;
+  const data = await directusRequest<NewsPost[]>(
+    readItems("News", {
+      filter: { slug: { _eq: slug } },
+      limit: 1,
+      fields: ["*"],
+    }),
+  );
+  return data[0] ?? null;
 }
 
 // Helper to get Directus asset URL from file UUID
@@ -143,4 +171,9 @@ export function getDirectusAssetUrl(fileId: string | null | undefined): string |
   const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL ?? process.env.DIRECTUS_URL;
   if (!baseUrl) return null;
   return `${baseUrl}/assets/${fileId}`;
+}
+
+export function getDirectusRestClient(): DirectusRestClient {
+  if (!haveEnv()) throw new Error("Directus not configured");
+  return getDirectusClient();
 }

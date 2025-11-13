@@ -1,18 +1,25 @@
 import React from "react";
-import { getHomePage, getPartners, getPeople, getCurrentSeason, getDirectusAssetUrl, type Page, type Person, type Partner, type Season } from "@/lib/directus";
+import { getHomePage, getPartners, getTeam, getSchedule, getDirectusAssetUrl } from "@/lib/directus";
 import { LOGO_ID } from "@/lib/config";
 import Link from "next/link";
 import Image from "next/image";
 
 export const revalidate = 300;
 
+type AsyncReturn<T> = T extends Promise<infer U> ? U : T;
+type HomePageData = AsyncReturn<ReturnType<typeof getHomePage>>;
+type ScheduleData = AsyncReturn<ReturnType<typeof getSchedule>>;
+type TeamData = AsyncReturn<ReturnType<typeof getTeam>>;
+type PartnersData = AsyncReturn<ReturnType<typeof getPartners>>;
+type PartnerItem = PartnersData extends Array<infer Item> ? Item : never;
+
 interface HeroSectionProps {
-  home: Page | null;
-  season: Season | null;
+  home: HomePageData;
+  schedule: ScheduleData;
   logoUrl: string | null;
 }
 
-function HeroSection({ home, season, logoUrl }: HeroSectionProps): React.JSX.Element {
+function HeroSection({ home, schedule, logoUrl }: HeroSectionProps): React.JSX.Element {
   const heroTitle = home?.hero_title ?? "The Fun Starts - Spring 2026";
   const heroSubtitle = home?.hero_subtitle ?? "Introducing Glenview's very first Youth Ultimate Frisbee Club";
   const heroTagline = home?.hero_tagline ?? "5th-8th Grade. Boys & Girls.";
@@ -45,20 +52,20 @@ function HeroSection({ home, season, logoUrl }: HeroSectionProps): React.JSX.Ele
         <Link className="button" href={ctaUrl}>{ctaLabel}</Link>
       </div>
       <p className="text-sm text-white/70 mt-2">{preRegistrationText}</p>
-      {season && (
+      {schedule && (
         <p className="text-sm text-white/70 mt-2">
-          {season.title ?? `${season.year} Season`} ({season.start_month ?? "Mar"}–{season.end_month ?? "May"})
+          {schedule.title ?? `${schedule.year} Season`} ({schedule.start_month ?? "Mar"}–{schedule.end_month ?? "May"})
         </p>
       )}
     </section>
   );
 }
 
-interface SeasonHighlightsProps {
+interface ScheduleHighlightsProps {
   highlights: string[];
 }
 
-function SeasonHighlights({ highlights }: SeasonHighlightsProps): React.JSX.Element {
+function ScheduleHighlights({ highlights }: ScheduleHighlightsProps): React.JSX.Element {
   return (
     <div className="card">
       <h2 className="text-xl font-semibold mb-3 text-white">Season Highlights</h2>
@@ -74,20 +81,20 @@ function SeasonHighlights({ highlights }: SeasonHighlightsProps): React.JSX.Elem
 }
 
 interface LeadershipSectionProps {
-  people: Person[];
+  team: TeamData;
 }
 
-function LeadershipSection({ people }: LeadershipSectionProps): React.JSX.Element {
+function LeadershipSection({ team }: LeadershipSectionProps): React.JSX.Element {
   return (
     <div className="card">
       <h2 className="text-xl font-semibold mb-2 text-white">Leadership</h2>
       <div className="space-y-2">
-        {people.length > 0 ? (
-          people.map((p) => (
-            <div key={p.id} className="border border-white/20 rounded p-2">
-              <div className="font-medium text-white">{p.name}</div>
-              <div className="text-sm text-white/70">{p.role}</div>
-              {p.email && <a className="text-sm text-white/80 hover:text-white" href={`mailto:${p.email}`}>{p.email}</a>}
+        {team.length > 0 ? (
+          team.map((member) => (
+            <div key={member.id} className="border border-white/20 rounded p-2">
+              <div className="font-medium text-white">{member.name}</div>
+              <div className="text-sm text-white/70">{member.role}</div>
+              {member.email && <a className="text-sm text-white/80 hover:text-white" href={`mailto:${member.email}`}>{member.email}</a>}
             </div>
           ))
         ) : (
@@ -99,11 +106,11 @@ function LeadershipSection({ people }: LeadershipSectionProps): React.JSX.Elemen
 }
 
 interface PartnersSectionProps {
-  partners: Partner[];
+  partners: PartnersData;
 }
 
 function PartnersSection({ partners }: PartnersSectionProps): React.JSX.Element {
-  const defaultPartners: Partner[] = [
+  const defaultPartners: PartnerItem[] = [
     { id: 1, name: "Illinois Ultimate", url: "https://illinoisultimate.org" },
     { id: 2, name: "Chicago Union (UFA)", url: "https://watchufa.com/union" },
     { id: 3, name: "Glenview Park District", url: "https://glenviewparks.org" },
@@ -128,22 +135,22 @@ function PartnersSection({ partners }: PartnersSectionProps): React.JSX.Element 
 }
 
 export default async function HomePage(): Promise<React.JSX.Element> {
-  const [home, partners, people, season] = await Promise.all([
+  const [home, partners, team, schedule] = await Promise.all([
     getHomePage(),
     getPartners(),
-    getPeople(),
-    getCurrentSeason(),
+    getTeam(),
+    getSchedule(),
   ]);
 
-  const highlights = season?.highlights ?? [];
+  const highlights = schedule?.highlights ?? [];
   const logoUrl = getDirectusAssetUrl(LOGO_ID);
 
   return (
     <div className="space-y-10">
-      <HeroSection home={home} season={season} logoUrl={logoUrl} />
+      <HeroSection home={home} schedule={schedule} logoUrl={logoUrl} />
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-        <SeasonHighlights highlights={highlights} />
-        <LeadershipSection people={people} />
+        <ScheduleHighlights highlights={highlights} />
+        <LeadershipSection team={team} />
       </section>
       <PartnersSection partners={partners} />
     </div>
