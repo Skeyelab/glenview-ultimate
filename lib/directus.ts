@@ -100,6 +100,7 @@ type RestRequest = Parameters<DirectusRestClient["request"]>[0];
 
 async function directusRequest<T>(request: RestRequest): Promise<T> {
   const client = getDirectusClient();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return await client.request(request) as T;
 }
 
