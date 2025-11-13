@@ -33,6 +33,7 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
   const events = schedule.events;
   const upcomingEvents = selectUpcomingEvents(events);
   const upcomingDisplay = upcomingEvents.length > 0 ? upcomingEvents : events.slice(0, Math.min(3, events.length));
+  const monthlyGroups = groupEventsByMonth(events);
 
   return (
     <div className="space-y-8">
@@ -106,16 +107,18 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
 
       <section className="card">
         <h2 className="text-xl font-semibold text-white mb-4">Season Timeline</h2>
-        <ol className="space-y-5">
+        <ol className="relative pl-4 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-px before:bg-white/20">
           {events.map((event, index) => {
             const timeRange = formatTimeRange(event);
             return (
-              <li key={event.id} className="grid gap-3 md:grid-cols-[minmax(180px,220px)_1fr] md:items-start">
-                <div>
+              <li key={event.id} className="relative pl-6 pb-6 last:pb-0 md:grid md:grid-cols-[minmax(180px,240px)_1fr] md:gap-6">
+                <span className="absolute left-0 top-1.5 h-3 w-3 rounded-full border-2 border-white/40 bg-[#175230]" />
+                <div className="mb-3 md:mb-0">
+                  <div className="text-xs uppercase tracking-wide text-white/60">{formatDay(event.date)}</div>
                   <div className="text-sm font-semibold text-white">{formatDateRange(event)}</div>
                   {timeRange && <div className="text-xs text-white/60 mt-1">{timeRange}</div>}
                 </div>
-                <div className={`space-y-3 border-l border-white/10 pl-4 ${index === 0 ? "border-l-white/40" : ""}`}>
+                <div className={`space-y-3 rounded-lg border border-white/10 bg-white/5 p-4 ${index === 0 ? "ring-1 ring-white/15" : ""}`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`${BADGE_BASE} ${EVENT_TYPE_STYLES[event.event_type]}`}>{EVENT_TYPE_LABELS[event.event_type]}</span>
                     {event.highlight && <span className={HIGHLIGHT_BADGE}>Key Moment</span>}
@@ -123,13 +126,46 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
                   <div>
                     <h3 className="text-lg font-semibold text-white">{event.title}</h3>
                     {event.description && <p className="text-white/80">{event.description}</p>}
-                    {event.location && <p className="text-sm text-white/60 mt-1">Location: {event.location}</p>}
+                    {event.location && <p className="text-sm text-white/60 mt-2">Location: {event.location}</p>}
                   </div>
                 </div>
               </li>
             );
           })}
         </ol>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xl font-semibold text-white">Season Calendar</h2>
+          <p className="text-sm text-white/60 hidden md:block">Month-by-month snapshot of every key date</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {monthlyGroups.map((group) => (
+            <article key={group.key} className="card space-y-3">
+              <header className="flex items-baseline justify-between">
+                <h3 className="text-lg font-semibold text-white">{group.label}</h3>
+                <span className="text-xs uppercase tracking-wide text-white/50">{group.events.length} {group.events.length === 1 ? "event" : "events"}</span>
+              </header>
+              <ul className="space-y-3">
+                {group.events.map((event) => (
+                  <li key={event.id} className="rounded-lg border border-white/10 bg-white/5 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-white/60">{formatDay(event.date)}</p>
+                        <p className="text-sm font-semibold text-white">{formatDateShort(event.date)}</p>
+                      </div>
+                      <span className={`${BADGE_BASE} ${EVENT_TYPE_STYLES[event.event_type]} text-[0.6rem]`}>{EVENT_TYPE_LABELS[event.event_type]}</span>
+                    </div>
+                    <p className="text-sm text-white/80 mt-2 font-medium">{event.title}</p>
+                    {event.location && <p className="text-xs text-white/60 mt-1">Location: {event.location}</p>}
+                    {event.description && <p className="text-xs text-white/60 mt-1">{event.description}</p>}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );
@@ -207,4 +243,43 @@ function isSameMinute(a: Date, b: Date): boolean {
 
 function isMidnight(date: Date): boolean {
   return date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0;
+}
+
+function groupEventsByMonth(events: ScheduleEvent[]): Array<{ key: string; label: string; events: ScheduleEvent[] }> {
+  const formatter = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
+  const buckets = new Map<string, { label: string; events: ScheduleEvent[] }>();
+
+  events.forEach((event) => {
+    const date = safeParseDate(event.date);
+    const key = date ? `${date.getFullYear()}-${date.getMonth()}` : "tbd";
+    const label = date ? formatter.format(date) : "Date TBD";
+    if (!buckets.has(key)) {
+      buckets.set(key, { label, events: [] });
+    }
+    buckets.get(key)!.events.push(event);
+  });
+
+  return Array.from(buckets.entries())
+    .sort(([a], [b]) => (a > b ? 1 : a < b ? -1 : 0))
+    .map(([key, group]) => ({
+      key,
+      label: group.label,
+      events: group.events.sort((x, y) => {
+        const dx = safeParseDate(x.date)?.getTime() ?? Number.POSITIVE_INFINITY;
+        const dy = safeParseDate(y.date)?.getTime() ?? Number.POSITIVE_INFINITY;
+        return dx - dy;
+      }),
+    }));
+}
+
+function formatDay(isoDate: string | null | undefined): string {
+  const date = safeParseDate(isoDate);
+  if (!date) return "Date TBD";
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+}
+
+function formatDateShort(isoDate: string | null | undefined): string {
+  const date = safeParseDate(isoDate);
+  if (!date) return "TBD";
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
 }
