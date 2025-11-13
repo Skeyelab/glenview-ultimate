@@ -11,6 +11,7 @@ import { getDirectusAssetUrl } from "@/lib/directus";
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/schedule", label: "Schedule" },
   { href: "/news", label: "News" },
 ];
 

@@ -41,6 +41,17 @@ export interface ScheduleEntry {
   end_month?: string | null;    // e.g., "May"
 }
 
+export interface ScheduleEvent {
+  id: number;
+  event_type: string;
+  title: string;
+  date: string;
+  end_date?: string | null;
+  season_year: number;
+  location?: string | null;
+  description?: string | null;
+}
+
 export interface NewsPost {
   id: number;
   slug: string;
@@ -54,7 +65,7 @@ export interface DirectusSchema {
   Pages: Page;
   Team: TeamMember;
   Partners: Partner;
-  Schedule: ScheduleEntry;
+  Schedule: ScheduleEvent;
   News: NewsPost;
   Registrations: Record<string, unknown>;
 }
@@ -143,6 +154,19 @@ export async function getSchedule(): Promise<ScheduleEntry | null> {
     })
   );
   return data[0] ?? null;
+}
+
+export async function getAllScheduleEvents(year?: number): Promise<ScheduleEvent[]> {
+  if (!haveEnv()) return [];
+  const client = getDirectusClient();
+  const filter = year ? { season_year: { _eq: year } } : {};
+  return await client.request<ScheduleEvent[]>(
+    (readItems as any)('Schedule', {
+      filter,
+      sort: ['date'],
+      fields: ['*']
+    })
+  );
 }
 
 export async function getNewsList(limit = 20): Promise<NewsPost[]> {
