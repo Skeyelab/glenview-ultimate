@@ -1,12 +1,14 @@
-// Mock fetch before importing route to avoid Request/Response issues
-// This needs to happen before Next.js server code is loaded
+// Mock submitRegistration before importing route
+jest.mock('@/lib/directus', () => ({
+  submitRegistration: jest.fn(),
+}))
+
 import { POST } from '@/app/api/register/route'
 import { NextRequest } from 'next/server'
-
-global.fetch = jest.fn()
+import { submitRegistration } from '@/lib/directus'
+import type { DirectusError } from '@directus/sdk'
 
 // Mock Next.js server modules that use Web APIs
-// We can't require the actual module because it uses Request which isn't available
 jest.mock('next/server', () => ({
   NextRequest: class MockNextRequest {
     constructor(url, init) {
@@ -60,6 +62,8 @@ describe('/api/register', () => {
 
     it('should return error when Directus credentials are missing', async () => {
       delete process.env.DIRECTUS_URL
+      const mockError = new Error('Directus not configured')
+      ;(submitRegistration as jest.Mock).mockRejectedValueOnce(mockError)
 
       const req = createRequest({
         parent1_name: 'Test Parent',
@@ -70,27 +74,25 @@ describe('/api/register', () => {
       const data = await response.json()
 
       expect(response.status).toBe(500)
-      expect(data.error).toBe('Server missing Directus credentials')
+      expect(data.error).toBe('Unexpected error while submitting registration.')
     })
 
     it('should handle duplicate email error', async () => {
-      // Mock Directus duplicate error
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          text: async () =>
-            JSON.stringify({
-              errors: [
-                {
-                  extensions: {
-                    code: 'RECORD_NOT_UNIQUE',
-                    field: 'parent1_email',
-                    value: 'test@example.com',
-                  },
-                },
-              ],
-            }),
-        })
+      const duplicateError: DirectusError = {
+        message: 'Duplicate entry',
+        errors: [
+          {
+            message: 'Duplicate entry',
+            extensions: {
+              code: 'RECORD_NOT_UNIQUE',
+              field: 'parent1_email',
+              value: 'test@example.com',
+            },
+          },
+        ],
+        response: { status: 400 } as Response,
+      }
+      ;(submitRegistration as jest.Mock).mockRejectedValueOnce(duplicateError)
 
       const req = createRequest({
         parent1_name: 'Test Parent',
@@ -106,11 +108,13 @@ describe('/api/register', () => {
     })
 
     it('should handle successful registration', async () => {
-      // Mock Directus success
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-          ok: true,
-          text: async () => JSON.stringify({ data: { id: 123 } }),
-        })
+      const mockRegistration = {
+        id: 123,
+        parent1_name: 'Test Parent',
+        parent1_email: 'test@example.com',
+        children: [{ full_name: 'Child 1' }],
+      }
+      ;(submitRegistration as jest.Mock).mockResolvedValueOnce(mockRegistration)
 
       const req = createRequest({
         parent1_name: 'Test Parent',
@@ -123,10 +127,7 @@ describe('/api/register', () => {
 
       expect(response.status).toBe(200)
       expect(data.ok).toBe(true)
-      // Route wraps Directus response: { ok: true, data: <directus_response> }
-      // Directus returns: { data: { id: 123 } }
-      // So final response is: { ok: true, data: { data: { id: 123 } } }
-      expect(data.data?.data?.id).toBe(123)
+      expect(data.data.id).toBe(123)
     })
   })
 })
