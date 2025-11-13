@@ -10,7 +10,7 @@ can be managed from Directus.
 
 1. Install Directus (Docker or Node). See: https://docs.directus.io/self-hosted/quickstart.html
 2. Create an **Admin** account and log into the Studio.
-3. Create a **Static Access Token** (Settings → Access Tokens). Give it a descriptive name (e.g., “Website Form Token”).
+3. Create a **Static Access Token** (Settings → Access Tokens). Give it a descriptive name (e.g., “Website Form Token”) and scope it to a role that can read public content and create registrations.
 4. Create the following **collections** in Data Model (with suggested fields). You can rename as you like.
 
 ### `pages`
@@ -49,8 +49,7 @@ can be managed from Directus.
 
 5. **Permissions** (Settings → Roles & Permissions):
    - For the **Public** role, allow **read** on `pages`, `people`, `partners`.
-   - For submissions, do **not** grant Public create permissions. Instead, the API route uses a static token to create `registrations` server-side.
-   - Alternatively, create a dedicated role (e.g., `webform`) with **create** on `registrations` and scope your static token to that role.
+   - For submissions, do **not** grant Public create permissions. Instead, create a dedicated role (e.g., `webform`) with **create** on `registrations` and generate the static token for that role. The token is only used server-side.
 
 6. (Optional) **Flows & Notifications**:
    - Create a Flow triggered on **Create → registrations** to send an email to organizers and/or write to Google Sheets.
@@ -64,12 +63,14 @@ can be managed from Directus.
 1. Copy `.env.example` to `.env.local` and fill:
    ```ini
    DIRECTUS_URL=https://your-directus.example.com
-   NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
    DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
+   NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
    NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
    ```
 
-   **Note:** `NEXT_PUBLIC_DIRECTUS_URL` is needed for client components (like the navbar logo) to access Directus assets. It should match `DIRECTUS_URL`.
+   **Notes:**
+   - `NEXT_PUBLIC_DIRECTUS_URL` is needed for client components (like the navbar logo) to access Directus assets. It should match `DIRECTUS_URL`.
+   - The SDK uses `DIRECTUS_STATIC_TOKEN`. Keep it scoped to the minimal permissions required and rotate it periodically.
 2. Install and run:
    ```bash
    npm i
@@ -89,7 +90,7 @@ can be managed from Directus.
 
 ## 4) Hardening & production notes
 
-- Create a **separate static token** with the minimum scope (create on `registrations` only).
+- Create a **dedicated role** for the static token with the minimum scope (e.g., `webform` that can create `registrations` only). Rotate the token periodically.
 - Add bot protection/rate limiting to the registration form (e.g., Cloudflare Turnstile, hCaptcha, or rate limiting middleware).
 - Add field **validation** in Directus (required, email format, etc.).
 - Add **CORS** settings in Directus if you later move to direct client reads.
