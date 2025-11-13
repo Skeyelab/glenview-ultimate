@@ -60,9 +60,9 @@ Tests are located in the `__tests__` directory, mirroring the source structure:
 
 3. **Directus API Functions** (`lib/directus.ts`)
    - `getHomePage()` - with mocked fetch
-   - `getPeople()` - with mocked fetch
+   - `getTeam()` - with mocked fetch
    - `getPartners()` - with mocked fetch
-   - `getCurrentSeason()` - with mocked fetch
+   - `getSchedule()` - with mocked fetch
    - `getNewsList()` - with mocked fetch
    - `getNewsBySlug()` - with mocked fetch
 
