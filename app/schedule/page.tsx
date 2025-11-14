@@ -1,34 +1,13 @@
 import React from "react";
-import { getSchedule, type ScheduleEvent, type ScheduleEventType } from "@/lib/directus";
-import { NextKeyDate } from "@/components/next-key-date";
-import { formatDateRange, formatTimeRange, formatDay, formatDateShort, safeParseDate } from "@/lib/date-utils";
+import { getSchedule, type ScheduleEvent } from "@/lib/directus";
+import { safeParseDate } from "@/lib/date-utils";
+import { ScheduleHeader } from "@/components/schedule/schedule-header";
+import { UpcomingEventsCard } from "@/components/schedule/upcoming-events-card";
+import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
+import { SeasonTimeline } from "@/components/schedule/season-timeline";
+import { SeasonCalendar, type MonthlyEventGroup } from "@/components/schedule/season-calendar";
 
 export const revalidate = 10;
-
-const EVENT_TYPE_LABELS: Record<ScheduleEventType, string> = {
-  season_start: "Season Start",
-  season_end: "Season Wrap",
-  registration_open: "Registration Opens",
-  registration_close: "Registration Deadline",
-  game: "Game Day",
-  practice: "Practice",
-  tournament: "Tournament",
-  other: "Event",
-};
-
-const EVENT_TYPE_STYLES: Record<ScheduleEventType, string> = {
-  season_start: "bg-emerald-500/20 text-emerald-100 border border-emerald-400/40",
-  season_end: "bg-rose-500/20 text-rose-100 border border-rose-400/40",
-  registration_open: "bg-sky-500/20 text-sky-100 border border-sky-400/40",
-  registration_close: "bg-sky-500/10 text-sky-100 border border-sky-300/40",
-  game: "bg-purple-500/20 text-purple-100 border border-purple-400/40",
-  practice: "bg-orange-500/20 text-orange-100 border border-orange-400/40",
-  tournament: "bg-teal-500/20 text-teal-100 border border-teal-400/40",
-  other: "bg-white/10 text-white border border-white/30",
-};
-
-const BADGE_BASE = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase";
-const HIGHLIGHT_BADGE = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border border-amber-300/70 text-amber-100";
 
 export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();
@@ -39,128 +18,16 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
 
   return (
     <div className="space-y-8">
-      <header className="card space-y-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-wide text-white/60">Season {schedule.season_year}</p>
-            <h1 className="text-3xl font-bold text-white">{schedule.title}</h1>
-            {schedule.start_month && schedule.end_month && (
-              <p className="text-white/80 mt-2">
-                Season runs from <strong>{schedule.start_month}</strong> through <strong>{schedule.end_month}</strong> {schedule.season_year}
-              </p>
-            )}
-          </div>
-          {upcomingDisplay.length > 0 && (
-            <NextKeyDate event={upcomingDisplay[0]} />
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
-          {Array.from(new Set(events.map((event) => EVENT_TYPE_LABELS[event.event_type]))).map((label) => (
-            <span key={label} className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
-              {label}
-            </span>
-          ))}
-        </div>
-      </header>
+      <ScheduleHeader schedule={schedule} events={events} featuredEvent={upcomingDisplay[0]} />
 
       <section className="grid-2">
-        <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-3">Up Next</h2>
-          {upcomingDisplay.length > 0 ? (
-            <ul className="space-y-3">
-              {upcomingDisplay.map((event) => (
-                <li key={event.id} className="rounded-lg border border-white/15 bg-white/5 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className={`${BADGE_BASE} ${EVENT_TYPE_STYLES[event.event_type]}`}>{EVENT_TYPE_LABELS[event.event_type]}</span>
-                    {event.highlight && <span className={HIGHLIGHT_BADGE}>Key Moment</span>}
-                  </div>
-                  <p className="text-sm text-white/70 mt-3">{formatDateRange(event)}</p>
-                  <p className="text-lg font-semibold text-white mt-1">{event.title}</p>
-                  {event.location && <p className="text-sm text-white/60 mt-1">Location: {event.location}</p>}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-white/80">Season events coming soon.</p>
-          )}
-        </div>
-
-        <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-3">Season Highlights</h2>
-          {schedule.highlights.length > 0 ? (
-            <ul className="list-disc space-y-2 ps-5 text-white/90">
-              {schedule.highlights.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-white/80">Highlights coming soon.</p>
-          )}
-        </div>
+        <UpcomingEventsCard events={upcomingDisplay} />
+        <SeasonHighlightsCard highlights={schedule.highlights} />
       </section>
 
-      <section className="card">
-        <h2 className="text-xl font-semibold text-white mb-4">Season Timeline</h2>
-        <ol className="relative pl-4 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-px before:bg-white/20">
-          {events.map((event, index) => {
-            const timeRange = formatTimeRange(event);
-            return (
-              <li key={event.id} className="relative pl-6 pb-6 last:pb-0 md:grid md:grid-cols-[minmax(180px,240px)_1fr] md:gap-6">
-                <span className="absolute left-0 top-1.5 h-3 w-3 rounded-full border-2 border-white/40 bg-[#175230]" />
-                <div className="mb-3 md:mb-0">
-                  <div className="text-xs uppercase tracking-wide text-white/60">{formatDay(event.date)}</div>
-                  <div className="text-sm font-semibold text-white">{formatDateRange(event)}</div>
-                  {timeRange && <div className="text-xs text-white/60 mt-1">{timeRange}</div>}
-                </div>
-                <div className={`space-y-3 rounded-lg border border-white/10 bg-white/5 p-4 ${index === 0 ? "ring-1 ring-white/15" : ""}`}>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`${BADGE_BASE} ${EVENT_TYPE_STYLES[event.event_type]}`}>{EVENT_TYPE_LABELS[event.event_type]}</span>
-                    {event.highlight && <span className={HIGHLIGHT_BADGE}>Key Moment</span>}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">{event.title}</h3>
-                    {event.description && <p className="text-white/80">{event.description}</p>}
-                    {event.location && <p className="text-sm text-white/60 mt-2">Location: {event.location}</p>}
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
+      <SeasonTimeline events={events} />
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold text-white">Season Calendar</h2>
-          <p className="text-sm text-white/60 hidden md:block">Month-by-month snapshot of every key date</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {monthlyGroups.map((group) => (
-            <article key={group.key} className="card space-y-3">
-              <header className="flex items-baseline justify-between">
-                <h3 className="text-lg font-semibold text-white">{group.label}</h3>
-                <span className="text-xs uppercase tracking-wide text-white/50">{group.events.length} {group.events.length === 1 ? "event" : "events"}</span>
-              </header>
-              <ul className="space-y-3">
-                {group.events.map((event) => (
-                  <li key={event.id} className="rounded-lg border border-white/10 bg-white/5 p-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-white/60">{formatDay(event.date)}</p>
-                        <p className="text-sm font-semibold text-white">{formatDateShort(event.date)}</p>
-                      </div>
-                      <span className={`${BADGE_BASE} ${EVENT_TYPE_STYLES[event.event_type]} text-[0.6rem]`}>{EVENT_TYPE_LABELS[event.event_type]}</span>
-                    </div>
-                    <p className="text-sm text-white/80 mt-2 font-medium">{event.title}</p>
-                    {event.location && <p className="text-xs text-white/60 mt-1">Location: {event.location}</p>}
-                    {event.description && <p className="text-xs text-white/60 mt-1">{event.description}</p>}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
+      <SeasonCalendar groups={monthlyGroups} />
     </div>
   );
 }
@@ -175,7 +42,7 @@ function selectUpcomingEvents(events: ScheduleEvent[]): ScheduleEvent[] {
     .slice(0, 3);
 }
 
-function groupEventsByMonth(events: ScheduleEvent[]): Array<{ key: string; label: string; events: ScheduleEvent[] }> {
+function groupEventsByMonth(events: ScheduleEvent[]): MonthlyEventGroup[] {
   const formatter = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
   const buckets = new Map<string, { label: string; events: ScheduleEvent[] }>();
 
