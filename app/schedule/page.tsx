@@ -1,7 +1,9 @@
 import React from "react";
 import { getSchedule, type ScheduleEvent, type ScheduleEventType } from "@/lib/directus";
+import { NextKeyDate } from "@/components/next-key-date";
+import { formatDateRange, formatTimeRange, formatDay, formatDateShort, safeParseDate } from "@/lib/date-utils";
 
-export const revalidate = 300;
+export const revalidate = 10;
 
 const EVENT_TYPE_LABELS: Record<ScheduleEventType, string> = {
   season_start: "Season Start",
@@ -49,15 +51,7 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
             )}
           </div>
           {upcomingDisplay.length > 0 && (
-            <div className="notice md:min-w-[240px]">
-              <p className="text-xs uppercase tracking-wide text-white/60 mb-1">Next Key Date</p>
-              <p className="font-semibold text-white">
-                {upcomingDisplay[0].title}
-              </p>
-              <p className="text-sm text-white/70">
-                {formatDateRange(upcomingDisplay[0])}
-              </p>
-            </div>
+            <NextKeyDate event={upcomingDisplay[0]} />
           )}
         </div>
         <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
@@ -181,70 +175,6 @@ function selectUpcomingEvents(events: ScheduleEvent[]): ScheduleEvent[] {
     .slice(0, 3);
 }
 
-function formatDateRange(event: ScheduleEvent): string {
-  const startDate = safeParseDate(event.date);
-  if (!startDate) return "Date TBD";
-  const endDate = safeParseDate(event.end_date) ?? startDate;
-
-  const sameDay = isSameDay(startDate, endDate);
-  if (sameDay) {
-    return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(startDate);
-  }
-
-  const sameYear = startDate.getFullYear() === endDate.getFullYear();
-  if (sameYear) {
-    const sameMonth = startDate.getMonth() === endDate.getMonth();
-    if (sameMonth) {
-      const monthLabel = new Intl.DateTimeFormat("en-US", { month: "long" }).format(startDate);
-      return `${monthLabel} ${startDate.getDate()}–${endDate.getDate()}, ${startDate.getFullYear()}`;
-    }
-    const startLabel = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(startDate);
-    const endLabel = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(endDate);
-    return `${startLabel} – ${endLabel}, ${startDate.getFullYear()}`;
-  }
-
-  const startFull = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(startDate);
-  const endFull = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(endDate);
-  return `${startFull} – ${endFull}`;
-}
-
-function formatTimeRange(event: ScheduleEvent): string | null {
-  const startDate = safeParseDate(event.date);
-  if (!startDate || isMidnight(startDate)) return null;
-
-  const endDate = safeParseDate(event.end_date);
-  const timeFormatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
-
-  if (!endDate || isSameMinute(startDate, endDate) || isMidnight(endDate)) {
-    return timeFormatter.format(startDate);
-  }
-
-  return `${timeFormatter.format(startDate)} – ${timeFormatter.format(endDate)}`;
-}
-
-function safeParseDate(iso: string | null | undefined): Date | null {
-  if (!iso) return null;
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return null;
-  return date;
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-
-function isSameMinute(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate() &&
-    a.getHours() === b.getHours() &&
-    a.getMinutes() === b.getMinutes();
-}
-
-function isMidnight(date: Date): boolean {
-  return date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0;
-}
-
 function groupEventsByMonth(events: ScheduleEvent[]): Array<{ key: string; label: string; events: ScheduleEvent[] }> {
   const formatter = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
   const buckets = new Map<string, { label: string; events: ScheduleEvent[] }>();
@@ -274,14 +204,3 @@ function groupEventsByMonth(events: ScheduleEvent[]): Array<{ key: string; label
     }));
 }
 
-function formatDay(isoDate: string | null | undefined): string {
-  const date = safeParseDate(isoDate);
-  if (!date) return "Date TBD";
-  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
-}
-
-function formatDateShort(isoDate: string | null | undefined): string {
-  const date = safeParseDate(isoDate);
-  if (!date) return "TBD";
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
-}
