@@ -1,4 +1,5 @@
 ---
-alwaysApply: true
+description: use this when we refernce what the client wants
+alwaysApply: false
 ---
 reference client_direction.md for the input our client privided
