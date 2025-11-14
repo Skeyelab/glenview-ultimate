@@ -4,32 +4,41 @@ jest.mock('@/lib/directus', () => ({
 }))
 
 // Mock Next.js server modules that use Web APIs
-jest.mock('next/server', () => ({
-  NextRequest: class MockNextRequest {
-    constructor(url, init) {
+jest.mock('next/server', () => {
+  class MockNextRequest {
+    public url: string
+    public method: string
+    public headers: Map<string, string>
+    private _body?: string
+
+    constructor(url: string, init?: { method?: string; headers?: Record<string, string>; body?: string }) {
       this.url = url
       this.method = init?.method || 'GET'
       this.headers = new Map()
       this._body = init?.body
     }
-    async json() {
+    async json(): Promise<unknown> {
       return JSON.parse(this._body || '{}')
     }
-    async text() {
+    async text(): Promise<string> {
       return this._body || ''
     }
-  },
-  NextResponse: {
-    json: (body, init) => {
-      const response = {
-        json: async () => body,
-        status: init?.status || 200,
-        ok: (init?.status || 200) < 400,
-      }
-      return response
+  }
+
+  return {
+    NextRequest: MockNextRequest,
+    NextResponse: {
+      json: (body: unknown, init?: { status?: number }): { json: () => Promise<unknown>; status: number; ok: boolean } => {
+        const response = {
+          json: async () => body,
+          status: init?.status || 200,
+          ok: (init?.status || 200) < 400,
+        }
+        return response
+      },
     },
-  },
-}))
+  }
+})
 
 // eslint-disable-next-line import/first -- Jest mocks must be before imports
 import { POST } from '@/app/api/register/route'
@@ -82,8 +91,8 @@ describe('/api/register', () => {
     })
 
     it('should handle duplicate email error', async () => {
-      const mockResponse = { status: 400 } satisfies Partial<Response>;
-      const duplicateError: DirectusError = {
+      const mockResponse = { status: 400 } as Partial<Response>;
+      const duplicateError: DirectusError<Response> = {
         message: 'Duplicate entry',
         errors: [
           {
@@ -95,7 +104,7 @@ describe('/api/register', () => {
             },
           },
         ],
-        response: mockResponse,
+        response: mockResponse as Response,
       }
       ;(submitRegistration as jest.Mock).mockRejectedValueOnce(duplicateError)
 
