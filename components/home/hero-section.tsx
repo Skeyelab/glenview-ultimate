@@ -1,25 +1,24 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { Page, SeasonSchedule } from "@/lib/directus";
+import type { SeasonSchedule } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 
 export interface HeroSectionProps {
-  home: Page | null;
   season: SeasonSchedule | null;
   logoUrl: string | null;
   className?: string;
 }
 
-export function HeroSection({ home, season, logoUrl, className }: HeroSectionProps): React.JSX.Element {
-  const heroTitle = home?.hero_title ?? "The Fun Starts - Spring 2026";
-  const heroSubtitle = home?.hero_subtitle ?? "Introducing Glenview's very first Youth Ultimate Frisbee Club";
-  const heroTagline = home?.hero_tagline ?? "5th-8th Grade. Boys & Girls.";
-  const heroMessage1 = home?.hero_message1 ?? "Everyone is Welcome. Everyone Plays.";
-  const heroMessage2 = home?.hero_message2 ?? "Come play with us. Join our team.";
-  const ctaLabel = home?.cta_label ?? "Register";
-  const ctaUrl = home?.cta_url ?? "/register";
-  const preRegistrationText = home?.pre_registration_text ?? "Pre-Registration is now open";
+export function HeroSection({ season, logoUrl, className }: HeroSectionProps): React.JSX.Element {
+  const heroTitle = "The Fun Starts - Spring 2026";
+  const heroSubtitle = "Introducing Glenview's very first Youth Ultimate Frisbee Club";
+  const heroTagline = "5th-8th Grade. Boys & Girls.";
+  const heroMessage1 = "Everyone is Welcome. Everyone Plays.";
+  const heroMessage2 = "Come play with us. Join our team.";
+  const ctaLabel = "Register";
+  const ctaUrl = "/register";
+  const preRegistrationText = "Pre-Registration is now open";
 
   return (
     <section className={cn("text-center space-y-4", className)}>

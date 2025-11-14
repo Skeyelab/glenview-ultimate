@@ -1,21 +1,6 @@
 import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 
-export interface Page {
-  id: number;
-  slug: string;
-  title: string;
-  hero_title?: string | null;
-  hero_subtitle?: string | null;
-  hero_tagline?: string | null;
-  hero_message1?: string | null;
-  hero_message2?: string | null;
-  pre_registration_text?: string | null;
-  cta_label?: string | null;
-  cta_url?: string | null;
-  content?: string | null;
-}
-
 export interface Partner {
   id: number;
   name: string;
@@ -80,7 +65,6 @@ export interface About {
 }
 
 export interface DirectusSchema {
-  Pages: Page[];
   Team: TeamMember[];
   Partners: Partner[];
   Schedule: ScheduleEvent[];
@@ -146,19 +130,6 @@ function initDirectusClient(): DirectusRestClient {
 function getDirectusClient(): DirectusRestClient {
   directusClient ??= initDirectusClient();
   return directusClient;
-}
-
-export async function getHomePage(): Promise<Page | null> {
-  if (!haveEnv()) return null;
-  const client = getDirectusClient();
-  const data = await client.request(
-    readItems("Pages", {
-      filter: { slug: { _eq: "home" } },
-      limit: 1,
-      fields: ["*"],
-    }),
-  );
-  return data[0] ?? null;
 }
 
 export async function getTeam(): Promise<TeamMember[]> {

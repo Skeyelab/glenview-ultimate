@@ -3,24 +3,15 @@
 [![CI](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml)
 
 This is a minimal, production-ready starter that connects a Next.js front-end to a Directus CMS back-end.
-It includes a registration form that writes to a `registrations` collection and public pages that
+It includes a registration form that writes to a `registrations` collection and public content that
 can be managed from Directus.
 
 ## 1) Directus quick setup
 
 1. Install Directus (Docker or Node). See: https://docs.directus.io/self-hosted/quickstart.html
 2. Create an **Admin** account and log into the Studio.
-3. Create a **Static Access Token** (Settings → Access Tokens). Give it a descriptive name (e.g., “Website Form Token”) and scope it to a role that can read public content and create registrations.
+3. Create a **Static Access Token** (Settings → Access Tokens). Give it a descriptive name (e.g., "Website Form Token") and scope it to a role that can read public content and create registrations.
 4. Create the following **collections** in Data Model (with suggested fields). You can rename as you like.
-
-### `pages`
-- `slug` (string, unique) — e.g., `home`, `about`
-- `title` (string)
-- `hero_title` (string, optional)
-- `hero_subtitle` (text, optional)
-- `cta_label` (string, optional)
-- `cta_url` (string, optional)
-- `content` (rich text or markdown, optional)
 
 ### `people`
 - `name` (string)
@@ -48,14 +39,13 @@ can be managed from Directus.
 > Tip: Using a JSON field for `children` keeps the form simple. If you prefer relational data, create a `children` collection and a one-to-many relation from `registrations` → `children`.
 
 5. **Permissions** (Settings → Roles & Permissions):
-   - For the **Public** role, allow **read** on `pages`, `people`, `partners`.
+   - For the **Public** role, allow **read** on `people`, `partners`.
    - For submissions, do **not** grant Public create permissions. Instead, create a dedicated role (e.g., `webform`) with **create** on `registrations` and generate the static token for that role. The token is only used server-side.
 
 6. (Optional) **Flows & Notifications**:
    - Create a Flow triggered on **Create → registrations** to send an email to organizers and/or write to Google Sheets.
 
 7. Seed some content:
-   - Create a `pages` item with `slug=home`, set your hero text and CTA.
    - Add your `people` and `partners` items.
 
 ## 2) Configure the Next.js app
