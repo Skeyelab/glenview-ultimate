@@ -1,0 +1,6 @@
+id,season_year,event_type,title,date,end_date,location,description,highlight
+1,2026,registration_open,"Pre-Registration Opens","2025-11-01T15:00:00.000Z",,,,"true"
+2,2026,registration_close,"Registration & Uniform Orders Due","2026-02-15T15:00:00.000Z",,,,"true"
+3,2026,season_start,"Spring Season Kickoff Practice","2026-03-01T21:30:00.000Z",,TBD,"Weekly practices begin (12 weeks). Time & location currently TBD.","true"
+4,2026,practice,"Weekly Practices Continue","2026-03-08T21:30:00.000Z","2026-05-24T21:30:00.000Z",TBD,"Skills, drills, and scrimmages.",
+5,2026,tournament,"Tournament Opportunities","2026-04-01T15:00:00.000Z","2026-05-31T22:00:00.000Z",,"Opportunity to attend 3-4 tournaments.",

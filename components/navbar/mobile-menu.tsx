@@ -11,9 +11,11 @@ interface NavLinkData {
 interface MobileMenuProps {
   links: readonly NavLinkData[];
   isOpen: boolean;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
 }
 
-export function MobileMenu({ links, isOpen }: MobileMenuProps): React.JSX.Element {
+export function MobileMenu({ links, isOpen, ctaLabel, ctaHref }: MobileMenuProps): React.JSX.Element {
   if (!isOpen) return <></>;
 
   return (
@@ -23,9 +25,11 @@ export function MobileMenu({ links, isOpen }: MobileMenuProps): React.JSX.Elemen
           <NavLink key={link.href} href={link.href} label={link.label} />
         ))}
       </nav>
-      <Button asChild className="mt-3 w-full">
-        <Link href="/register">Register</Link>
-      </Button>
+      {ctaLabel && ctaHref && (
+        <Button asChild className="mt-3 w-full">
+          <Link href={ctaHref}>{ctaLabel}</Link>
+        </Button>
+      )}
     </div>
   );
 }

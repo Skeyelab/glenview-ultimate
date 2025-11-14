@@ -1,0 +1,7 @@
+id,label,href,order,is_primary_cta
+1,Home,/,1,false
+2,About,/about,2,false
+3,"What is Ultimate?",/what-is-ultimate,3,false
+4,News,/news,4,false
+5,Schedule,/schedule,5,false
+6,Register,/register,6,true

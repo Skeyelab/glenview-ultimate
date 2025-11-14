@@ -2,7 +2,8 @@
 
 import React from "react";
 import type { Child } from "@/lib/register-types";
-import { WEEKDAYS } from "@/lib/constants";
+
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
 interface ChildFormFieldsProps {
   child: Child;
@@ -69,7 +70,7 @@ export function ChildFormFields({
         <div>
           <label className="label">Availability (check all that apply)</label>
           <div className="flex gap-3 flex-wrap">
-            {WEEKDAYS.map((day) => (
+            {WEEK_DAYS.map((day) => (
               <label key={day} className="text-sm text-white/90">
                 <input
                   type="checkbox"

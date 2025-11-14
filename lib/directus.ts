@@ -1,6 +1,14 @@
 import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 import { safeParseDate } from "./date-utils";
+import {
+  FALLBACK_ABOUT,
+  FALLBACK_NAV_LINKS,
+  FALLBACK_PARTNERS,
+  FALLBACK_SCHEDULE_EVENTS,
+  FALLBACK_WEBSITE_SETTINGS,
+  FALLBACK_WHAT_IS_ULTIMATE_VIDEOS,
+} from "./directus-fallbacks";
 
 export interface Partner {
   id: number;
@@ -65,6 +73,45 @@ export interface About {
   what_kids_learn?: string[] | null;
 }
 
+export interface WebsiteSettings {
+  id: number;
+  site_name: string;
+  footer_text?: string | null;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_tagline: string;
+  hero_message_primary: string;
+  hero_message_secondary: string;
+  hero_cta_label: string;
+  hero_cta_url: string;
+  hero_pre_registration_text?: string | null;
+  description_paragraphs?: string[] | null;
+  register_heading?: string | null;
+  register_intro?: string | null;
+}
+
+export interface NavigationLink {
+  id: number;
+  label: string;
+  href: string;
+  order?: number | null;
+  is_primary_cta?: boolean | null;
+}
+
+export interface LogoSingleton {
+  id: number;
+  image?: string | null;
+}
+
+export interface WhatIsUltimateVideo {
+  id: number;
+  title: string;
+  description: string;
+  youtube_embed_id?: string | null;
+  video_url?: string | null;
+  sort?: number | null;
+}
+
 export interface DirectusSchema {
   Team: TeamMember[];
   Partners: Partner[];
@@ -72,6 +119,10 @@ export interface DirectusSchema {
   News: NewsPost[];
   About: About[];
   Registrations: Registration[];
+  Website: WebsiteSettings[];
+  NavigationLinks: NavigationLink[];
+  Logo: LogoSingleton[];
+  WhatIsUltimateVideos: WhatIsUltimateVideo[];
 }
 
 // Removed AuthenticatedRestClient - not used
@@ -90,13 +141,21 @@ function getDirectusConfig(): DirectusConfig {
 }
 
 function haveEnv(): boolean {
+  if (process.env.NODE_ENV === "test") return false;
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
 async function withDirectus<T>(fallback: T, request: (client: DirectusRestClient) => Promise<T>): Promise<T> {
   if (!haveEnv()) return fallback;
   const client = getDirectusClient();
-  return await request(client);
+  try {
+    return await request(client);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[directus] Falling back to local data due to error:", error);
+    }
+    return fallback;
+  }
 }
 
 type DirectusRestClient = DirectusClient<DirectusSchema> & StaticTokenClient<DirectusSchema> & RestClient<DirectusSchema>;
@@ -148,7 +207,7 @@ export function getTeam(): Promise<TeamMember[]> {
 }
 
 export function getPartners(): Promise<Partner[]> {
-  return withDirectus([], (client) =>
+  return withDirectus(FALLBACK_PARTNERS, (client) =>
     client.request(
       readItems("Partners", { fields: ["*"] }),
     ),
@@ -158,65 +217,7 @@ export function getPartners(): Promise<Partner[]> {
 const START_EVENT_TYPES: ScheduleEventType[] = ["season_start", "practice", "game", "tournament"];
 const END_EVENT_TYPES: ScheduleEventType[] = ["season_end", "tournament", "game", "practice"];
 
-const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
-  {
-    id: 1,
-    season_year: 2026,
-    event_type: "registration_open",
-    title: "Pre-Registration Opens",
-    date: "2025-11-01T15:00:00.000Z",
-    end_date: null,
-    location: null,
-    description: null,
-    highlight: true,
-  },
-  {
-    id: 2,
-    season_year: 2026,
-    event_type: "registration_close",
-    title: "Registration & Uniform Orders Due",
-    date: "2026-02-15T15:00:00.000Z",
-    end_date: null,
-    location: null,
-    description: null,
-    highlight: true,
-  },
-  {
-    id: 3,
-    season_year: 2026,
-    event_type: "season_start",
-    title: "Spring Season Kickoff Practice",
-    date: "2026-03-01T21:30:00.000Z",
-    end_date: null,
-    location: "TBD",
-    description: "Weekly practices begin (12 weeks). Time & location currently TBD.",
-    highlight: true,
-  },
-  {
-    id: 4,
-    season_year: 2026,
-    event_type: "practice",
-    title: "Weekly Practices Continue",
-    date: "2026-03-08T21:30:00.000Z",
-    end_date: "2026-05-24T21:30:00.000Z",
-    location: "TBD",
-    description: "Skills, drills, and scrimmages.",
-    highlight: null,
-  },
-  {
-    id: 5,
-    season_year: 2026,
-    event_type: "tournament",
-    title: "Tournament Opportunities",
-    date: "2026-04-01T15:00:00.000Z",
-    end_date: "2026-05-31T22:00:00.000Z",
-    description: "Opportunity to attend 3-4 tournaments.",
-    location: null,
-    highlight: null,
-  },
-];
-
-const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(DEFAULT_SCHEDULE_EVENTS);
+const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(FALLBACK_SCHEDULE_EVENTS);
 
 export function getSchedule(): Promise<SeasonSchedule> {
   return withDirectus(DEFAULT_SCHEDULE, async (client) => {
@@ -270,15 +271,67 @@ export function getNewsBySlug(slug: string): Promise<NewsPost | null> {
 }
 
 export function getAbout(): Promise<About | null> {
-  return withDirectus<About | null>(null, async (client) => {
+  return withDirectus<About | null>(FALLBACK_ABOUT, async (client) => {
     const data = await client.request(
       readItems("About", {
         limit: 1,
         fields: ["*"],
       }),
     );
-    return data[0] ?? null;
+    return data[0] ?? FALLBACK_ABOUT;
   });
+}
+
+export function getWebsiteSettings(): Promise<WebsiteSettings> {
+  return withDirectus(FALLBACK_WEBSITE_SETTINGS, async (client) => {
+    const data = await client.request(
+      readItems("Website", {
+        limit: 1,
+        fields: ["*"],
+      }),
+    );
+    const record = data[0];
+    if (!record) return FALLBACK_WEBSITE_SETTINGS;
+    return {
+      ...record,
+      description_paragraphs: (record.description_paragraphs as string[] | null | undefined) ?? FALLBACK_WEBSITE_SETTINGS.description_paragraphs,
+    };
+  });
+}
+
+export function getNavigationLinks(): Promise<NavigationLink[]> {
+  return withDirectus(FALLBACK_NAV_LINKS, (client) =>
+    client.request(
+      readItems("NavigationLinks", {
+        fields: ["*"],
+        sort: ["order"],
+      }),
+    ),
+  ).then((links) => (links.length ? links : FALLBACK_NAV_LINKS));
+}
+
+export function getLogoImageId(): Promise<string | null> {
+  return withDirectus<string | null>(null, async (client) => {
+    const data = await client.request(
+      readItems("Logo", {
+        limit: 1,
+        fields: ["image"],
+      }),
+    );
+    const logo = data[0];
+    return logo?.image ?? null;
+  });
+}
+
+export function getWhatIsUltimateVideos(): Promise<WhatIsUltimateVideo[]> {
+  return withDirectus(FALLBACK_WHAT_IS_ULTIMATE_VIDEOS, (client) =>
+    client.request(
+      readItems("WhatIsUltimateVideos", {
+        fields: ["*"],
+        sort: ["sort"],
+      }),
+    ),
+  ).then((videos) => (videos.length ? videos : FALLBACK_WHAT_IS_ULTIMATE_VIDEOS));
 }
 
 // Helper to get Directus asset URL from file UUID
@@ -304,7 +357,7 @@ export async function submitRegistration(payload: RegistrationInsert): Promise<R
 
 function buildSeasonSchedule(events: ScheduleEvent[]): SeasonSchedule {
   const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const seasonYear = sortedEvents[0]?.season_year ?? DEFAULT_SCHEDULE_EVENTS[0].season_year;
+  const seasonYear = sortedEvents[0]?.season_year ?? FALLBACK_SCHEDULE_EVENTS[0].season_year;
   const title = `${seasonYear} Season Schedule`;
 
   const seasonStartSource =

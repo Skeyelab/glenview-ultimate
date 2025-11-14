@@ -1028,6 +1028,39 @@
                 "*"
             ],
             "policy": "f93ac672-f585-4337-b1f1-c6f9aa20ac5c"
+        },
+        {
+            "collection": "Logo",
+            "action": "read",
+            "permissions": null,
+            "validation": null,
+            "presets": null,
+            "fields": [
+                "*"
+            ],
+            "policy": "f93ac672-f585-4337-b1f1-c6f9aa20ac5c"
+        },
+        {
+            "collection": "NavigationLinks",
+            "action": "read",
+            "permissions": null,
+            "validation": null,
+            "presets": null,
+            "fields": [
+                "*"
+            ],
+            "policy": "f93ac672-f585-4337-b1f1-c6f9aa20ac5c"
+        },
+        {
+            "collection": "WhatIsUltimateVideos",
+            "action": "read",
+            "permissions": null,
+            "validation": null,
+            "presets": null,
+            "fields": [
+                "*"
+            ],
+            "policy": "f93ac672-f585-4337-b1f1-c6f9aa20ac5c"
         }
     ],
     "access": [

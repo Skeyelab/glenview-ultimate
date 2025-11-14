@@ -3,25 +3,24 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SeasonSchedule } from "@/lib/directus";
 import { cn } from "@/lib/utils";
-import {
-  HERO_TITLE,
-  HERO_SUBTITLE,
-  HERO_TAGLINE,
-  HERO_MESSAGE_1,
-  HERO_MESSAGE_2,
-  HERO_CTA_LABEL,
-  HERO_CTA_URL,
-  HERO_PRE_REGISTRATION_TEXT,
-} from "@/lib/constants";
 
 export interface HeroSectionProps {
   season: SeasonSchedule | null;
   logoUrl: string | null;
+  hero: {
+    title: string;
+    subtitle?: string | null;
+    tagline?: string | null;
+    messagePrimary?: string | null;
+    messageSecondary?: string | null;
+    ctaLabel?: string | null;
+    ctaUrl?: string | null;
+    preRegistrationText?: string | null;
+  };
   className?: string;
 }
 
-export function HeroSection({ season, logoUrl, className }: HeroSectionProps): React.JSX.Element {
-
+export function HeroSection({ season, logoUrl, hero, className }: HeroSectionProps): React.JSX.Element {
   return (
     <section className={cn("text-center space-y-4", className)}>
       {logoUrl && (
@@ -36,17 +35,19 @@ export function HeroSection({ season, logoUrl, className }: HeroSectionProps): R
           />
         </div>
       )}
-      <h1 className="text-3xl md:text-5xl font-bold text-white">{HERO_TITLE}</h1>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_SUBTITLE}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_TAGLINE}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_MESSAGE_1}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_MESSAGE_2}</p>
-      <div className="mt-4">
-        <Link className="button" href={HERO_CTA_URL}>
-          {HERO_CTA_LABEL}
-        </Link>
-      </div>
-      <p className="text-sm text-white/70 mt-2">{HERO_PRE_REGISTRATION_TEXT}</p>
+      <h1 className="text-3xl md:text-5xl font-bold text-white">{hero.title}</h1>
+      {hero.subtitle && <p className="text-lg text-white/90 max-w-2xl mx-auto">{hero.subtitle}</p>}
+      {hero.tagline && <p className="text-lg text-white/90 max-w-2xl mx-auto">{hero.tagline}</p>}
+      {hero.messagePrimary && <p className="text-lg text-white/90 max-w-2xl mx-auto">{hero.messagePrimary}</p>}
+      {hero.messageSecondary && <p className="text-lg text-white/90 max-w-2xl mx-auto">{hero.messageSecondary}</p>}
+      {hero.ctaLabel && hero.ctaUrl && (
+        <div className="mt-4">
+          <Link className="button" href={hero.ctaUrl}>
+            {hero.ctaLabel}
+          </Link>
+        </div>
+      )}
+      {hero.preRegistrationText && <p className="text-sm text-white/70 mt-2">{hero.preRegistrationText}</p>}
       {season && (
         <p className="text-sm text-white/70 mt-2">
           {season.title ?? `${season.year} Season`} ({season.start_month ?? "Mar"}–{season.end_month ?? "May"})

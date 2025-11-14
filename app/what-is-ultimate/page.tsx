@@ -1,35 +1,25 @@
 import React from "react";
 import { WhatIsUltimateHeader } from "@/components/what-is-ultimate/what-is-ultimate-header";
 import { DescriptionSection } from "@/components/what-is-ultimate/description-section";
-import { VideoGrid, type VideoItem } from "@/components/what-is-ultimate/video-grid";
-import { DESCRIPTION_PARAGRAPHS } from "@/lib/constants";
+import { VideoGrid } from "@/components/what-is-ultimate/video-grid";
+import { getWebsiteSettings, getWhatIsUltimateVideos } from "@/lib/directus";
 
-const VIDEOS: VideoItem[] = [
-  {
-    title: "Introduction to Ultimate",
-    description: "A comprehensive introduction to the basics of Ultimate Frisbee",
-  },
-  {
-    title: "Rules of the Game",
-    description: "Learn the fundamental rules and how the game is played",
-  },
-  {
-    title: "Basic Throwing Techniques",
-    description: "Master the backhand and forehand throws",
-  },
-  {
-    title: "Spirit of the Game",
-    description: "Understanding the core values and sportsmanship in Ultimate",
-  },
-];
+export default async function WhatIsUltimatePage(): Promise<React.JSX.Element> {
+  const [websiteSettings, videos] = await Promise.all([getWebsiteSettings(), getWhatIsUltimateVideos()]);
+  const paragraphs = websiteSettings.description_paragraphs ?? [];
+  const videoItems = videos.map((video) => ({
+    title: video.title,
+    description: video.description,
+    videoUrl: video.video_url ?? undefined,
+    embedId: video.youtube_embed_id ?? undefined,
+  }));
 
-export default function WhatIsUltimatePage(): React.JSX.Element {
   return (
     <div className="space-y-6">
       <WhatIsUltimateHeader />
-      <DescriptionSection paragraphs={DESCRIPTION_PARAGRAPHS} />
+      <DescriptionSection paragraphs={paragraphs} />
       <VideoGrid
-        videos={VIDEOS}
+        videos={videoItems}
         description="Check out these videos to learn more about Ultimate Frisbee:"
         columns={2}
       />
