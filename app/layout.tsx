@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/navbar/navbar";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_SITE_NAME ?? "Glenview Ultimate",
