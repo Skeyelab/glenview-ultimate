@@ -1,6 +1,6 @@
 import React from "react";
 import type { SeasonSchedule, ScheduleEvent } from "@/lib/directus";
-import { NextKeyDate } from "@/components/next-key-date";
+import { NextKeyDate } from "./next-key-date";
 import { listEventTypeLabels } from "./event-badge";
 
 interface ScheduleHeaderProps {
