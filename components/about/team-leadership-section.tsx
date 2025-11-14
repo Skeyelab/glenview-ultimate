@@ -1,5 +1,6 @@
 import React from "react";
 import type { TeamMember } from "@/lib/directus";
+import { cn } from "@/lib/utils";
 import { normalizeRole } from "./role-utils";
 import { TeamMemberCard } from "./team-member-card";
 
@@ -44,7 +45,7 @@ export function TeamLeadershipSection({
   });
 
   return (
-    <section className={className ? `space-y-4 ${className}` : "space-y-4"}>
+    <section className={cn("space-y-4", className)}>
       <h2 className="text-2xl font-bold text-white">{title}</h2>
       {captains.length > 0 || coach ? (
         <div className="space-y-4">
