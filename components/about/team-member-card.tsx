@@ -26,7 +26,7 @@ export function TeamMemberCard({
   const roleTitle = getRoleDisplayTitle(member.role);
   const normalizedRole = normalizeRole(member.role);
   const isHeadCoach = normalizedRole === "head_coach";
-  const shouldSpanFull = spanFullWidth ?? isHeadCoach;
+  const shouldSpanFull = spanFullWidth || isHeadCoach;
 
   return (
     <div className={cn("card", shouldSpanFull && "md:col-span-2", className)}>
