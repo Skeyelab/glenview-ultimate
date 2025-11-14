@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Glenview Ultimate favicon</title>
+  <rect width="64" height="64" rx="12" fill="#175230"/>
+  <g transform="translate(5 15) scale(0.9)">
+    <ellipse cx="32" cy="23" rx="22" ry="12" fill="#F5F9F6"/>
+    <ellipse cx="32" cy="21" rx="15" ry="7" fill="#E4EEE8"/>
+    <path d="M10 25c5.5 6.5 41 6.5 46 0" stroke="#C6D7CE" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M13 20c7-7 31-7 38 0" stroke="#8CD7AA" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M12 48c9 4 31 4 40 0" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>
