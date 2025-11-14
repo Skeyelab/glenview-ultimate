@@ -7,12 +7,12 @@ export const DEFAULT_WHAT_KIDS_LEARN = [
   "Rules of Ultimate",
   "Proper way to throw a backhand & forehand",
   "How to run multiple types of offense & defense",
-] as const;
+];
 
 export const DESCRIPTION_PARAGRAPHS = [
   'Ultimate, also known as Ultimate Frisbee, is a non-contact team sport played with a flying disc (frisbee). It combines elements of soccer, basketball, and football, emphasizing sportsmanship and fair play through the "Spirit of the Game" philosophy.',
   "The sport is played on a field similar to a football field, with end zones at each end. Teams score by catching the disc in the opposing team's end zone. Players cannot run with the disc and must pass it to teammates to advance down the field.",
-] as const;
+];
 
 export const HERO_TITLE = "The Fun Starts - Spring 2026";
 export const HERO_SUBTITLE = "Introducing Glenview's very first Youth Ultimate Frisbee Club";
