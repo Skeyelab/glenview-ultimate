@@ -2,11 +2,7 @@ import React from "react";
 import { WhatIsUltimateHeader } from "@/components/what-is-ultimate/what-is-ultimate-header";
 import { DescriptionSection } from "@/components/what-is-ultimate/description-section";
 import { VideoGrid, type VideoItem } from "@/components/what-is-ultimate/video-grid";
-
-const DESCRIPTION_PARAGRAPHS = [
-  'Ultimate, also known as Ultimate Frisbee, is a non-contact team sport played with a flying disc (frisbee). It combines elements of soccer, basketball, and football, emphasizing sportsmanship and fair play through the "Spirit of the Game" philosophy.',
-  "The sport is played on a field similar to a football field, with end zones at each end. Teams score by catching the disc in the opposing team's end zone. Players cannot run with the disc and must pass it to teammates to advance down the field.",
-];
+import { DESCRIPTION_PARAGRAPHS } from "@/lib/constants";
 
 const VIDEOS: VideoItem[] = [
   {

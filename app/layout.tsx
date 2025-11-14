@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/navbar/navbar";
+import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_SITE_NAME ?? "Glenview Ultimate",
@@ -21,11 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
           <Navbar />
         </header>
         <main className="container py-10">{children}</main>
-        <footer className="border-t border-white/20 mt-4">
-          <div className="container py-8 text-sm text-white/70">
-            © {new Date().getFullYear()} Glenview Ultimate
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

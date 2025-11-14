@@ -1,0 +1,25 @@
+export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
+
+export const DEFAULT_CLUB_DESCRIPTION =
+  "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin Carrigan, his sister, and his father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'.";
+
+export const DEFAULT_WHAT_KIDS_LEARN = [
+  "Rules of Ultimate",
+  "Proper way to throw a backhand & forehand",
+  "How to run multiple types of offense & defense",
+];
+
+export const DESCRIPTION_PARAGRAPHS = [
+  'Ultimate, also known as Ultimate Frisbee, is a non-contact team sport played with a flying disc (frisbee). It combines elements of soccer, basketball, and football, emphasizing sportsmanship and fair play through the "Spirit of the Game" philosophy.',
+  "The sport is played on a field similar to a football field, with end zones at each end. Teams score by catching the disc in the opposing team's end zone. Players cannot run with the disc and must pass it to teammates to advance down the field.",
+];
+
+export const HERO_TITLE = "The Fun Starts - Spring 2026";
+export const HERO_SUBTITLE = "Introducing Glenview's very first Youth Ultimate Frisbee Club";
+export const HERO_TAGLINE = "5th-8th Grade. Boys & Girls.";
+export const HERO_MESSAGE_1 = "Everyone is Welcome. Everyone Plays.";
+export const HERO_MESSAGE_2 = "Come play with us. Join our team.";
+export const HERO_CTA_LABEL = "Register";
+export const HERO_CTA_URL = "/register";
+export const HERO_PRE_REGISTRATION_TEXT = "Pre-Registration is now open";
+

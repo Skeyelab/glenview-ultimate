@@ -1,5 +1,6 @@
 import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
+import { safeParseDate } from "./date-utils";
 
 export interface Partner {
   id: number;
@@ -326,22 +327,15 @@ function buildSeasonSchedule(events: ScheduleEvent[]): SeasonSchedule {
 }
 
 function getMonthLabel(isoDate: string | null | undefined): string | null {
-  const date = parseDate(isoDate);
+  const date = safeParseDate(isoDate);
   if (!date) return null;
   return new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
 }
 
 function formatMonthYear(isoDate: string): string {
-  const date = parseDate(isoDate);
+  const date = safeParseDate(isoDate);
   if (!date) return "Date TBD";
   return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date);
-}
-
-function parseDate(isoDate: string | null | undefined): Date | null {
-  if (!isoDate) return null;
-  const date = new Date(isoDate);
-  if (Number.isNaN(date.getTime())) return null;
-  return date;
 }
 
 function normalizeScheduleEvent(event: ScheduleEvent): ScheduleEvent {
