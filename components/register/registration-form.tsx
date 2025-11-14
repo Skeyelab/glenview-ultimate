@@ -57,8 +57,8 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
     setParents((prev) => prev.filter((_, idx) => idx !== i));
   }
 
-  async function handleSubmit(e: React.FormEvent): Promise<void> {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
     setStatus("Submitting...");
     setErrorField(null);
     try {
@@ -87,7 +87,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void handleSubmit(e); }} className="grid gap-6">
+    <form onSubmit={handleSubmit} className="grid gap-6">
       <ParentFormSection
         parents={parents}
         errorField={errorField}

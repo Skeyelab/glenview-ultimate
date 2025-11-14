@@ -1,5 +1,6 @@
 import React from "react";
 import type { NewsPost } from "@/lib/directus";
+import { cn } from "@/lib/utils";
 import { NewsArticleCard } from "./news-article-card";
 
 export interface NewsListProps {
@@ -20,7 +21,7 @@ export function NewsList({
   }
 
   return (
-    <div className={className ? `space-y-4 ${className}` : "space-y-4"}>
+    <div className={cn("space-y-4", className)}>
       {posts.map((post) => (
         <React.Fragment key={post.id}>{renderArticle?.(post) ?? <NewsArticleCard post={post} />}</React.Fragment>
       ))}

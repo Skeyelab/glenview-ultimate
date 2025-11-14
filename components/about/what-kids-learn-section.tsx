@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 export interface WhatKidsLearnSectionProps {
   items: string[];
@@ -14,7 +15,7 @@ export function WhatKidsLearnSection({
   className,
 }: WhatKidsLearnSectionProps): React.JSX.Element {
   return (
-    <section className={className ? `space-y-3 ${className}` : "space-y-3"}>
+    <section className={cn("space-y-3", className)}>
       <h2 className="text-2xl font-bold text-white">{title}</h2>
       {items.length > 0 ? (
         <ul className="list-disc list-inside space-y-2 text-white/90">

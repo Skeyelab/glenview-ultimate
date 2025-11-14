@@ -1,13 +1,14 @@
 import React from "react";
 import { getSchedule } from "@/lib/directus";
 import { selectUpcomingEvents, groupEventsByMonth } from "@/lib/schedule-utils";
+import { DEFAULT_REVALIDATE_SECONDS } from "@/lib/config";
 import { ScheduleHeader } from "@/components/schedule/schedule-header";
 import { UpcomingEventsCard } from "@/components/schedule/upcoming-events-card";
 import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
 import { SeasonCalendar } from "@/components/schedule/season-calendar";
 
-export const revalidate = 300;
+export const revalidate = DEFAULT_REVALIDATE_SECONDS;
 
 export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();

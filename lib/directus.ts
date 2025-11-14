@@ -93,6 +93,12 @@ function haveEnv(): boolean {
   return Boolean(process.env.DIRECTUS_URL && process.env.DIRECTUS_STATIC_TOKEN);
 }
 
+async function withDirectus<T>(fallback: T, request: (client: DirectusRestClient) => Promise<T>): Promise<T> {
+  if (!haveEnv()) return fallback;
+  const client = getDirectusClient();
+  return await request(client);
+}
+
 type DirectusRestClient = DirectusClient<DirectusSchema> & StaticTokenClient<DirectusSchema> & RestClient<DirectusSchema>;
 
 export interface RegistrationChild {
@@ -133,19 +139,19 @@ function getDirectusClient(): DirectusRestClient {
   return directusClient;
 }
 
-export async function getTeam(): Promise<TeamMember[]> {
-  if (!haveEnv()) return [];
-  const client = getDirectusClient();
-  return await client.request(
-    readItems("Team", { fields: ["*"] }),
+export function getTeam(): Promise<TeamMember[]> {
+  return withDirectus([], (client) =>
+    client.request(
+      readItems("Team", { fields: ["*"] }),
+    ),
   );
 }
 
-export async function getPartners(): Promise<Partner[]> {
-  if (!haveEnv()) return [];
-  const client = getDirectusClient();
-  return await client.request(
-    readItems("Partners", { fields: ["*"] }),
+export function getPartners(): Promise<Partner[]> {
+  return withDirectus([], (client) =>
+    client.request(
+      readItems("Partners", { fields: ["*"] }),
+    ),
   );
 }
 
@@ -212,67 +218,67 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
 
 const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(DEFAULT_SCHEDULE_EVENTS);
 
-export async function getSchedule(): Promise<SeasonSchedule> {
-  if (!haveEnv()) return DEFAULT_SCHEDULE;
-  const client = getDirectusClient();
-  const events = await client.request(
-    readItems("Schedule", {
-      fields: ["id", "season_year", "event_type", "title", "date", "end_date", "location", "description", "highlight"],
-      sort: ["-season_year", "date"],
-    }),
-  );
+export function getSchedule(): Promise<SeasonSchedule> {
+  return withDirectus(DEFAULT_SCHEDULE, async (client) => {
+    const events = await client.request(
+      readItems("Schedule", {
+        fields: ["id", "season_year", "event_type", "title", "date", "end_date", "location", "description", "highlight"],
+        sort: ["-season_year", "date"],
+      }),
+    );
 
-  if (!events || events.length === 0) {
-    return DEFAULT_SCHEDULE;
-  }
+    if (!events || events.length === 0) {
+      return DEFAULT_SCHEDULE;
+    }
 
-  const latestSeasonYear = events[0]?.season_year ?? DEFAULT_SCHEDULE.season_year;
-  const latestSeasonEvents = events
-    .filter((event) => event.season_year === latestSeasonYear && Boolean(event.date))
-    .map(normalizeScheduleEvent);
+    const latestSeasonYear = events[0]?.season_year ?? DEFAULT_SCHEDULE.season_year;
+    const latestSeasonEvents = events
+      .filter((event) => event.season_year === latestSeasonYear && Boolean(event.date))
+      .map(normalizeScheduleEvent);
 
-  if (latestSeasonEvents.length === 0) {
-    return DEFAULT_SCHEDULE;
-  }
+    if (latestSeasonEvents.length === 0) {
+      return DEFAULT_SCHEDULE;
+    }
 
-  return buildSeasonSchedule(latestSeasonEvents);
+    return buildSeasonSchedule(latestSeasonEvents);
+  });
 }
 
-export async function getNewsList(limit = 20): Promise<NewsPost[]> {
-  if (!haveEnv()) return [];
-  const client = getDirectusClient();
-  return await client.request(
-    readItems("News", {
-      limit,
-      sort: ["-published_at"],
-      fields: ["*"],
-    }),
+export function getNewsList(limit = 20): Promise<NewsPost[]> {
+  return withDirectus([], (client) =>
+    client.request(
+      readItems("News", {
+        limit,
+        sort: ["-published_at"],
+        fields: ["*"],
+      }),
+    ),
   );
 }
 
-export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
-  if (!haveEnv()) return null;
-  const client = getDirectusClient();
-  const data = await client.request(
-    readItems("News", {
-      filter: { slug: { _eq: slug } },
-      limit: 1,
-      fields: ["*"],
-    }),
-  );
-  return data[0] ?? null;
+export function getNewsBySlug(slug: string): Promise<NewsPost | null> {
+  return withDirectus<NewsPost | null>(null, async (client) => {
+    const data = await client.request(
+      readItems("News", {
+        filter: { slug: { _eq: slug } },
+        limit: 1,
+        fields: ["*"],
+      }),
+    );
+    return data[0] ?? null;
+  });
 }
 
-export async function getAbout(): Promise<About | null> {
-  if (!haveEnv()) return null;
-  const client = getDirectusClient();
-  const data = await client.request(
-    readItems("About", {
-      limit: 1,
-      fields: ["*"],
-    }),
-  );
-  return data[0] ?? null;
+export function getAbout(): Promise<About | null> {
+  return withDirectus<About | null>(null, async (client) => {
+    const data = await client.request(
+      readItems("About", {
+        limit: 1,
+        fields: ["*"],
+      }),
+    );
+    return data[0] ?? null;
+  });
 }
 
 // Helper to get Directus asset URL from file UUID
