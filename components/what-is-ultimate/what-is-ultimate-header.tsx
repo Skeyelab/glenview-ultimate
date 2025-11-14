@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/page-header";
 
 export interface WhatIsUltimateHeaderProps {
   title?: string;
@@ -10,5 +10,5 @@ export function WhatIsUltimateHeader({
   title = "What is Ultimate?",
   className,
 }: WhatIsUltimateHeaderProps): React.JSX.Element {
-  return <h1 className={cn("text-3xl font-bold text-white", className)}>{title}</h1>;
+  return <PageHeader title={title} className={className} />;
 }

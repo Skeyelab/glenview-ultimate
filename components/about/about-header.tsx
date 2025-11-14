@@ -1,4 +1,5 @@
 import React from "react";
+import { PageHeader } from "@/components/ui/page-header";
 
 export interface AboutHeaderProps {
   title?: string;
@@ -11,10 +12,5 @@ export function AboutHeader({
   description,
   className,
 }: AboutHeaderProps): React.JSX.Element {
-  return (
-    <div className={className}>
-      <h1 className="text-3xl font-bold text-white">{title}</h1>
-      <p className="text-white/90">{description}</p>
-    </div>
-  );
+  return <PageHeader title={title} description={description} className={className} />;
 }
