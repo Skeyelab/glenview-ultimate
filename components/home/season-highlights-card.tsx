@@ -19,8 +19,8 @@ export function SeasonHighlightsCard({
       <h2 className="text-xl font-semibold mb-3 text-white">{title}</h2>
       {highlights.length > 0 ? (
         <ul className="list-disc ps-5 space-y-1 text-white/90">
-          {highlights.map((h, i) => (
-            <li key={`highlight-${i}`}>{h}</li>
+          {highlights.map((h) => (
+            <li key={h}>{h}</li>
           ))}
         </ul>
       ) : (
