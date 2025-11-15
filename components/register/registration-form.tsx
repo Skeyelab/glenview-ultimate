@@ -18,6 +18,18 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [status, setStatus] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
 
+  function trackRegistrationSubmitEvent(): void {
+    if (typeof window === "undefined") return;
+    const track = window.umami?.track;
+    if (typeof track === "function") {
+      track("registration_form_submit", {
+        parentCount: parents.length,
+        childCount: children.length,
+        marketingOptIn: marketing_opt_in,
+      });
+    }
+  }
+
   function updateChild(i: number, patch: Partial<Child>): void {
     setChildren((prev) => prev.map((c, idx) => (idx === i ? { ...c, ...patch } : c)));
   }
@@ -61,6 +73,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
     event.preventDefault();
     setStatus("Submitting...");
     setErrorField(null);
+    trackRegistrationSubmitEvent();
     try {
       const payload = buildRegistrationPayload(parents, children, notes, marketing_opt_in);
 
