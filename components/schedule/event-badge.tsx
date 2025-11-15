@@ -24,6 +24,17 @@ const EVENT_TYPE_STYLES: Record<ScheduleEventType, string> = {
   other: "bg-white/10 text-white border border-white/30",
 };
 
+export const EVENT_TYPE_ACCENTS: Record<ScheduleEventType, string> = {
+  season_start: "bg-emerald-400",
+  season_end: "bg-rose-400",
+  registration_open: "bg-sky-400",
+  registration_close: "bg-sky-300",
+  game: "bg-purple-400",
+  practice: "bg-orange-400",
+  tournament: "bg-teal-400",
+  other: "bg-white",
+};
+
 const BADGE_BASE = "inline-flex items-center rounded-full font-semibold uppercase tracking-wide";
 
 const BADGE_SIZES = {
