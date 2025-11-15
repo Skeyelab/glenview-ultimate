@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -9,6 +9,37 @@ import { cn } from "@/lib/utils";
 import "react-day-picker/dist/style.css";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+
+type CalendarChevronProps = {
+  className?: string;
+  size?: number;
+  disabled?: boolean;
+  orientation?: "up" | "down" | "left" | "right";
+};
+
+type Orientation = NonNullable<CalendarChevronProps["orientation"]>;
+
+const ORIENTATION_ICONS: Record<Orientation, (iconProps: { size?: number; className?: string }) => React.JSX.Element> = {
+  up: (iconProps) => <ChevronUp {...iconProps} />,
+  down: (iconProps) => <ChevronDown {...iconProps} />,
+  left: (iconProps) => <ChevronLeft {...iconProps} />,
+  right: (iconProps) => <ChevronRight {...iconProps} />,
+};
+
+function CalendarChevron({
+  orientation = "right",
+  size = 16,
+  disabled,
+  className,
+}: CalendarChevronProps): React.JSX.Element {
+  const Icon = ORIENTATION_ICONS[orientation] ?? ChevronRight;
+  return (
+    <Icon
+      size={size}
+      className={cn("text-white", disabled && "opacity-40", className)}
+    />
+  );
+}
 
 export function Calendar({
   className,
@@ -51,8 +82,7 @@ export function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...iconProps }) => <ChevronLeft className="h-4 w-4" {...iconProps} />,
-        IconRight: ({ ...iconProps }) => <ChevronRight className="h-4 w-4" {...iconProps} />,
+        Chevron: CalendarChevron,
         ...components,
       }}
       {...props}
