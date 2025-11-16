@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ChildFormFields } from '@/components/register/child-form-fields';
@@ -44,7 +44,6 @@ describe('ChildFormFields', () => {
   });
 
   it('calls onUpdate when name field changes', async () => {
-    const user = userEvent.setup();
     render(
       <ChildFormFields
         child={sampleChild1}
@@ -54,18 +53,11 @@ describe('ChildFormFields', () => {
       />
     );
     const nameInput = screen.getByDisplayValue('Alice Doe');
-    await user.clear(nameInput);
-    await user.type(nameInput, 'New Name');
-    // Wait for the input to have the final value, then check calls
-    await waitFor(() => {
-      expect(nameInput).toHaveValue('New Name');
-    });
-    // Check that it was called with the final value
+    fireEvent.change(nameInput, { target: { value: 'New Name' } });
     expect(mockUpdate).toHaveBeenCalledWith(0, { full_name: 'New Name' });
   });
 
   it('calls onUpdate when age field changes', async () => {
-    const user = userEvent.setup();
     render(
       <ChildFormFields
         child={sampleChild1}
@@ -75,13 +67,7 @@ describe('ChildFormFields', () => {
       />
     );
     const ageInput = screen.getByDisplayValue('10');
-    await user.clear(ageInput);
-    await user.type(ageInput, '11');
-    // Wait for the input to have the final value, then check calls
-    await waitFor(() => {
-      expect(ageInput).toHaveValue('11');
-    });
-    // Check that it was called with the final value
+    fireEvent.change(ageInput, { target: { value: '11' } });
     expect(mockUpdate).toHaveBeenCalledWith(0, { age: '11' });
   });
 

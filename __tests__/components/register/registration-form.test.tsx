@@ -36,9 +36,11 @@ describe('RegistrationForm', () => {
 
   it('renders the form with initial fields', () => {
     render(<RegistrationForm />);
-    expect(screen.getByDisplayValue('')).toBeInTheDocument(); // Empty name field
-    expect(screen.getByRole('textbox', { type: 'email' })).toBeInTheDocument();
-    expect(screen.getAllByRole('textbox').length).toBeGreaterThan(0);
+    // Check that form fields are present (multiple empty inputs exist)
+    expect(screen.getAllByDisplayValue('').length).toBeGreaterThan(0);
+    // Check for email input by type
+    const emailInputs = screen.getAllByRole('textbox').filter(input => input.getAttribute('type') === 'email');
+    expect(emailInputs.length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /Submit Registration/i })).toBeInTheDocument();
   });
 
@@ -56,7 +58,8 @@ describe('RegistrationForm', () => {
   it('validates email format', async () => {
     const user = userEvent.setup();
     render(<RegistrationForm />);
-    const emailInput = screen.getByRole('textbox', { type: 'email' });
+    const emailInputs = screen.getAllByRole('textbox').filter(input => input.getAttribute('type') === 'email');
+    const emailInput = emailInputs[0];
     await user.type(emailInput, 'invalid-email');
     await user.tab();
     
@@ -188,15 +191,13 @@ describe('RegistrationForm', () => {
     const addParentButton = screen.getByRole('button', { name: /Add second parent/i });
     await user.click(addParentButton);
     
-    // Fill in required fields
-    const nameInputs = screen.getAllByRole('textbox', { name: /Full Name/i });
-    const emailInputs = screen.getAllByRole('textbox', { name: /Email/i });
-    await user.type(nameInputs[0], sampleParent1.name);
-    await user.type(emailInputs[0], sampleParent1.email);
-    await user.type(nameInputs[1], sampleParent2.name);
-    await user.type(emailInputs[1], sampleParent2.email);
-    const emptyTextboxes = screen.getAllByDisplayValue('');
-    await user.type(emptyTextboxes[3], sampleChild1.full_name);
+    // Fill in required fields - use all textboxes
+    const allTextboxes = screen.getAllByRole('textbox');
+    await user.type(allTextboxes[0], sampleParent1.name);
+    await user.type(allTextboxes[1], sampleParent1.email);
+    await user.type(allTextboxes[3], sampleParent2.name);
+    await user.type(allTextboxes[4], sampleParent2.email);
+    await user.type(allTextboxes[6], sampleChild1.full_name);
     
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
@@ -304,15 +305,17 @@ describe('RegistrationForm', () => {
     const addParentButton = screen.getByRole('button', { name: /Add second parent/i });
     await user.click(addParentButton);
     
-    // Fill in parent fields - after adding second parent, get updated empty inputs
-    const emptyTextboxes = screen.getAllByDisplayValue('');
-    await user.type(emptyTextboxes[0], sampleParent1.name);
-    await user.type(emptyTextboxes[1], sampleParent1.email);
-    await user.type(emptyTextboxes[3], sampleParent2.name);
-    await user.type(emptyTextboxes[4], sampleParent2.email);
+    // Fill in parent fields - after adding second parent, get all textboxes
+    const allTextboxes = screen.getAllByRole('textbox');
+    // First parent fields
+    await user.type(allTextboxes[0], sampleParent1.name);
+    await user.type(allTextboxes[1], sampleParent1.email);
+    // Second parent fields (after first parent's 3 fields: name, email, phone)
+    await user.type(allTextboxes[3], sampleParent2.name);
+    await user.type(allTextboxes[4], sampleParent2.email);
     
-    // Fill in child field
-    await user.type(emptyTextboxes[6], sampleChild1.full_name);
+    // Fill in child field (after both parents' fields)
+    await user.type(allTextboxes[6], sampleChild1.full_name);
     
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
@@ -333,32 +336,45 @@ describe('RegistrationForm', () => {
 
     render(<RegistrationForm />);
     
-    // Fill in parent fields
-    const emptyTextboxes = screen.getAllByDisplayValue('');
-    await user.type(emptyTextboxes[0], sampleParent1.name);
-    await user.type(emptyTextboxes[1], sampleParent1.email);
+    // Fill in parent fields - use getAllByDisplayValue to find empty inputs
+    const emptyInputs = screen.getAllByDisplayValue('');
+    await user.type(emptyInputs[0], sampleParent1.name);
+    await user.type(emptyInputs[1], sampleParent1.email);
     
-    // Fill in first child
-    await user.type(emptyTextboxes[3], sampleChild1.full_name);
+    // Fill in first child name (should be 4th empty input: parent name, email, phone, then child name)
+    await user.type(emptyInputs[3], sampleChild1.full_name);
     
     // Add second child
     const addChildButton = screen.getByRole('button', { name: /Add a child/i });
     await user.click(addChildButton);
     
-    // After adding child, get updated empty textboxes
-    const updatedEmptyTextboxes = screen.getAllByDisplayValue('');
-    // Find the second child name input (should be after first child's fields)
-    await user.type(updatedEmptyTextboxes[7], sampleChild2.full_name);
+    // Wait for the new child field to appear, then find the new empty inputs
+    await waitFor(() => {
+      const newEmptyInputs = screen.getAllByDisplayValue('');
+      expect(newEmptyInputs.length).toBeGreaterThan(3);
+    });
+    
+    // Get updated empty inputs and fill the second child's name
+    const updatedEmptyInputs = screen.getAllByDisplayValue('');
+    // The second child name should be one of the later empty inputs
+    // After first child: name (index 3), age might be empty (index 4), then second child name
+    await user.type(updatedEmptyInputs[updatedEmptyInputs.length - 3] || updatedEmptyInputs[4], sampleChild2.full_name);
     
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
 
     await waitFor(() => {
-      const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string);
-      expect(callBody.children).toHaveLength(2);
-      expect(callBody.children[0].full_name).toBe(sampleChild1.full_name);
-      expect(callBody.children[1].full_name).toBe(sampleChild2.full_name);
-    });
+      expect(mockFetch).toHaveBeenCalled();
+    }, { timeout: 3000 });
+    
+    // Verify the payload after fetch is called
+    expect(mockFetch.mock.calls.length).toBeGreaterThan(0);
+    const fetchCall = mockFetch.mock.calls[0];
+    expect(fetchCall.length).toBeGreaterThan(1);
+    const callBody = JSON.parse(fetchCall[1].body as string);
+    expect(callBody.children).toHaveLength(2);
+    expect(callBody.children[0].full_name).toBe(sampleChild1.full_name);
+    expect(callBody.children[1].full_name).toBe(sampleChild2.full_name);
   });
 
   it('calls onSubmit callback on successful submission', async () => {

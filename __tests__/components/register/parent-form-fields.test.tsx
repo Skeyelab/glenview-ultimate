@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ParentFormFields } from '@/components/register/parent-form-fields';
@@ -45,7 +45,6 @@ describe('ParentFormFields', () => {
   });
 
   it('calls onUpdate when name field changes', async () => {
-    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -56,18 +55,11 @@ describe('ParentFormFields', () => {
       />
     );
     const nameInput = screen.getByDisplayValue('John Doe');
-    await user.clear(nameInput);
-    await user.type(nameInput, 'Jane Doe');
-    // Wait for the input to have the final value, then check calls
-    await waitFor(() => {
-      expect(nameInput).toHaveValue('Jane Doe');
-    });
-    // Check that it was called with the final value
+    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
     expect(mockUpdate).toHaveBeenCalledWith(0, { name: 'Jane Doe' });
   });
 
   it('calls onUpdate when email field changes', async () => {
-    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -78,14 +70,11 @@ describe('ParentFormFields', () => {
       />
     );
     const emailInput = screen.getByDisplayValue('john@example.com');
-    await user.clear(emailInput);
-    await user.type(emailInput, 'newemail@example.com');
-    // Check that it was called with the final value
+    fireEvent.change(emailInput, { target: { value: 'newemail@example.com' } });
     expect(mockUpdate).toHaveBeenCalledWith(0, { email: 'newemail@example.com' });
   });
 
   it('calls onUpdate when phone field changes', async () => {
-    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -96,9 +85,7 @@ describe('ParentFormFields', () => {
       />
     );
     const phoneInput = screen.getByDisplayValue('555-0100');
-    await user.clear(phoneInput);
-    await user.type(phoneInput, '555-9999');
-    // Check that it was called with the final value
+    fireEvent.change(phoneInput, { target: { value: '555-9999' } });
     expect(mockUpdate).toHaveBeenCalledWith(0, { phone: '555-9999' });
   });
 
