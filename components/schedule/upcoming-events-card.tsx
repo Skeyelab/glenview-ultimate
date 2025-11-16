@@ -1,6 +1,7 @@
 import React from "react";
 import type { ScheduleEvent } from "@/lib/directus";
 import { formatDateRange } from "@/lib/date-utils";
+import { SectionCard } from "@/components/ui/section-card";
 import { ScheduleEventCard } from "./event-card";
 
 interface UpcomingEventsCardProps {
@@ -19,8 +20,7 @@ export function UpcomingEventsCard({
   renderEventCard,
 }: UpcomingEventsCardProps): React.JSX.Element {
   return (
-    <div className="card">
-      <h2 className="text-xl font-semibold text-white mb-3">{title}</h2>
+    <SectionCard title={title}>
       {events.length > 0 ? (
         <ul className="space-y-3">
           {events.map((event) => (
@@ -40,6 +40,6 @@ export function UpcomingEventsCard({
       ) : (
         <p className="text-white/80">{emptyMessage}</p>
       )}
-    </div>
+    </SectionCard>
   );
 }

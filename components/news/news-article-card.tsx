@@ -2,30 +2,29 @@ import React from "react";
 import Link from "next/link";
 import type { NewsPost } from "@/lib/directus";
 import { cn } from "@/lib/utils";
+import { formatFullDate } from "@/lib/date-utils";
 
 export interface NewsArticleCardProps {
   post: NewsPost;
   showExcerpt?: boolean;
   showReadMore?: boolean;
   readMoreLabel?: string;
-  dateFormat?: (date: string) => string;
+  dateFormat?: (date: string) => string | null;
   className?: string;
   titleAs?: keyof React.JSX.IntrinsicElements;
 }
-
-const defaultDateFormat = (date: string): string => {
-  return new Date(date).toLocaleDateString();
-};
 
 export function NewsArticleCard({
   post,
   showExcerpt = true,
   showReadMore = true,
   readMoreLabel = "Read more",
-  dateFormat = defaultDateFormat,
+  dateFormat = formatFullDate,
   className,
   titleAs: TitleTag = "h2",
 }: NewsArticleCardProps): React.JSX.Element {
+  const publishedAt = post.published_at ? dateFormat(post.published_at) : null;
+
   return (
     <article className={cn("border border-white/20 rounded-lg p-4", className)}>
       <TitleTag className="text-xl font-semibold text-white">
@@ -33,9 +32,7 @@ export function NewsArticleCard({
           {post.title}
         </Link>
       </TitleTag>
-      {post.published_at && (
-        <div className="text-xs text-white/70">{dateFormat(post.published_at)}</div>
-      )}
+      {publishedAt && <div className="text-xs text-white/70">{publishedAt}</div>}
       {showExcerpt && post.excerpt && <p className="text-white/90 mt-2">{post.excerpt}</p>}
       {showReadMore && (
         <div className="mt-2">
