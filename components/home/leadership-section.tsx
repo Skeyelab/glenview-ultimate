@@ -1,9 +1,9 @@
 'use client';
 import React from "react";
 import type { TeamMember } from "@/lib/directus";
-import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
+import { SectionCard } from "@/components/ui/section-card";
 
 export interface LeadershipSectionProps {
   people: TeamMember[];
@@ -23,15 +23,7 @@ export function LeadershipSection({
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
   return (
-    <div className={cn("card", className)}>
-      <h2
-        className="text-xl font-semibold mb-2 text-white"
-        {...(editingEnabled
-          ? { "data-directus": setAttr({ collection: "Team", item: people[0]?.id ?? 1, fields: "role", mode: "popover" }) }
-          : {})}
-      >
-        {title}
-      </h2>
+    <SectionCard title={title} className={className}>
       <div className="space-y-2">
         {people.length > 0 ? (
           people.map((p) => (
@@ -62,6 +54,6 @@ export function LeadershipSection({
           <p className="text-white/90">{emptyMessage}</p>
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }

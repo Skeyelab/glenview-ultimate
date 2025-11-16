@@ -1,9 +1,9 @@
 'use client';
 import React from "react";
 import type { Partner } from "@/lib/directus";
-import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
+import { SectionCard } from "@/components/ui/section-card";
 
 export interface PartnersSectionProps {
   partners: Partner[];
@@ -33,15 +33,7 @@ export function PartnersSection({
   const editingEnabled = search.get("visual-editing") === "true";
 
   return (
-    <section className={cn("card", className)}>
-      <h2
-        className="text-xl font-semibold mb-3 text-white"
-        {...(editingEnabled
-          ? { "data-directus": setAttr({ collection: "Partners", item: displayPartners[0]?.id ?? 1, fields: "name", mode: "popover" }) }
-          : {})}
-      >
-        {title}
-      </h2>
+    <SectionCard title={title} className={className}>
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${minColumnWidth}, 1fr))` }}>
         {displayPartners.map((p) => (
           <a
@@ -58,6 +50,6 @@ export function PartnersSection({
           </a>
         ))}
       </div>
-    </section>
+    </SectionCard>
   );
 }
