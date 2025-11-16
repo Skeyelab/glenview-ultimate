@@ -1,5 +1,7 @@
 import React from "react";
+import Image from "next/image";
 import type { Partner } from "@/lib/directus";
+import { getDirectusAssetUrl } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 
 export interface PartnersSectionProps {
@@ -31,17 +33,35 @@ export function PartnersSection({
     <section className={cn("card", className)}>
       <h2 className="text-xl font-semibold mb-3 text-white">{title}</h2>
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${minColumnWidth}, 1fr))` }}>
-        {displayPartners.map((p) => (
-          <a
-            key={p.id}
-            className="border border-white/20 rounded p-3 text-white/90 hover:text-white hover:border-white/40 transition-colors"
-            href={p.url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {p.name}
-          </a>
-        ))}
+        {displayPartners.map((p) => {
+          const logoUrl = getDirectusAssetUrl(p.logo);
+          return (
+            <a
+              key={p.id}
+              className="border border-white/20 rounded-lg p-4 text-white/90 hover:text-white hover:border-white/40 transition-colors flex flex-col items-center justify-center gap-2 min-h-[120px]"
+              href={p.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {logoUrl ? (
+                <>
+                  <div className="relative w-full h-16 flex items-center justify-center">
+                    <Image
+                      src={logoUrl}
+                      alt={p.name}
+                      width={120}
+                      height={60}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                  <span className="text-sm text-center">{p.name}</span>
+                </>
+              ) : (
+                <span className="text-center">{p.name}</span>
+              )}
+            </a>
+          );
+        })}
       </div>
     </section>
   );
