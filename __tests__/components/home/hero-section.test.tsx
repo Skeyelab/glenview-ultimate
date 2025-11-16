@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HeroSection } from '@/components/home/hero-section';
 import type { SeasonSchedule } from '@/lib/directus';
+import { HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT } from '@/lib/constants';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -53,14 +54,14 @@ describe('HeroSection', () => {
 
   it('renders the CTA link', () => {
     render(<HeroSection season={null} logoUrl={null} />);
-    const ctaLink = screen.getByRole('link', { name: /Register/i });
+    const ctaLink = screen.getByRole('link', { name: HERO_CTA_LABEL });
     expect(ctaLink).toBeInTheDocument();
-    expect(ctaLink).toHaveAttribute('href', '/register');
+    expect(ctaLink).toHaveAttribute('href', HERO_CTA_URL);
   });
 
   it('renders pre-registration text', () => {
     render(<HeroSection season={null} logoUrl={null} />);
-    expect(screen.getByText(/Pre-Registration is now open/i)).toBeInTheDocument();
+    expect(screen.getByText(HERO_PRE_REGISTRATION_TEXT)).toBeInTheDocument();
   });
 
   it('renders logo when provided', () => {

@@ -14,8 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
     <html lang="en">
       <body className="min-h-screen antialiased bg-brand-green text-white">
         <Script
-          src="https://umami.apps.stereorail.com/script.js"
-          data-website-id="12909e0c-7500-4496-9a7d-498e13ceac79"
+          src="https://umami.glenview-ultimate.org/script.js"
+          data-website-id="c374c9b6-a4c4-4c42-837e-681db5fb70f0"
           strategy="afterInteractive"
         />
         <header className="border-b border-white/20">
