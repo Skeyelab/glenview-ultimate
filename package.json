@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@directus/sdk": "^20.1.1",
+    "@directus/visual-editing": "1.1.0",
     "@radix-ui/react-slot": "^1.2.4",
     "marked": "12.0.2",
     "next": "14.2.32",

@@ -1,5 +1,8 @@
+'use client';
 import React from "react";
 import type { Partner } from "@/lib/directus";
+import { useSearchParams } from "next/navigation";
+import { setAttr } from "@/lib/visual-editing";
 import { SectionCard } from "@/components/ui/section-card";
 
 export interface PartnersSectionProps {
@@ -24,8 +27,10 @@ export function PartnersSection({
   title = "Partners",
   minColumnWidth = "160px",
   className,
-}: PartnersSectionProps): React.JSX.Element {
+}: PartnersSectionProps): React.ReactElement {
   const displayPartners = partners.length > 0 ? partners : defaultPartners;
+  const search = useSearchParams();
+  const editingEnabled = search.get("visual-editing") === "true";
 
   return (
     <SectionCard title={title} className={className}>
@@ -37,6 +42,9 @@ export function PartnersSection({
             href={p.url}
             target="_blank"
             rel="noreferrer"
+            {...(editingEnabled
+              ? { "data-directus": setAttr({ collection: "Partners", item: p.id, fields: ["name", "url"], mode: "popover" }) }
+              : {})}
           >
             {p.name}
           </a>
