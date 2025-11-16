@@ -18,6 +18,14 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [status, setStatus] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
 
+  const trackEvent = React.useCallback((eventName: string, data?: Record<string, unknown>): void => {
+    if (typeof window === "undefined") return;
+    const track = window.umami?.track;
+    if (typeof track === "function") {
+      track(eventName, data);
+    }
+  }, []);
+
   function updateChild(i: number, patch: Partial<Child>): void {
     setChildren((prev) => prev.map((c, idx) => (idx === i ? { ...c, ...patch } : c)));
   }
@@ -25,10 +33,17 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   function addChild(): void {
     if (children.length >= 3) return;
     setChildren((prev) => [...prev, { full_name: "", availability: [] }]);
+    trackEvent("registration_add_child", {
+      childCount: children.length + 1,
+    });
   }
 
   function removeChild(i: number): void {
     setChildren((prev) => prev.filter((_, idx) => idx !== i));
+    trackEvent("registration_remove_child", {
+      removedIndex: i,
+      childCount: Math.max(children.length - 1, 0),
+    });
   }
 
   function updateParent(i: number, patch: Partial<Parent>): void {
@@ -45,6 +60,9 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   function addParent(): void {
     if (parents.length >= 2) return;
     setParents((prev) => [...prev, { name: "", email: "", phone: "" }]);
+    trackEvent("registration_add_parent", {
+      parentCount: parents.length + 1,
+    });
   }
 
   function removeParent(i: number): void {
@@ -55,12 +73,21 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
       setErrorField(null);
     }
     setParents((prev) => prev.filter((_, idx) => idx !== i));
+    trackEvent("registration_remove_parent", {
+      removedIndex: i,
+      parentCount: Math.max(parents.length - 1, 0),
+    });
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setStatus("Submitting...");
     setErrorField(null);
+    trackEvent("registration_form_submit", {
+      parentCount: parents.length,
+      childCount: children.length,
+      marketingOptIn: marketing_opt_in,
+    });
     try {
       const payload = buildRegistrationPayload(parents, children, notes, marketing_opt_in);
 
@@ -74,15 +101,29 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
         const { error, field } = parseApiError(body);
         if (field) {
           setErrorField(field);
+          trackEvent("registration_form_validation_error", { field });
         }
+        trackEvent("registration_form_submit_error", {
+          message: error,
+          field,
+        });
         throw new Error(error);
       }
       setStatus("✅ Thanks! Your registration was received.");
       setErrorField(null);
+      trackEvent("registration_form_submit_success", {
+        parentCount: parents.length,
+        childCount: children.length,
+        marketingOptIn: marketing_opt_in,
+      });
       onSubmit?.();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
       setStatus("❌ " + errorMessage);
+      trackEvent("registration_form_submit_error", {
+        message: errorMessage,
+        field: errorField ?? undefined,
+      });
     }
   }
 
@@ -120,6 +161,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
             checked={marketing_opt_in}
             onChange={(e) => {
               setOptIn(e.target.checked);
+              trackEvent("registration_marketing_opt_in", { optedIn: e.target.checked });
             }}
           />
           I agree to receive updates about the club.

@@ -1,126 +1,130 @@
-# Glenview Ultimate — Next.js + Directus starter (Tailwind)
+# Glenview Ultimate
 
 [![CI](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml)
 
-This is a minimal, production-ready starter that connects a Next.js front-end to a Directus CMS back-end.
-It includes a registration form that writes to a `registrations` collection and public content that
-can be managed from Directus.
+A Next.js website for Glenview Ultimate, a youth ultimate frisbee organization. The site connects to a Directus CMS backend for content management and includes features for registration, news, schedules, and team information.
 
-## 1) Directus quick setup
+## Features
 
-1. Install Directus (Docker or Node). See: https://docs.directus.io/self-hosted/quickstart.html
-2. Create an **Admin** account and log into the Studio.
-3. Create a **Static Access Token** (Settings → Access Tokens). Give it a descriptive name (e.g., "Website Form Token") and scope it to a role that can read public content and create registrations.
-4. Create the following **collections** in Data Model (with suggested fields). You can rename as you like.
+- **Homepage** - Season highlights, team leadership, and partner sponsors
+- **Registration** - Multi-child registration form with parent information
+- **News** - Blog-style news posts with Markdown support
+- **Schedule** - Season calendar with events, practices, and tournaments
+- **About** - Team information and what kids learn
+- **What is Ultimate** - Educational content about ultimate frisbee
 
-### `people`
-- `name` (string)
-- `role` (string) — e.g., "Boys Team Captain", "Girls Team Captain", "Head Coach"
-- `email` (string, optional)
-- `bio` (text, optional)
-- `photo` (file, optional)
+## Tech Stack
 
-### `partners`
-- `name` (string)
-- `url` (string, required)
-- `logo` (file, optional)
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling with `@tailwindcss/forms` and `@tailwindcss/typography`
+- **Directus SDK** - CMS integration for content management
+- **Jest & React Testing Library** - Testing framework
 
-### `registrations`
-- `parent1_name` (string, required)
-- `parent1_email` (string, required)
-- `parent1_phone` (string, optional)
-- `parent2_name` (string, optional)
-- `parent2_email` (string, optional)
-- `parent2_phone` (string, optional)
-- `children` (JSON) — array of children objects: `{ full_name, age, experience, availability[] }`
-- `notes` (text, optional)
-- `marketing_opt_in` (boolean, default false)
+## Development
 
-> Tip: Using a JSON field for `children` keeps the form simple. If you prefer relational data, create a `children` collection and a one-to-many relation from `registrations` → `children`.
+### Prerequisites
 
-5. **Permissions** (Settings → Roles & Permissions):
-   - For the **Public** role, allow **read** on `people`, `partners`.
-   - For submissions, do **not** grant Public create permissions. Instead, create a dedicated role (e.g., `webform`) with **create** on `registrations` and generate the static token for that role. The token is only used server-side.
+- Node.js >=22.14.0 <23.0.0
+- Directus instance configured with required collections
 
-6. (Optional) **Flows & Notifications**:
-   - Create a Flow triggered on **Create → registrations** to send an email to organizers and/or write to Google Sheets.
+### Environment Variables
 
-7. Seed some content:
-   - Add your `people` and `partners` items.
+Create a `.env.local` file with:
 
-## 2) Configure the Next.js app
+```ini
+DIRECTUS_URL=https://your-directus.example.com
+DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
+NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
+NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+```
 
-1. Copy `.env.example` to `.env.local` and fill:
-   ```ini
-   DIRECTUS_URL=https://your-directus.example.com
-   DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
-   NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
-   NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
-   ```
+### Commands
 
-   **Notes:**
-   - `NEXT_PUBLIC_DIRECTUS_URL` is needed for client components (like the navbar logo) to access Directus assets. It should match `DIRECTUS_URL`.
-   - The SDK uses `DIRECTUS_STATIC_TOKEN`. Keep it scoped to the minimal permissions required and rotate it periodically.
-2. Install and run:
-   ```bash
-   npm i
-   npm run dev
-   ```
+```bash
+# Install dependencies
+npm install
 
-## 3) Tailwind CSS
+# Run development server
+npm run dev
 
-- Tailwind is pre-configured with `@tailwindcss/forms` and `@tailwindcss/typography`.
-- Global component shortcuts live in `app/globals.css` (e.g., `.button`, `.card`, `.input`, `.grid-2`) built with `@apply`.
-- You can replace these shortcuts with inline utilities as you iterate on the design.
+# Build for production
+npm run build
 
-### Files
-- `tailwind.config.ts` — content paths, container width
-- `postcss.config.js` — PostCSS pipeline
-- `app/globals.css` — Tailwind layers + component utilities
+# Start production server
+npm start
 
-## 4) Hardening & production notes
+# Run linter
+npm run lint
 
-- Create a **dedicated role** for the static token with the minimum scope (e.g., `webform` that can create `registrations` only). Rotate the token periodically.
-- Add bot protection/rate limiting to the registration form (e.g., Cloudflare Turnstile, hCaptcha, or rate limiting middleware).
-- Add field **validation** in Directus (required, email format, etc.).
-- Add **CORS** settings in Directus if you later move to direct client reads.
-- Use **revalidate** or on-demand revalidation webhooks for fresher content.
-- Host Next.js on Vercel, Fly.io, Render, or your own infra.
+# Fix linting issues
+npm run standard
 
-Happy building!
+# Run tests
+npm test
 
----
+# Run tests in watch mode
+npm run test:watch
 
-## Directus: new collections for Homepage & News
+# Run tests with coverage
+npm run test:coverage
+```
 
-### `seasons`
-- `year` (integer, unique or sortable)
-- `title` (string, optional) — e.g., "Spring 2026"
-- `highlights` (JSON, array of strings) — e.g., ["12 weeks of practice", "3–4 tournaments"]
-- `start_month` (string, optional) — e.g., "March"
-- `end_month` (string, optional) — e.g., "May"
+## Project Structure
 
-> The homepage reads the **latest** season by `year` and prints `highlights` as bullets.
+```
+app/                    # Next.js app directory
+  ├── about/           # About page
+  ├── api/             # API routes
+  │   └── register/    # Registration endpoint
+  ├── news/            # News listing and detail pages
+  ├── register/        # Registration form page
+  ├── schedule/        # Schedule page
+  └── what-is-ultimate/ # Educational content page
 
-### `news`
-- `title` (string, required)
-- `slug` (string, unique, required)
-- `published_at` (datetime, required)
-- `excerpt` (text, optional)
-- `content` (text, required) — supports **Markdown**; rendered with `marked` and styled via Tailwind **typography** (`prose`).
+components/            # React components
+  ├── about/           # About page components
+  ├── home/            # Homepage components
+  ├── news/            # News components
+  ├── navbar/          # Navigation components
+  ├── register/        # Registration form components
+  ├── schedule/        # Schedule components
+  ├── ui/              # Reusable UI components
+  └── what-is-ultimate/ # What is Ultimate components
 
-Routes:
-- `/news` — lists posts (newest first)
-- `/news/[slug]` — post detail
+lib/                   # Utility functions and helpers
+  ├── directus.ts      # Directus SDK integration
+  ├── config.ts        # Configuration constants
+  ├── date-utils.ts    # Date formatting utilities
+  ├── register-types.ts # Registration type definitions
+  ├── register-utils.ts # Registration form utilities
+  ├── schedule-utils.ts # Schedule processing utilities
+  └── utils.ts         # General utilities
 
-> To use Markdown links/images, just write standard Markdown in `content`.
+__tests__/             # Test files
+```
 
-## shadcn/ui-style components
+## Directus Collections
 
-Included lightweight components inspired by shadcn/ui:
-- `components/ui/button.tsx` (with `class-variance-authority`)
-- `components/ui/input.tsx`, `components/ui/textarea.tsx`, `components/ui/label.tsx`
-- `components/ui/card.tsx`
-- `components/navbar.tsx` (adds a top nav)
+The project uses the following Directus collections:
 
-These are zero-config and Tailwind-native. You can swap in full shadcn/ui CLI components later if you prefer.
+- **Team** - Team members with roles, bios, and photos
+- **Partners** - Sponsors and partners with logos
+- **Schedule** - Season events, practices, and tournaments
+- **News** - Blog posts with Markdown content
+- **About** - Club description and educational content
+- **Registrations** - Registration submissions
+
+## Testing
+
+See [TESTING.md](./TESTING.md) for detailed testing documentation.
+
+## Styling
+
+- Tailwind CSS with custom component utilities in `app/globals.css`
+- shadcn/ui-inspired components in `components/ui/`
+- Responsive design with mobile-first approach
+
+## License
+
+UNLICENSED
