@@ -2,14 +2,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
-
-interface NavLinkData {
-  href: string;
-  label: string;
-}
+import type { NavLinkItem } from "./nav-links";
 
 interface MobileMenuProps {
-  links: readonly NavLinkData[];
+  links: readonly NavLinkItem[];
   isOpen: boolean;
 }
 

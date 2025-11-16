@@ -1,13 +1,9 @@
 'use client';
 import { NavLink } from "./nav-link";
-
-interface NavLinkData {
-  href: string;
-  label: string;
-}
+import type { NavLinkItem } from "./nav-links";
 
 interface DesktopNavProps {
-  links: readonly NavLinkData[];
+  links: readonly NavLinkItem[];
 }
 
 export function DesktopNav({ links }: DesktopNavProps): React.JSX.Element {

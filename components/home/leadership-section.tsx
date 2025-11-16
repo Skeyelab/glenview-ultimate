@@ -1,6 +1,6 @@
 import React from "react";
 import type { TeamMember } from "@/lib/directus";
-import { cn } from "@/lib/utils";
+import { SectionCard } from "@/components/ui/section-card";
 
 export interface LeadershipSectionProps {
   people: TeamMember[];
@@ -18,8 +18,7 @@ export function LeadershipSection({
   className,
 }: LeadershipSectionProps): React.JSX.Element {
   return (
-    <div className={cn("card", className)}>
-      <h2 className="text-xl font-semibold mb-2 text-white">{title}</h2>
+    <SectionCard title={title} className={className}>
       <div className="space-y-2">
         {people.length > 0 ? (
           people.map((p) => (
@@ -41,6 +40,6 @@ export function LeadershipSection({
           <p className="text-white/90">{emptyMessage}</p>
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }

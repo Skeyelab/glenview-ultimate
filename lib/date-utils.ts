@@ -53,6 +53,12 @@ export function formatDateShort(isoDate: string | null | undefined): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
 }
 
+export function formatFullDate(isoDate: string | null | undefined): string | null {
+  const date = safeParseDate(isoDate);
+  if (!date) return null;
+  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(date);
+}
+
 export function safeParseDate(iso: string | null | undefined): Date | null {
   if (!iso) return null;
   const date = new Date(iso);

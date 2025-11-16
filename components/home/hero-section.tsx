@@ -21,6 +21,9 @@ export interface HeroSectionProps {
 }
 
 export function HeroSection({ season, logoUrl, className }: HeroSectionProps): React.JSX.Element {
+  const heroParagraphs = [HERO_SUBTITLE, HERO_TAGLINE, HERO_MESSAGE_1, HERO_MESSAGE_2];
+  const heroParagraphClass = "text-lg text-white/90 max-w-2xl mx-auto";
+  const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
 
   return (
     <section className={cn("text-center space-y-4", className)}>
@@ -37,19 +40,20 @@ export function HeroSection({ season, logoUrl, className }: HeroSectionProps): R
         </div>
       )}
       <h1 className="text-3xl md:text-5xl font-bold text-white">{HERO_TITLE}</h1>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_SUBTITLE}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_TAGLINE}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_MESSAGE_1}</p>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto">{HERO_MESSAGE_2}</p>
+      {heroParagraphs.map((paragraph) => (
+        <p key={paragraph} className={heroParagraphClass}>
+          {paragraph}
+        </p>
+      ))}
       <div className="mt-4">
         <Link className="button" href={HERO_CTA_URL}>
           {HERO_CTA_LABEL}
         </Link>
       </div>
       <p className="text-sm text-white/70 mt-2">{HERO_PRE_REGISTRATION_TEXT}</p>
-      {season && (
+      {season && seasonLabel && (
         <p className="text-sm text-white/70 mt-2">
-          {season.title ?? `${season.year} Season`} ({season.start_month ?? "Mar"}–{season.end_month ?? "May"})
+          {seasonLabel} ({season.start_month ?? "Mar"}–{season.end_month ?? "May"})
         </p>
       )}
     </section>
