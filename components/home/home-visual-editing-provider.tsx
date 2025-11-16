@@ -19,8 +19,9 @@ export function HomeVisualEditingProvider({
     let mounted = true;
     async function run() {
       if (!isVisualEditingEnabled(search)) return;
-      const { remove } = await applyVisualEditing(directusUrl);
-      cleanupRef.current = remove;
+      const result = await applyVisualEditing(directusUrl);
+      if (!result) return;
+      cleanupRef.current = result.remove;
     }
     run();
     return () => {
