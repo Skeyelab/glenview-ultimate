@@ -27,7 +27,7 @@ export function PartnersSection({
   title = "Partners",
   minColumnWidth = "160px",
   className,
-}: PartnersSectionProps): React.JSX.Element {
+}: PartnersSectionProps): React.ReactElement {
   const displayPartners = partners.length > 0 ? partners : defaultPartners;
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";

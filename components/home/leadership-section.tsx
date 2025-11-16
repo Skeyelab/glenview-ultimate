@@ -19,7 +19,7 @@ export function LeadershipSection({
   emptyMessage = "Captains & coach bios coming soon.",
   renderMember,
   className,
-}: LeadershipSectionProps): React.JSX.Element {
+}: LeadershipSectionProps): React.ReactElement {
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
   return (

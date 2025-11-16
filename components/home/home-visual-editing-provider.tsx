@@ -10,7 +10,7 @@ export function HomeVisualEditingProvider({
 }: {
   directusUrl: string;
   children: React.ReactNode;
-}): React.JSX.Element {
+}): React.ReactElement {
   const pathname = usePathname();
   const search = useSearchParams();
   const cleanupRef = useRef<null | (() => void)>(null);
@@ -32,5 +32,3 @@ export function HomeVisualEditingProvider({
 
   return <>{children}</>;
 }
-
-

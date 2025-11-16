@@ -14,5 +14,3 @@ export async function applyVisualEditing(directusUrl: string, opts?: { elements?
   }
   return await apply({ directusUrl, ...opts });
 }
-
-
