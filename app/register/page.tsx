@@ -1,9 +1,17 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import { RegistrationForm } from "@/components/register/registration-form";
 
 export default function RegisterPage(): React.JSX.Element {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const track = window.umami?.track;
+    if (typeof track === "function") {
+      track("registration_form_view");
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white">Registration</h1>
