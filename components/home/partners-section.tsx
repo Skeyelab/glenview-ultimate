@@ -1,6 +1,9 @@
+'use client';
 import React from "react";
 import type { Partner } from "@/lib/directus";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+import { setAttr } from "@/lib/visual-editing";
 
 export interface PartnersSectionProps {
   partners: Partner[];
@@ -26,10 +29,19 @@ export function PartnersSection({
   className,
 }: PartnersSectionProps): React.JSX.Element {
   const displayPartners = partners.length > 0 ? partners : defaultPartners;
+  const search = useSearchParams();
+  const editingEnabled = search.get("visual-editing") === "true";
 
   return (
     <section className={cn("card", className)}>
-      <h2 className="text-xl font-semibold mb-3 text-white">{title}</h2>
+      <h2
+        className="text-xl font-semibold mb-3 text-white"
+        {...(editingEnabled
+          ? { "data-directus": setAttr({ collection: "Partners", item: displayPartners[0]?.id ?? 1, fields: "name", mode: "popover" }) }
+          : {})}
+      >
+        {title}
+      </h2>
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${minColumnWidth}, 1fr))` }}>
         {displayPartners.map((p) => (
           <a
@@ -38,6 +50,9 @@ export function PartnersSection({
             href={p.url}
             target="_blank"
             rel="noreferrer"
+            {...(editingEnabled
+              ? { "data-directus": setAttr({ collection: "Partners", item: p.id, fields: ["name", "url"], mode: "popover" }) }
+              : {})}
           >
             {p.name}
           </a>
