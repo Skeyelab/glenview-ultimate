@@ -18,4 +18,13 @@ jest.mock('next/navigation', () => ({
   usePathname() {
     return '/'
   },
+  useSearchParams() {
+    // Minimal ReadonlyURLSearchParams mock
+    const params = new URLSearchParams('')
+    return {
+      get: params.get.bind(params),
+      toString: params.toString.bind(params),
+      // Add any methods lazily as needed by tests/components
+    }
+  },
 }))
