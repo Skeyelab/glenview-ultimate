@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ChildFormFields } from '@/components/register/child-form-fields';
 import type { Child } from '@/lib/register-types';
-import { sampleChild1, sampleChild2 } from '@/__tests__/fixtures/registration';
+import { sampleChild1 } from '@/__tests__/fixtures/registration';
 
 describe('ChildFormFields', () => {
   const mockUpdate = jest.fn();
