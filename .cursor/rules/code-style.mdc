@@ -1,0 +1,59 @@
+---
+description: Glenview Ultimate code style & architecture guardrails
+alwaysApply: true
+---
+
+## TypeScript & Modules
+- Stick with TypeScript everywhere (`strict: true`); import `React` whenever you need JSX return types or hooks, and annotate component outputs as `React.JSX.Element`/`React.ReactElement`.
+- Prefer named exports for components and utilities; reserve default exports for Next.js route handlers or page components only.
+- Define props/DTO shapes with `interface` declarations placed directly above the component/function; use `type` aliases for unions and helper tuples (`as const` to lock literals).
+- Keep the alias-based import style (`@/lib/...`, `@/components/...`) and group external imports before internal ones without blank-line noise.
+- Put `'use client';` as the first statement (single quotes) in interactive components; do not add it to server components.
+
+## Components & Hooks
+- Keep components focused and reusable—most sections expose `renderX` overrides, `title`, `emptyMessage`, and `className` props; follow this pattern when adding new blocks.
+- Use the `cn` helper from `@/lib/utils` for dynamic class merging instead of template literals, especially when applying conditional Tailwind classes.
+- When dealing with fragments inside `.map`, wrap with `React.Fragment` (or shorthand) and provide a stable `key` (prefer IDs over array indices unless the data is static copy).
+- Favor `React.forwardRef` for primitives (`Button`, `Input`, etc.) and remember to set `.displayName`.
+- Localize helpers (`const heroParagraphs = [...]`, `const SIZE_STYLES = {...}`) inside the file instead of exporting magic strings; if the data is shared, promote it to `lib/constants`.
+
+## Styling & Layout
+- Styling lives in Tailwind classes plus a handful of global utility classes defined in `app/globals.css` (`button`, `card`, `grid-2`, `notice`, etc.); reuse them before inventing new bespoke class strings.
+- Respect the dark-green brand palette (`bg-brand-green` on `<body>`, white text) and component spacing conventions (`space-y-*`, `gap-*`, `rounded-lg` borders with `white/20` overlays).
+- Compose sections from the shared primitives first (`SectionCard`, `PageHeader`, schedule cards/badges) to maintain consistent typography and padding.
+- Keep layout containers constrained via the Tailwind `container` utility (see `app/layout.tsx`) and prefer responsive grids defined with `grid-2`, `md:grid-cols-*`, or inline `gridTemplateColumns`.
+
+## Data Fetching & Directus
+- Export `revalidate = DEFAULT_REVALIDATE_SECONDS` from server pages and fetch data with `async` page components.
+- Batch Directus reads with `Promise.all` when multiple collections are required, and default to local constants when the CMS is empty/unconfigured (`DEFAULT_SCHEDULE`, `DEFAULT_PARTNERS`, fallback copy in `lib/constants`).
+- Interact with Directus only through `lib/directus` helpers; they already guard for missing env vars via `withDirectus`.
+- When exposing media, run UUIDs through `getDirectusAssetUrl` instead of composing URLs manually.
+- Convert untrusted Markdown/HTML by piping through `marked` and `sanitize-html` before rendering (`NewsPost` pattern).
+
+## Forms & Client Behavior
+- Manage dynamic repeaters (parents/kids) with `useState` arrays and helper mutators (`updateChild`, `addChild`, etc.), capping entries per business rules (max 3 kids, 2 parents).
+- Guard browser-only APIs (`window`, `URLSearchParams`) with `typeof window !== "undefined"` checks; the `global.d.ts` typing for `window.umami` is already in place.
+- Track analytics via `window.umami?.track` and reuse the existing event names (`registration_form_submit`, `registration_add_child`, etc.) for consistency.
+- Use controlled inputs built from the `.button/.input/.select/.textarea` styles or the `components/ui` primitives; keep labels accessible and include `aria-*` attributes where appropriate (`MobileMenuButton`).
+
+## API Routes
+- Validate input with `zod.safeParse` and bail out early with meaningful error messages (`app/api/register/route.ts`).
+- Surface Directus constraint violations as friendly responses (e.g., `DUPLICATE_EMAIL`) and fall back to a generic 500 with `{ error: "Unexpected error..." }`.
+- Use `NextResponse.json` everywhere and clamp HTTP status codes to sensible ranges (see `MIN_HTTP_ERROR_STATUS` / `MAX_HTTP_ERROR_STATUS` guard).
+- Build payloads for Directus mutations via helpers in `lib/register-utils` rather than constructing inline objects.
+
+## Visual Editing
+- Enable Directus Visual Editing only when the `visual-editing=true` search param is present: use `HomeVisualEditingProvider` to inject scripts and spread `data-directus={setAttr(...)}` selectively (see `HeroSection`, `PartnersSection`).
+- When adding new editable surfaces, collect the relevant field names into the `setAttr` call and keep those arrays in the component file for clarity.
+
+## Testing
+- Co-locate tests under `__tests__` mirroring the source tree, and rely on `@testing-library/react`, `@testing-library/user-event`, and `@testing-library/jest-dom` utilities already wired up in `jest.setup.js`.
+- Mock modules with `jest.mock` before importing the module under test and justify the ordering with `// eslint-disable-next-line import/first` when necessary (`__tests__/api/register/route.test.ts`).
+- For modules that depend on environment variables or caches, reset them with `jest.resetModules()` and `delete require.cache[...]` before each test suite; freeze time with `jest.useFakeTimers()` when inspecting date logic.
+- Write behavior-focused assertions (`expect(screen.getBy...`).toBeInTheDocument()`, `expect(fetch).toHaveBeenCalledWith(...)`) and keep fixtures in `__tests__/fixtures/`.
+
+## Utility Patterns
+- Reuse helpers such as `safeParseDate`, `formatDateRange`, `selectUpcomingEvents`, `groupEventsByMonth`, and `listEventTypeLabels` instead of reimplementing date/label logic.
+- Prefer `Record<Literal, string>` objects plus `satisfies` to map enums → labels/style tokens (see `EventTypeBadge`).
+- When deriving collections (`Set`, `Map`) ensure outputs are sorted for deterministic rendering (example: `groupEventsByMonth` sorts keys and events).
+- Keep constants uppercase (`LOGO_ID`, `DEFAULT_CLUB_DESCRIPTION`) and trim trailing slashes on URLs before concatenation (`app/sitemap.ts` pattern).
