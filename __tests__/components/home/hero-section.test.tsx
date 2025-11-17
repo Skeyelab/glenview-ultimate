@@ -13,9 +13,11 @@ jest.mock('next/navigation', () => ({
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, ...props }: { src: string; alt: string }) => (
-    <img src={src} alt={alt} {...props} />
-  ),
+  default: ({ src, alt, priority: _priority, ...props }: { src: string; alt: string; priority?: boolean; [key: string]: any }) => {
+    // Filter out Next.js specific props that aren't valid HTML attributes
+    const { width: _width, height: _height, fill: _fill, quality: _quality, placeholder: _placeholder, blurDataURL: _blurDataURL, ...htmlProps } = props;
+    return <img src={src} alt={alt} {...htmlProps} />;
+  },
 }));
 
 // Mock next/link

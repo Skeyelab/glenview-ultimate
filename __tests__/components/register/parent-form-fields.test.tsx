@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ParentFormFields } from '@/components/register/parent-form-fields';
@@ -45,6 +45,7 @@ describe('ParentFormFields', () => {
   });
 
   it('calls onUpdate when name field changes', async () => {
+    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -55,11 +56,13 @@ describe('ParentFormFields', () => {
       />
     );
     const nameInput = screen.getByDisplayValue('John Doe');
-    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-    expect(mockUpdate).toHaveBeenCalledWith(0, { name: 'Jane Doe' });
+    await user.tripleClick(nameInput);
+    await user.paste('Jane Doe');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { name: 'Jane Doe' });
   });
 
   it('calls onUpdate when email field changes', async () => {
+    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -70,11 +73,13 @@ describe('ParentFormFields', () => {
       />
     );
     const emailInput = screen.getByDisplayValue('john@example.com');
-    fireEvent.change(emailInput, { target: { value: 'newemail@example.com' } });
-    expect(mockUpdate).toHaveBeenCalledWith(0, { email: 'newemail@example.com' });
+    await user.tripleClick(emailInput);
+    await user.paste('newemail@example.com');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { email: 'newemail@example.com' });
   });
 
   it('calls onUpdate when phone field changes', async () => {
+    const user = userEvent.setup();
     render(
       <ParentFormFields
         parent={sampleParent1}
@@ -85,8 +90,9 @@ describe('ParentFormFields', () => {
       />
     );
     const phoneInput = screen.getByDisplayValue('555-0100');
-    fireEvent.change(phoneInput, { target: { value: '555-9999' } });
-    expect(mockUpdate).toHaveBeenCalledWith(0, { phone: '555-9999' });
+    await user.tripleClick(phoneInput);
+    await user.paste('555-9999');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { phone: '555-9999' });
   });
 
   it('marks name and email fields as required', () => {
