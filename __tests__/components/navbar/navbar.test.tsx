@@ -6,7 +6,6 @@ import { Navbar } from '@/components/navbar/navbar';
 
 // Mock next/navigation
 const mockPathname = '/';
-const mockSetPathname = jest.fn();
 jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
 }));
@@ -23,7 +22,6 @@ jest.mock('next/link', () => ({
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...props }: any) => {
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img src={src} alt={alt} {...props} />;
   },
 }));

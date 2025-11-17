@@ -8,7 +8,7 @@ export function isVisualEditingEnabled(searchParams: URLSearchParams): boolean {
   return searchParams.get('visual-editing') === 'true';
 }
 
-export async function applyVisualEditing(directusUrl: string, opts?: { elements?: HTMLElement | HTMLElement[]; onSaved?: (d: any) => void }) {
+export async function applyVisualEditing(directusUrl: string, opts?: { elements?: HTMLElement | HTMLElement[]; onSaved?: (d: unknown) => void }) {
   if (!directusUrl) {
     return { remove: () => {}, disable: () => {}, enable: () => {} };
   }
