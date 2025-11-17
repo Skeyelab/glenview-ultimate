@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ParentFormFields } from '@/components/register/parent-form-fields';
-import type { Parent } from '@/lib/register-types';
 import { sampleParent1 } from '@/__tests__/fixtures/registration';
 
 describe('ParentFormFields', () => {
