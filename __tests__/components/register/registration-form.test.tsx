@@ -354,11 +354,10 @@ describe('RegistrationForm', () => {
       expect(newEmptyInputs.length).toBeGreaterThan(3);
     });
 
-    // Get updated empty inputs and fill the second child's name
-    const updatedEmptyInputs = screen.getAllByDisplayValue('');
-    // The second child name should be one of the later empty inputs
-    // After first child: name (index 3), age might be empty (index 4), then second child name
-    await user.type(updatedEmptyInputs[updatedEmptyInputs.length - 3] || updatedEmptyInputs[4], sampleChild2.full_name);
+    // Fill in the second child's name using a robust label-based selector
+    const childNameInputs = screen.getAllByLabelText(/child.*full name/i);
+    // The second child's name input should be the second in the list (index 1)
+    await user.type(childNameInputs[1], sampleChild2.full_name);
 
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
