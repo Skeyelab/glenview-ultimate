@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Skeyelab/glenview-ultimate/actions/workflows/ci.yml)
 
-A Next.js website for Glenview Ultimate, a youth ultimate frisbee organization. The site connects to a Directus CMS backend for content management and includes features for registration, news, schedules, and team information.
+A Next.js website for [Glenview Ultimate](https://glenview-ultimate.org), a youth ultimate frisbee organization. The site connects to a Directus CMS backend for content management and includes features for registration, news, schedules, and team information.
 
 ## Features
 
