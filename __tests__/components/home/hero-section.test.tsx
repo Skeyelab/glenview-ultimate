@@ -1,40 +1,107 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { HeroSection } from "@/components/home/hero-section";
-import type { SeasonSchedule } from "@/lib/directus";
-import { HERO_TITLE, HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT } from "@/lib/constants";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { HeroSection } from '@/components/home/hero-section';
+import type { SeasonSchedule } from '@/lib/directus';
+import { HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT } from '@/lib/constants';
 
-describe("HeroSection", () => {
-  const baseSeason: SeasonSchedule = {
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock next/image
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ src, alt, priority: _priority, ...props }: { src: string; alt: string; priority?: boolean; [key: string]: any }) => {
+    // Filter out Next.js specific props that aren't valid HTML attributes
+    const { width: _width, height: _height, fill: _fill, quality: _quality, placeholder: _placeholder, blurDataURL: _blurDataURL, ...htmlProps } = props;
+    return <img src={src} alt={alt} {...htmlProps} />;
+  },
+}));
+
+// Mock next/link
+jest.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+describe('HeroSection', () => {
+  const mockSeason: SeasonSchedule = {
     season_year: 2026,
     year: 2026,
-    title: "2026 Season Schedule",
-    start_month: "March",
-    end_month: "May",
+    title: 'Spring 2026',
+    start_month: 'Mar',
+    end_month: 'May',
     highlights: [],
     events: [],
   };
 
-  it("renders heading, CTA and pre-registration text", () => {
+  it('renders the hero title', () => {
     render(<HeroSection season={null} logoUrl={null} />);
-    expect(screen.getByRole("heading", { level: 1, name: HERO_TITLE })).toBeInTheDocument();
-    const cta = screen.getByRole("link", { name: HERO_CTA_LABEL });
-    expect(cta).toHaveAttribute("href", HERO_CTA_URL);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/The Fun Starts/i);
+  });
+
+  it('renders hero paragraphs', () => {
+    render(<HeroSection season={null} logoUrl={null} />);
+    expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
+    expect(screen.getByText(/5th-8th Grade. Boys & Girls./i)).toBeInTheDocument();
+    expect(screen.getByText(/Everyone is Welcome. Everyone Plays./i)).toBeInTheDocument();
+    expect(screen.getByText(/Come play with us. Join our team./i)).toBeInTheDocument();
+  });
+
+  it('renders the CTA link', () => {
+    render(<HeroSection season={null} logoUrl={null} />);
+    const ctaLink = screen.getByRole('link', { name: HERO_CTA_LABEL });
+    expect(ctaLink).toBeInTheDocument();
+    expect(ctaLink).toHaveAttribute('href', HERO_CTA_URL);
+  });
+
+  it('renders pre-registration text', () => {
+    render(<HeroSection season={null} logoUrl={null} />);
     expect(screen.getByText(HERO_PRE_REGISTRATION_TEXT)).toBeInTheDocument();
   });
 
-  it("renders season label when season is provided", () => {
-    render(<HeroSection season={baseSeason} logoUrl={null} />);
-    expect(screen.getByText(/2026 Season Schedule/)).toBeInTheDocument();
-    expect(screen.getByText(/\(March–May\)/)).toBeInTheDocument();
+  it('renders logo when provided', () => {
+    render(<HeroSection season={null} logoUrl="/logo.png" />);
+    const logo = screen.getByAltText('Glenview Ultimate');
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute('src', '/logo.png');
   });
 
-  it("renders logo when logoUrl is provided", () => {
-    render(<HeroSection season={null} logoUrl="/logo.png" />);
-    // Uses Next/Image which renders an img element in tests
-    expect(screen.getByAltText("Glenview Ultimate")).toBeInTheDocument();
+  it('does not render logo when not provided', () => {
+    render(<HeroSection season={null} logoUrl={null} />);
+    expect(screen.queryByAltText('Glenview Ultimate')).not.toBeInTheDocument();
+  });
+
+  it('renders season information when provided', () => {
+    render(<HeroSection season={mockSeason} logoUrl={null} />);
+    expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
+  });
+
+  it('renders season with default months when start/end_month not provided', () => {
+    const seasonWithoutMonths: SeasonSchedule = {
+      ...mockSeason,
+      start_month: null,
+      end_month: null,
+    };
+    render(<HeroSection season={seasonWithoutMonths} logoUrl={null} />);
+    expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
+  });
+
+  it('renders section with landmark role', () => {
+    const { container } = render(<HeroSection season={null} logoUrl={null} />);
+    const section = container.querySelector('section');
+    expect(section).toBeInTheDocument();
+  });
+
+  it('applies custom className when provided', () => {
+    const { container } = render(<HeroSection season={null} logoUrl={null} className="custom-class" />);
+    const section = container.querySelector('section');
+    expect(section).toHaveClass('custom-class');
   });
 });
-
-

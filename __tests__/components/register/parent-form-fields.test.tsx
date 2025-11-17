@@ -1,52 +1,203 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { ParentFormFields } from "@/components/register/parent-form-fields";
-import { parentA } from "../../../tests/fixtures/registration";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+import { ParentFormFields } from '@/components/register/parent-form-fields';
+import type { Parent } from '@/lib/register-types';
+import { sampleParent1 } from '@/__tests__/fixtures/registration';
 
-describe("ParentFormFields", () => {
-  it("renders fields and calls onUpdate on input changes", () => {
-    const onUpdate = jest.fn();
+describe('ParentFormFields', () => {
+  const mockUpdate = jest.fn();
+  const mockRemove = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders all form fields', () => {
     render(
       <ParentFormFields
-        parent={{ ...parentA }}
+        parent={sampleParent1}
         index={0}
         errorField={null}
-        onUpdate={onUpdate}
+        onUpdate={mockUpdate}
         canRemove={false}
-      />,
+      />
     );
-    const textboxes = screen.getAllByRole("textbox");
-    fireEvent.change(textboxes[0], { target: { value: "New Name" } });
-    expect(onUpdate).toHaveBeenCalledWith(0, { name: "New Name" });
-    fireEvent.change(textboxes[1], { target: { value: "new@example.com" } });
-    expect(onUpdate).toHaveBeenCalledWith(0, { email: "new@example.com" });
-    fireEvent.change(textboxes[2], { target: { value: "999-9999" } });
-    expect(onUpdate).toHaveBeenCalledWith(0, { phone: "999-9999" });
+    expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('john@example.com')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('555-0100')).toBeInTheDocument();
   });
 
-  it("applies error styling when errorField matches", () => {
-    const { rerender } = render(
+  it('displays parent data in fields', () => {
+    render(
       <ParentFormFields
-        parent={{ ...parentA }}
+        parent={sampleParent1}
         index={0}
-        errorField={"parent1_email"}
-        onUpdate={jest.fn()}
+        errorField={null}
+        onUpdate={mockUpdate}
         canRemove={false}
-      />,
+      />
     );
-    expect(screen.getAllByRole("textbox")[1].className).toMatch(/border-red-500/);
-    rerender(
+    expect(screen.getByDisplayValue('John Doe')).toHaveValue('John Doe');
+    expect(screen.getByDisplayValue('john@example.com')).toHaveValue('john@example.com');
+    expect(screen.getByDisplayValue('555-0100')).toHaveValue('555-0100');
+  });
+
+  it('calls onUpdate when name field changes', async () => {
+    const user = userEvent.setup();
+    render(
       <ParentFormFields
-        parent={{ ...parentA }}
-        index={1}
-        errorField={"parent2_email"}
-        onUpdate={jest.fn()}
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
         canRemove={false}
-      />,
+      />
     );
-    expect(screen.getAllByRole("textbox")[1].className).toMatch(/border-red-500/);
+    const nameInput = screen.getByDisplayValue('John Doe');
+    await user.tripleClick(nameInput);
+    await user.paste('Jane Doe');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { name: 'Jane Doe' });
+  });
+
+  it('calls onUpdate when email field changes', async () => {
+    const user = userEvent.setup();
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const emailInput = screen.getByDisplayValue('john@example.com');
+    await user.tripleClick(emailInput);
+    await user.paste('newemail@example.com');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { email: 'newemail@example.com' });
+  });
+
+  it('calls onUpdate when phone field changes', async () => {
+    const user = userEvent.setup();
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const phoneInput = screen.getByDisplayValue('555-0100');
+    await user.tripleClick(phoneInput);
+    await user.paste('555-9999');
+    expect(mockUpdate).toHaveBeenLastCalledWith(0, { phone: '555-9999' });
+  });
+
+  it('marks name and email fields as required', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const nameInput = screen.getByDisplayValue('John Doe');
+    const emailInput = screen.getByDisplayValue('john@example.com');
+    const phoneInput = screen.getByDisplayValue('555-0100');
+    expect(nameInput).toBeRequired();
+    expect(emailInput).toBeRequired();
+    expect(phoneInput).not.toBeRequired();
+  });
+
+  it('shows error styling when errorField matches parent1_email', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField="parent1_email"
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const emailInput = screen.getByDisplayValue('john@example.com');
+    expect(emailInput).toHaveClass('border-red-500');
+  });
+
+  it('shows error styling when errorField matches parent2_email for index 1', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={1}
+        errorField="parent2_email"
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const emailInput = screen.getByDisplayValue('john@example.com');
+    expect(emailInput).toHaveClass('border-red-500');
+  });
+
+  it('does not show error styling when errorField does not match', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField="parent2_email"
+        onUpdate={mockUpdate}
+        canRemove={false}
+      />
+    );
+    const emailInput = screen.getByDisplayValue('john@example.com');
+    expect(emailInput).not.toHaveClass('border-red-500');
+  });
+
+  it('renders remove button when canRemove is true and onRemove is provided', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        onRemove={mockRemove}
+        canRemove={true}
+      />
+    );
+    const removeButton = screen.getByRole('button', { name: /Remove/i });
+    expect(removeButton).toBeInTheDocument();
+  });
+
+  it('does not render remove button when canRemove is false', () => {
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        onRemove={mockRemove}
+        canRemove={false}
+      />
+    );
+    expect(screen.queryByRole('button', { name: /Remove/i })).not.toBeInTheDocument();
+  });
+
+  it('calls onRemove when remove button is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <ParentFormFields
+        parent={sampleParent1}
+        index={0}
+        errorField={null}
+        onUpdate={mockUpdate}
+        onRemove={mockRemove}
+        canRemove={true}
+      />
+    );
+    const removeButton = screen.getByRole('button', { name: /Remove/i });
+    await user.click(removeButton);
+    expect(mockRemove).toHaveBeenCalledTimes(1);
   });
 });
-
-
