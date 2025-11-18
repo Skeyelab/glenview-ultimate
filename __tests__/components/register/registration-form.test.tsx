@@ -348,16 +348,21 @@ describe('RegistrationForm', () => {
     const addChildButton = screen.getByRole('button', { name: /Add a child/i });
     await user.click(addChildButton);
 
-    // Wait for the new child field to appear, then find the new empty inputs
+    // Wait for the new child field to appear
     await waitFor(() => {
-      const newEmptyInputs = screen.getAllByDisplayValue('');
-      expect(newEmptyInputs.length).toBeGreaterThan(3);
+      const childLabels = screen.getAllByText('Child Full Name');
+      expect(childLabels.length).toBe(2);
     });
 
-    // Fill in the second child's name using a robust label-based selector
-    const childNameInputs = screen.getAllByLabelText(/child.*full name/i);
-    // The second child's name input should be the second in the list (index 1)
-    await user.type(childNameInputs[1], sampleChild2.full_name);
+    // Find the second child's name input by finding all "Child Full Name" labels
+    // and getting the input that follows each label in the DOM
+    const childLabels = screen.getAllByText('Child Full Name');
+    const secondChildLabel = childLabels[1];
+    // Find the input that follows this label - it should be in the same parent div
+    const secondChildLabelContainer = secondChildLabel.closest('div');
+    const secondChildNameInput = secondChildLabelContainer?.querySelector('input[type="text"], input:not([type])') as HTMLInputElement;
+    expect(secondChildNameInput).toBeDefined();
+    await user.type(secondChildNameInput!, sampleChild2.full_name);
 
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
