@@ -4,12 +4,12 @@ import { marked } from "marked";
 import { notFound } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
 import { NewsPost } from "@/components/news/news-post";
-import { DEFAULT_REVALIDATE_SECONDS } from "@/lib/config";
 
-export const revalidate = DEFAULT_REVALIDATE_SECONDS;
+export const revalidate = 300;
 
-export default async function NewsPostPage({ params }: { params: { slug: string } }): Promise<React.JSX.Element> {
-  const post = await getNewsBySlug(params.slug);
+export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }): Promise<React.JSX.Element> {
+  const { slug } = await params;
+  const post = await getNewsBySlug(slug);
   if (!post) return notFound();
 
   const rawHtml = await marked.parse(post.content);
