@@ -1,13 +1,13 @@
 import React, { Suspense } from "react";
 import { getPartners, getTeam, getSchedule, getDirectusAssetUrl } from "@/lib/directus";
-import { LOGO_ID, DEFAULT_REVALIDATE_SECONDS } from "@/lib/config";
+import { LOGO_ID } from "@/lib/config";
 import { HeroSection } from "@/components/home/hero-section";
 import { SeasonHighlightsCard } from "@/components/home/season-highlights-card";
 import { LeadershipSection } from "@/components/home/leadership-section";
 import { PartnersSection } from "@/components/home/partners-section";
 import { HomeVisualEditingProvider } from "../components/home/home-visual-editing-provider";
 
-export const revalidate = DEFAULT_REVALIDATE_SECONDS;
+export const revalidate = 300;
 
 export default async function HomePage(): Promise<React.JSX.Element> {
   const [partners, people, season] = await Promise.all([
