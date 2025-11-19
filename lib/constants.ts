@@ -14,6 +14,11 @@ export const DESCRIPTION_PARAGRAPHS = [
   "The sport is played on a field similar to a football field, with end zones at each end. Teams score by catching the disc in the opposing team's end zone. Players cannot run with the disc and must pass it to teammates to advance down the field.",
 ];
 
+/**
+ * @deprecated These constants are only used as fallbacks when CMS data is unavailable.
+ * Hero content should now be managed through the Website collection in Directus.
+ * These may be removed in a future version once CMS migration is complete.
+ */
 export const HERO_TITLE = "The Fun Starts - Spring 2026";
 export const HERO_SUBTITLE = "Introducing Glenview's very first Youth Ultimate Frisbee Club";
 export const HERO_TAGLINE = "5th-8th Grade. Boys & Girls.";

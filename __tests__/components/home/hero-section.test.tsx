@@ -42,12 +42,12 @@ describe('HeroSection', () => {
   };
 
   it('renders the hero title', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/The Fun Starts/i);
   });
 
   it('renders hero paragraphs', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
     expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
     expect(screen.getByText(/5th-8th Grade. Boys & Girls./i)).toBeInTheDocument();
     expect(screen.getByText(/Everyone is Welcome. Everyone Plays./i)).toBeInTheDocument();
@@ -55,31 +55,31 @@ describe('HeroSection', () => {
   });
 
   it('renders the CTA link', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
     const ctaLink = screen.getByRole('link', { name: HERO_CTA_LABEL });
     expect(ctaLink).toBeInTheDocument();
     expect(ctaLink).toHaveAttribute('href', HERO_CTA_URL);
   });
 
   it('renders pre-registration text', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
     expect(screen.getByText(HERO_PRE_REGISTRATION_TEXT)).toBeInTheDocument();
   });
 
   it('renders logo when provided', () => {
-    render(<HeroSection season={null} logoUrl="/logo.png" />);
+    render(<HeroSection season={null} logoUrl="/logo.png" website={null} />);
     const logo = screen.getByAltText('Glenview Ultimate');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src', '/logo.png');
   });
 
   it('does not render logo when not provided', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
     expect(screen.queryByAltText('Glenview Ultimate')).not.toBeInTheDocument();
   });
 
   it('renders season information when provided', () => {
-    render(<HeroSection season={mockSeason} logoUrl={null} />);
+    render(<HeroSection season={mockSeason} logoUrl={null} website={null} />);
     expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
   });
 
@@ -89,18 +89,18 @@ describe('HeroSection', () => {
       start_month: null,
       end_month: null,
     };
-    render(<HeroSection season={seasonWithoutMonths} logoUrl={null} />);
+    render(<HeroSection season={seasonWithoutMonths} logoUrl={null} website={null} />);
     expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
   });
 
   it('renders section with landmark role', () => {
-    const { container } = render(<HeroSection season={null} logoUrl={null} />);
+    const { container } = render(<HeroSection season={null} logoUrl={null} website={null} />);
     const section = container.querySelector('section');
     expect(section).toBeInTheDocument();
   });
 
   it('applies custom className when provided', () => {
-    const { container } = render(<HeroSection season={null} logoUrl={null} className="custom-class" />);
+    const { container } = render(<HeroSection season={null} logoUrl={null} website={null} className="custom-class" />);
     const section = container.querySelector('section');
     expect(section).toHaveClass('custom-class');
   });

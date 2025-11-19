@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { getPartners, getTeam, getSchedule, getDirectusAssetUrl } from "@/lib/directus";
+import { getPartners, getTeam, getSchedule, getWebsite, getDirectusAssetUrl } from "@/lib/directus";
 import { LOGO_ID } from "@/lib/config";
 import { HeroSection } from "@/components/home/hero-section";
 import { SeasonHighlightsCard } from "@/components/home/season-highlights-card";
@@ -10,10 +10,11 @@ import { HomeVisualEditingProvider } from "../components/home/home-visual-editin
 export const revalidate = 300;
 
 export default async function HomePage(): Promise<React.JSX.Element> {
-  const [partners, people, season] = await Promise.all([
+  const [partners, people, season, website] = await Promise.all([
     getPartners(),
     getTeam(),
     getSchedule(),
+    getWebsite(),
   ]);
 
   const highlights = season?.highlights ?? [];
@@ -24,7 +25,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
     <Suspense fallback={null}>
       <HomeVisualEditingProvider directusUrl={directusUrl}>
         <div className="space-y-10">
-          <HeroSection season={season} logoUrl={logoUrl} />
+          <HeroSection season={season} logoUrl={logoUrl} website={website} />
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <SeasonHighlightsCard highlights={highlights} />
             <LeadershipSection people={people} />
