@@ -9,14 +9,15 @@ jest.mock('@/lib/directus', () => ({
   getPartners: jest.fn(),
   getTeam: jest.fn(),
   getSchedule: jest.fn(),
+  getWebsite: jest.fn(),
   getDirectusAssetUrl: jest.fn((id) => `https://example.com/assets/${id}`),
 }));
 
 // Mock components
 jest.mock('@/components/home/hero-section', () => ({
-  HeroSection: ({ season, logoUrl }: any) => (
+  HeroSection: ({ season, logoUrl, website }: any) => (
     <div data-testid="hero-section">
-      {season ? 'Has season' : 'No season'} - {logoUrl ? 'Has logo' : 'No logo'}
+      {season ? 'Has season' : 'No season'} - {logoUrl ? 'Has logo' : 'No logo'} - {website ? 'Has website' : 'No website'}
     </div>
   ),
 }));
@@ -40,7 +41,7 @@ jest.mock('@/components/home/home-visual-editing-provider', () => ({
 }));
 
 describe('HomePage', () => {
-  const { getPartners, getTeam, getSchedule, getDirectusAssetUrl } = require('@/lib/directus');
+  const { getPartners, getTeam, getSchedule, getWebsite, getDirectusAssetUrl } = require('@/lib/directus');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,6 +52,7 @@ describe('HomePage', () => {
     getPartners.mockResolvedValue([]);
     getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
+    getWebsite.mockResolvedValue(null);
 
     const page = await HomePage();
     const { getByTestId } = render(page);
@@ -67,10 +69,12 @@ describe('HomePage', () => {
     const mockSchedule = {
       highlights: [{ id: '1', title: 'Highlight 1' }],
     };
+    const mockWebsite = { id: 1, hero_title: 'Test Title' };
 
     getPartners.mockResolvedValue(mockPartners);
     getTeam.mockResolvedValue(mockTeam);
     getSchedule.mockResolvedValue(mockSchedule);
+    getWebsite.mockResolvedValue(mockWebsite);
 
     const page = await HomePage();
     const { getByTestId } = render(page);
@@ -84,18 +88,21 @@ describe('HomePage', () => {
     getPartners.mockResolvedValue([]);
     getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
+    getWebsite.mockResolvedValue(null);
 
     await HomePage();
 
     expect(getPartners).toHaveBeenCalledTimes(1);
     expect(getTeam).toHaveBeenCalledTimes(1);
     expect(getSchedule).toHaveBeenCalledTimes(1);
+    expect(getWebsite).toHaveBeenCalledTimes(1);
   });
 
   it('should get logo URL', async () => {
     getPartners.mockResolvedValue([]);
     getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
+    getWebsite.mockResolvedValue(null);
 
     await HomePage();
 

@@ -80,6 +80,20 @@ export interface WhatIsUltimateVideo {
   active?: boolean | null;
 }
 
+export interface Website {
+  id: number;
+  site_name: string;
+  footer_text?: string | null;
+  hero_title: string;
+  hero_subtitle?: string | null;
+  hero_tagline?: string | null;
+  hero_message_primary?: string | null;
+  hero_message_secondary?: string | null;
+  hero_cta_label?: string | null;
+  hero_cta_url?: string | null;
+  hero_pre_registration_text?: string | null;
+}
+
 export interface DirectusSchema {
   Team: TeamMember[];
   Partners: Partner[];
@@ -89,6 +103,7 @@ export interface DirectusSchema {
   WhatIsUltimate: WhatIsUltimate[];
   WhatIsUltimateVideos: WhatIsUltimateVideo[];
   Registrations: Registration[];
+  Website: Website[];
 }
 
 // Removed AuthenticatedRestClient - not used
@@ -320,6 +335,30 @@ export function getWhatIsUltimateVideos(): Promise<WhatIsUltimateVideo[]> {
       }),
     );
     return videos;
+  });
+}
+
+export function getWebsite(): Promise<Website | null> {
+  return withDirectus<Website | null>(null, async (client) => {
+    const data = await client.request(
+      readItems("Website", {
+        limit: 1,
+        fields: [
+          "id",
+          "site_name",
+          "footer_text",
+          "hero_title",
+          "hero_subtitle",
+          "hero_tagline",
+          "hero_message_primary",
+          "hero_message_secondary",
+          "hero_cta_label",
+          "hero_cta_url",
+          "hero_pre_registration_text",
+        ],
+      }),
+    );
+    return data[0] ?? null;
   });
 }
 
