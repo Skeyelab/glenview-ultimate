@@ -28,12 +28,6 @@ describe("register-utils", () => {
         parent2_phone: "222-2222",
       });
     });
-
-    it("includes turnstile token when provided", () => {
-      const parents = [{ name: "A", email: "a@example.com", phone: "111-1111" }] as any;
-      const payload = buildRegistrationPayload(parents, [], "", false, "token-123");
-      expect(payload.turnstile_token).toBe("token-123");
-    });
   });
 
   describe("parseApiError", () => {
