@@ -2,8 +2,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HeroSection } from '@/components/home/hero-section';
-import type { SeasonSchedule } from '@/lib/directus';
-import { HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT } from '@/lib/constants';
+import type { SeasonSchedule, Website } from '@/lib/directus';
+import {
+  HERO_CTA_LABEL,
+  HERO_CTA_URL,
+  HERO_MESSAGE_1,
+  HERO_MESSAGE_2,
+  HERO_PRE_REGISTRATION_TEXT,
+  HERO_SUBTITLE,
+  HERO_TAGLINE,
+  HERO_TITLE,
+} from '@/lib/constants';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -41,13 +50,29 @@ describe('HeroSection', () => {
     events: [],
   };
 
+  const mockWebsite: Website = {
+    id: 1,
+    site_name: 'Glenview Ultimate',
+    hero_title: HERO_TITLE,
+    hero_subtitle: HERO_SUBTITLE,
+    hero_tagline: HERO_TAGLINE,
+    hero_message_primary: HERO_MESSAGE_1,
+    hero_message_secondary: HERO_MESSAGE_2,
+    hero_cta_label: HERO_CTA_LABEL,
+    hero_cta_url: HERO_CTA_URL,
+    hero_pre_registration_text: HERO_PRE_REGISTRATION_TEXT,
+  };
+
+  const renderComponent = (props: Partial<React.ComponentProps<typeof HeroSection>> = {}) =>
+    render(<HeroSection season={null} logoUrl={null} website={mockWebsite} {...props} />);
+
   it('renders the hero title', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    renderComponent();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/The Fun Starts/i);
   });
 
   it('renders hero paragraphs', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    renderComponent();
     expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
     expect(screen.getByText(/5th-8th Grade. Boys & Girls./i)).toBeInTheDocument();
     expect(screen.getByText(/Everyone is Welcome. Everyone Plays./i)).toBeInTheDocument();
@@ -55,31 +80,31 @@ describe('HeroSection', () => {
   });
 
   it('renders the CTA link', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    renderComponent();
     const ctaLink = screen.getByRole('link', { name: HERO_CTA_LABEL });
     expect(ctaLink).toBeInTheDocument();
     expect(ctaLink).toHaveAttribute('href', HERO_CTA_URL);
   });
 
   it('renders pre-registration text', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    renderComponent();
     expect(screen.getByText(HERO_PRE_REGISTRATION_TEXT)).toBeInTheDocument();
   });
 
   it('renders logo when provided', () => {
-    render(<HeroSection season={null} logoUrl="/logo.png" />);
+    renderComponent({ logoUrl: '/logo.png' });
     const logo = screen.getByAltText('Glenview Ultimate');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src', '/logo.png');
   });
 
   it('does not render logo when not provided', () => {
-    render(<HeroSection season={null} logoUrl={null} />);
+    renderComponent();
     expect(screen.queryByAltText('Glenview Ultimate')).not.toBeInTheDocument();
   });
 
   it('renders season information when provided', () => {
-    render(<HeroSection season={mockSeason} logoUrl={null} />);
+    renderComponent({ season: mockSeason });
     expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
   });
 
@@ -89,18 +114,18 @@ describe('HeroSection', () => {
       start_month: null,
       end_month: null,
     };
-    render(<HeroSection season={seasonWithoutMonths} logoUrl={null} />);
+    renderComponent({ season: seasonWithoutMonths });
     expect(screen.getByText(/Spring 2026 \(Mar–May\)/i)).toBeInTheDocument();
   });
 
   it('renders section with landmark role', () => {
-    const { container } = render(<HeroSection season={null} logoUrl={null} />);
+    const { container } = renderComponent();
     const section = container.querySelector('section');
     expect(section).toBeInTheDocument();
   });
 
   it('applies custom className when provided', () => {
-    const { container } = render(<HeroSection season={null} logoUrl={null} className="custom-class" />);
+    const { container } = renderComponent({ className: 'custom-class' });
     const section = container.querySelector('section');
     expect(section).toHaveClass('custom-class');
   });

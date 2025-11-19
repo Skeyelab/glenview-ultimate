@@ -1,6 +1,16 @@
 import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 import { safeParseDate } from "./date-utils";
+import {
+  HERO_CTA_LABEL,
+  HERO_CTA_URL,
+  HERO_MESSAGE_1,
+  HERO_MESSAGE_2,
+  HERO_PRE_REGISTRATION_TEXT,
+  HERO_SUBTITLE,
+  HERO_TAGLINE,
+  HERO_TITLE,
+} from "./constants";
 
 export interface Partner {
   id: number;
@@ -65,6 +75,23 @@ export interface About {
   what_kids_learn?: string[] | null;
 }
 
+export interface Website {
+  id: number;
+  site_name: string;
+  footer_text?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+  hero_tagline?: string | null;
+  hero_message_primary?: string | null;
+  hero_message_secondary?: string | null;
+  hero_cta_label?: string | null;
+  hero_cta_url?: string | null;
+  hero_pre_registration_text?: string | null;
+  description_paragraphs?: string[] | null;
+  register_heading?: string | null;
+  register_intro?: string | null;
+}
+
 export interface DirectusSchema {
   Team: TeamMember[];
   Partners: Partner[];
@@ -72,6 +99,7 @@ export interface DirectusSchema {
   News: NewsPost[];
   About: About[];
   Registrations: Registration[];
+  Website: Website[];
 }
 
 // Removed AuthenticatedRestClient - not used
@@ -218,6 +246,23 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
 
 const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(DEFAULT_SCHEDULE_EVENTS);
 
+const DEFAULT_WEBSITE: Website = {
+  id: 0,
+  site_name: "Glenview Ultimate",
+  footer_text: null,
+  hero_title: HERO_TITLE,
+  hero_subtitle: HERO_SUBTITLE,
+  hero_tagline: HERO_TAGLINE,
+  hero_message_primary: HERO_MESSAGE_1,
+  hero_message_secondary: HERO_MESSAGE_2,
+  hero_cta_label: HERO_CTA_LABEL,
+  hero_cta_url: HERO_CTA_URL,
+  hero_pre_registration_text: HERO_PRE_REGISTRATION_TEXT,
+  description_paragraphs: null,
+  register_heading: null,
+  register_intro: null,
+};
+
 export function getSchedule(): Promise<SeasonSchedule> {
   return withDirectus(DEFAULT_SCHEDULE, async (client) => {
     const events = await client.request(
@@ -278,6 +323,33 @@ export function getAbout(): Promise<About | null> {
       }),
     );
     return data[0] ?? null;
+  });
+}
+
+export function getWebsite(): Promise<Website> {
+  return withDirectus(DEFAULT_WEBSITE, async (client) => {
+    const data = await client.request(
+      readItems("Website", {
+        limit: 1,
+        fields: [
+          "id",
+          "site_name",
+          "footer_text",
+          "hero_title",
+          "hero_subtitle",
+          "hero_tagline",
+          "hero_message_primary",
+          "hero_message_secondary",
+          "hero_cta_label",
+          "hero_cta_url",
+          "hero_pre_registration_text",
+          "description_paragraphs",
+          "register_heading",
+          "register_intro",
+        ],
+      }),
+    );
+    return data[0] ?? DEFAULT_WEBSITE;
   });
 }
 

@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { SeasonSchedule } from "@/lib/directus";
+import type { SeasonSchedule, Website } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
@@ -20,54 +20,59 @@ import {
 export interface HeroSectionProps {
   season: SeasonSchedule | null;
   logoUrl: string | null;
+  website: Website | null;
   className?: string;
 }
 
-export function HeroSection({ season, logoUrl, className }: HeroSectionProps): React.JSX.Element {
+export function HeroSection({ season, logoUrl, website, className }: HeroSectionProps): React.JSX.Element {
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
-  const heroParagraphs = [HERO_SUBTITLE, HERO_TAGLINE, HERO_MESSAGE_1, HERO_MESSAGE_2];
+  const websiteId = website?.id;
   const heroParagraphClass = "text-lg text-white/90 max-w-2xl mx-auto";
   const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
+  const heroTitle = website?.hero_title ?? HERO_TITLE;
+  const heroSubtitle = website?.hero_subtitle ?? HERO_SUBTITLE;
+  const heroTagline = website?.hero_tagline ?? HERO_TAGLINE;
+  const heroMessagePrimary = website?.hero_message_primary ?? HERO_MESSAGE_1;
+  const heroMessageSecondary = website?.hero_message_secondary ?? HERO_MESSAGE_2;
+  const heroCtaLabel = website?.hero_cta_label ?? HERO_CTA_LABEL;
+  const heroCtaUrl = website?.hero_cta_url ?? HERO_CTA_URL;
+  const heroPreRegistrationText = website?.hero_pre_registration_text ?? HERO_PRE_REGISTRATION_TEXT;
+  const heroParagraphs: { key: string; text: string; fields: string[] }[] = [
+    { key: "hero_subtitle", text: heroSubtitle, fields: ["hero_subtitle"] },
+    { key: "hero_tagline", text: heroTagline, fields: ["hero_tagline"] },
+    { key: "hero_message_primary", text: heroMessagePrimary, fields: ["hero_message_primary"] },
+    { key: "hero_message_secondary", text: heroMessageSecondary, fields: ["hero_message_secondary"] },
+  ];
+
+  const getWebsiteAttr = (fields: string[]) =>
+    editingEnabled && websiteId
+      ? {
+          "data-directus": setAttr({
+            collection: "Website",
+            item: String(websiteId),
+            fields,
+            mode: "popover",
+          }),
+        }
+      : {};
 
   return (
     <section
       className={cn("text-center space-y-4", className)}
-      {...(editingEnabled
-        ? {
-            "data-directus": setAttr({
-              collection: "Website",
-              item: "home",
-              fields: [
-                "hero_title",
-                "hero_subtitle",
-                "hero_tagline",
-                "hero_message_1",
-                "hero_message_2",
-                "hero_cta_label",
-                "hero_cta_url",
-                "hero_pre_registration_text",
-                "hero_logo",
-              ],
-              mode: "popover",
-            }),
-          }
-        : {})}
+      {...getWebsiteAttr([
+        "hero_title",
+        "hero_subtitle",
+        "hero_tagline",
+        "hero_message_primary",
+        "hero_message_secondary",
+        "hero_cta_label",
+        "hero_cta_url",
+        "hero_pre_registration_text",
+      ])}
     >
       {logoUrl && (
-        <div
-          className="flex justify-center mb-6"
-          {...(editingEnabled
-            ? {
-                "data-directus": setAttr({
-                  collection: "Website",
-                  item: "home",
-                  fields: ["hero_logo"],
-                  mode: "popover",
-                }),
-              }
-            : {})}
-        >
+        <div className="flex justify-center mb-6">
           <Image
             src={logoUrl}
             alt="Glenview Ultimate"
@@ -80,69 +85,33 @@ export function HeroSection({ season, logoUrl, className }: HeroSectionProps): R
       )}
       <h1
         className="text-3xl md:text-5xl font-bold text-white"
-        {...(editingEnabled
-          ? {
-              "data-directus": setAttr({
-                collection: "Website",
-                item: "home",
-                fields: ["hero_title"],
-                mode: "popover",
-              }),
-            }
-          : {})}
+        {...getWebsiteAttr(["hero_title"])}
       >
-        {HERO_TITLE}
+        {heroTitle}
       </h1>
-      {heroParagraphs.map((paragraph) => (
+      {heroParagraphs.map(({ key, text, fields }) => (
         <p
-          key={paragraph}
+          key={key}
           className={heroParagraphClass}
-          {...(editingEnabled
-            ? {
-                "data-directus": setAttr({
-                  collection: "Website",
-                  item: "home",
-                  fields: ["hero_subtitle", "hero_tagline", "hero_message_1", "hero_message_2"],
-                  mode: "popover",
-                }),
-              }
-            : {})}
+          {...getWebsiteAttr(fields)}
         >
-          {paragraph}
+          {text}
         </p>
       ))}
       <div className="mt-4">
         <Link
           className="button"
-          href={HERO_CTA_URL}
-          {...(editingEnabled
-            ? {
-                "data-directus": setAttr({
-                  collection: "Website",
-                  item: "home",
-                  fields: ["hero_cta_label", "hero_cta_url"],
-                  mode: "popover",
-                }),
-              }
-            : {})}
+          href={heroCtaUrl}
+          {...getWebsiteAttr(["hero_cta_label", "hero_cta_url"])}
         >
-          {HERO_CTA_LABEL}
+          {heroCtaLabel}
         </Link>
       </div>
       <p
         className="text-sm text-white/70 mt-2"
-        {...(editingEnabled
-          ? {
-              "data-directus": setAttr({
-                collection: "Website",
-                item: "home",
-                fields: ["hero_pre_registration_text"],
-                mode: "popover",
-              }),
-            }
-          : {})}
+        {...getWebsiteAttr(["hero_pre_registration_text"])}
       >
-        {HERO_PRE_REGISTRATION_TEXT}
+        {heroPreRegistrationText}
       </p>
       {season && seasonLabel && (
         <p className="text-sm text-white/70 mt-2">
