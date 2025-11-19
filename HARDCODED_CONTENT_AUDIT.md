@@ -54,29 +54,6 @@ This document lists all pages and components that are still using hardcoded cont
 
 ---
 
-### 3. What Is Ultimate Page (`app/what-is-ultimate/page.tsx`)
-
-**Status:** ⚠️ Hardcoded
-
-**Hardcoded Content:**
-- Description paragraphs from `lib/constants.ts`:
-  - `DESCRIPTION_PARAGRAPHS` array (lines 12-15 in constants.ts)
-- Video items hardcoded in page component:
-  - `VIDEOS` array with 4 video items (lines 7-24):
-    - "Introduction to Ultimate"
-    - "Rules of the Game"
-    - "Basic Throwing Techniques"
-    - "Spirit of the Game"
-- Video grid description: "Check out these videos to learn more about Ultimate Frisbee:" (line 33)
-- Notice text about video content (lines 36-40)
-- Page header title defaults to "What is Ultimate?" (in `components/what-is-ultimate/what-is-ultimate-header.tsx`)
-
-**Recommendation:**
-- Create a `getWhatIsUltimate()` function in `lib/directus.ts`
-- Move description paragraphs to CMS
-- Move video items to CMS (with support for YouTube embed IDs or URLs)
-- Make page title and description configurable
-
 ---
 
 ## Pages Already Using CMS (✅)
@@ -95,6 +72,14 @@ This document lists all pages and components that are still using hardcoded cont
 - Fetches partners, team, and schedule from CMS
 - Only hero section content is hardcoded
 
+### ✅ What Is Ultimate Page (Mostly CMS)
+- `app/what-is-ultimate/page.tsx` - Fetches from `getWhatIsUltimate()` and `getWhatIsUltimateVideos()`
+- Description content comes from CMS (with fallback to constants)
+- Videos come from CMS
+- **Minor hardcoded strings remaining:**
+  - Video grid description: "Check out these videos to learn more about Ultimate Frisbee:" (line 33)
+  - Notice text when no videos available (lines 36-42)
+
 ---
 
 ## Additional Components with Hardcoded Content
@@ -112,8 +97,8 @@ This document lists all pages and components that are still using hardcoded cont
 ## Summary
 
 **Total Pages Audited:** 7
-- **Pages with hardcoded content:** 3 (Home hero section, Register, What Is Ultimate)
-- **Pages using CMS:** 4 (News, Schedule, About, Home partial)
+- **Pages with hardcoded content:** 2 (Home hero section, Register)
+- **Pages using CMS:** 5 (News, Schedule, About, Home partial, What Is Ultimate - mostly)
 
 **Additional Components:**
 - Navigation links (probably acceptable)
@@ -121,8 +106,8 @@ This document lists all pages and components that are still using hardcoded cont
 
 **Priority Recommendations:**
 1. **High Priority:** Home page hero section (most visible content)
-2. **Medium Priority:** What Is Ultimate page (informational content)
-3. **Low Priority:** Register page (form labels, but functional as-is)
+2. **Low Priority:** Register page (form labels, but functional as-is)
+3. **Very Low Priority:** What Is Ultimate page minor strings (video grid description, notice text)
 
 ---
 
