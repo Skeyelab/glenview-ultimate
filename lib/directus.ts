@@ -65,12 +65,29 @@ export interface About {
   what_kids_learn?: string[] | null;
 }
 
+export interface WhatIsUltimate {
+  id: number;
+  Description?: string | null;
+}
+
+export interface WhatIsUltimateVideo {
+  id: number;
+  title: string;
+  description?: string | null;
+  youtube_embed_id?: string | null;
+  video_url?: string | null;
+  sort?: number | null;
+  active?: boolean | null;
+}
+
 export interface DirectusSchema {
   Team: TeamMember[];
   Partners: Partner[];
   Schedule: ScheduleEvent[];
   News: NewsPost[];
   About: About[];
+  WhatIsUltimate: WhatIsUltimate[];
+  WhatIsUltimateVideos: WhatIsUltimateVideo[];
   Registrations: Registration[];
 }
 
@@ -278,6 +295,31 @@ export function getAbout(): Promise<About | null> {
       }),
     );
     return data[0] ?? null;
+  });
+}
+
+export function getWhatIsUltimate(): Promise<WhatIsUltimate | null> {
+  return withDirectus<WhatIsUltimate | null>(null, async (client) => {
+    const data = await client.request(
+      readItems("WhatIsUltimate", {
+        limit: 1,
+        fields: ["*"],
+      }),
+    );
+    return data[0] ?? null;
+  });
+}
+
+export function getWhatIsUltimateVideos(): Promise<WhatIsUltimateVideo[]> {
+  return withDirectus<WhatIsUltimateVideo[]>([], async (client) => {
+    const videos = await client.request(
+      readItems("WhatIsUltimateVideos", {
+        fields: ["id", "title", "description", "youtube_embed_id", "video_url", "sort", "active"],
+        filter: { active: { _eq: true } },
+        sort: ["sort"],
+      }),
+    );
+    return videos;
   });
 }
 
