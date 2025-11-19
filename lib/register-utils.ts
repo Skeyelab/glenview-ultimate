@@ -5,7 +5,6 @@ export function buildRegistrationPayload(
   children: Child[],
   notes: string,
   marketing_opt_in: boolean,
-  turnstileToken?: string | null,
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     children,
@@ -25,10 +24,6 @@ export function buildRegistrationPayload(
     payload.parent2_name = parents[1].name;
     payload.parent2_email = parents[1].email;
     payload.parent2_phone = parents[1].phone;
-  }
-
-  if (typeof turnstileToken === "string" && turnstileToken.length > 0) {
-    payload.turnstile_token = turnstileToken;
   }
 
   return payload;
