@@ -54,8 +54,6 @@ This document lists all pages and components that are still using hardcoded cont
 
 ---
 
----
-
 ## Pages Already Using CMS (✅)
 
 ### ✅ News Pages
