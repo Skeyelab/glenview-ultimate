@@ -3,6 +3,10 @@ jest.mock('@/lib/directus', () => ({
   submitRegistration: jest.fn(),
 }))
 
+jest.mock('@/lib/turnstile', () => ({
+  verifyTurnstileToken: jest.fn().mockResolvedValue(true),
+}))
+
 // Mock Next.js server modules that use Web APIs
 jest.mock('next/server', () => {
   class MockNextRequest {
@@ -48,6 +52,8 @@ import { NextRequest } from 'next/server'
 import { submitRegistration } from '@/lib/directus'
 // eslint-disable-next-line import/first -- Jest mocks must be before imports
 import type { DirectusError } from '@directus/sdk'
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import { verifyTurnstileToken } from '@/lib/turnstile'
 
 describe('/api/register', () => {
   const originalEnv = process.env
@@ -58,6 +64,7 @@ describe('/api/register', () => {
       ...originalEnv,
       DIRECTUS_URL: 'https://directus.example.com',
       DIRECTUS_STATIC_TOKEN: 'test-token',
+      TURNSTILE_SECRET_KEY: 'ts-secret',
     }
   })
 
@@ -65,11 +72,57 @@ describe('/api/register', () => {
     process.env = originalEnv
   })
 
-  const createRequest = (body: any) => new NextRequest('http://localhost/api/register', {
+  const createRequest = (body: any, includeToken: boolean = true) => new NextRequest('http://localhost/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(includeToken ? { turnstile_token: 'valid-token', ...body } : body),
     })
+
+  describe('Turnstile verification', () => {
+    it('returns 400 when token is missing', async () => {
+      const req = createRequest({
+        parent1_name: 'Test Parent',
+        parent1_email: 'test@example.com',
+      }, false)
+
+      const response = await POST(req)
+      const data = await response.json()
+
+      expect(response.status).toBe(400)
+      expect(data.error).toMatch(/verification challenge/i)
+      expect(submitRegistration).not.toHaveBeenCalled()
+    })
+
+    it('returns 400 when secret key is missing', async () => {
+      delete process.env.TURNSTILE_SECRET_KEY
+      const req = createRequest({
+        parent1_name: 'Test Parent',
+        parent1_email: 'test@example.com',
+      })
+
+      const response = await POST(req)
+      const data = await response.json()
+
+      expect(response.status).toBe(400)
+      expect(data.error).toMatch(/temporarily unavailable/i)
+      expect(verifyTurnstileToken).not.toHaveBeenCalled()
+    })
+
+    it('returns 400 when verification fails', async () => {
+      ;(verifyTurnstileToken as jest.Mock).mockResolvedValueOnce(false)
+      const req = createRequest({
+        parent1_name: 'Test Parent',
+        parent1_email: 'test@example.com',
+      })
+
+      const response = await POST(req)
+      const data = await response.json()
+
+      expect(response.status).toBe(400)
+      expect(data.error).toMatch(/unable to verify/i)
+      expect(submitRegistration).not.toHaveBeenCalled()
+    })
+  })
 
   describe('Directus integration', () => {
 

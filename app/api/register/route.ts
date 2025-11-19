@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { submitRegistration } from "@/lib/directus";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 const MIN_HTTP_ERROR_STATUS = 400;
 const MAX_HTTP_ERROR_STATUS = 599;
@@ -27,12 +28,33 @@ const registrationSchema = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const parseResult = registrationSchema.safeParse(await req.json());
+  const rawBody = (await req.json()) as unknown;
+  const parsedBody = typeof rawBody === "object" && rawBody !== null ? (rawBody as Record<string, unknown>) : {};
+  const { turnstile_token, ...registrationFields } = parsedBody;
+  const token = typeof turnstile_token === "string" ? turnstile_token : "";
+
+  const parseResult = registrationSchema.safeParse(registrationFields);
   if (!parseResult.success) {
     const errorMessage = parseResult.error.issues[0]?.message ?? "Invalid registration payload";
     return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
   const payload = parseResult.data;
+
+  if (!token) {
+    return NextResponse.json({ error: "Please complete the verification challenge." }, { status: 400 });
+  }
+
+  if (!process.env.TURNSTILE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: "Verification is temporarily unavailable. Please try again later." },
+      { status: 400 },
+    );
+  }
+
+  const verified = await verifyTurnstileToken(token);
+  if (!verified) {
+    return NextResponse.json({ error: "Unable to verify your submission. Please refresh and try again." }, { status: 400 });
+  }
 
   try {
     const data = await submitRegistration(payload);

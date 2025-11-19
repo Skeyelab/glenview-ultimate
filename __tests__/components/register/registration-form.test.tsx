@@ -6,6 +6,40 @@ import { RegistrationForm } from '@/components/register/registration-form';
 import { sampleParent1, sampleParent2, sampleChild1, sampleChild2, sampleNotes } from '@/__tests__/fixtures/registration';
 import { buildRegistrationPayload } from '@/lib/register-utils';
 
+const originalEnv = process.env;
+
+jest.mock('react-turnstile', () => {
+  const React = require('react');
+  const MockTurnstile = (props: any) => {
+    React.useEffect(() => {
+      const bound = {
+        reset: jest.fn(),
+        execute: jest.fn(),
+        getResponse: jest.fn(),
+        isExpired: jest.fn().mockReturnValue(false),
+      };
+      props.onLoad?.('mock-widget', bound);
+      if ((globalThis as any).__autoSolveTurnstile !== false) {
+        props.onSuccess?.('test-turnstile-token');
+      }
+    }, [props]);
+
+    return (
+      <button
+        type="button"
+        data-testid="turnstile-mock"
+        onClick={() => props.onSuccess?.('test-turnstile-token')}
+      >
+        Solve verification
+      </button>
+    );
+  };
+  return {
+    __esModule: true,
+    default: MockTurnstile,
+  };
+});
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
@@ -28,10 +62,17 @@ describe('RegistrationForm', () => {
     // Mock fetch globally
     global.fetch = jest.fn() as jest.Mock;
     mockFetch = global.fetch as jest.Mock;
+    process.env = {
+      ...originalEnv,
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'test-site-key',
+    };
+    (globalThis as any).__autoSolveTurnstile = true;
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    process.env = originalEnv;
+    delete (globalThis as any).__autoSolveTurnstile;
   });
 
   it('renders the form with initial fields', () => {
@@ -65,6 +106,38 @@ describe('RegistrationForm', () => {
 
     // HTML5 email validation
     expect(emailInput).toBeInvalid();
+  });
+
+  it('requires Turnstile verification before submitting', async () => {
+    const user = userEvent.setup();
+    (globalThis as any).__autoSolveTurnstile = false;
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    } as Response);
+
+    render(<RegistrationForm />);
+
+    const emptyTextboxes = screen.getAllByDisplayValue('');
+    await user.type(emptyTextboxes[0], sampleParent1.name);
+    await user.type(emptyTextboxes[1], sampleParent1.email);
+    await user.type(emptyTextboxes[3], sampleChild1.full_name);
+
+    const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
+    await user.click(submitButton);
+
+    const verificationMessages = await screen.findAllByText(/verification challenge/i);
+    expect(verificationMessages.length).toBeGreaterThan(0);
+    expect(mockFetch).not.toHaveBeenCalled();
+
+    const turnstileButton = screen.getByTestId('turnstile-mock');
+    await user.click(turnstileButton);
+
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalled();
+    });
   });
 
   it('submits correct payload on successful submission', async () => {
@@ -119,6 +192,7 @@ describe('RegistrationForm', () => {
       notes: expectedPayload.notes,
       marketing_opt_in: expectedPayload.marketing_opt_in,
     });
+    expect(callBody.turnstile_token).toBe('test-turnstile-token');
   });
 
   it('shows success message on successful submission', async () => {

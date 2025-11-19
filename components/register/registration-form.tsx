@@ -5,6 +5,7 @@ import type { Parent, Child } from "@/lib/register-types";
 import { buildRegistrationPayload, parseApiError } from "@/lib/register-utils";
 import { ParentFormSection } from "./parent-form-section";
 import { ChildFormSection } from "./child-form-section";
+import { TurnstileField, type TurnstileFieldHandle } from "./turnstile-field";
 
 interface RegistrationFormProps {
   onSubmit?: () => void;
@@ -17,6 +18,9 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [marketing_opt_in, setOptIn] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileStatusMessage, setTurnstileStatusMessage] = useState<string | null>(null);
+  const turnstileRef = React.useRef<TurnstileFieldHandle | null>(null);
 
   const trackEvent = React.useCallback((eventName: string, data?: Record<string, unknown>): void => {
     if (typeof window === "undefined") return;
@@ -81,15 +85,28 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    setStatus("Submitting...");
     setErrorField(null);
+    if (!turnstileToken) {
+      const missingMessage = "Please complete the verification challenge.";
+      setStatus("❌ " + missingMessage);
+      setTurnstileStatusMessage(missingMessage);
+      trackEvent("registration_form_submit_error", {
+        message: missingMessage,
+        field: undefined,
+        turnstileTokenPresent: false,
+      });
+      return;
+    }
+    setTurnstileStatusMessage(null);
+    setStatus("Submitting...");
     trackEvent("registration_form_submit", {
       parentCount: parents.length,
       childCount: children.length,
       marketingOptIn: marketing_opt_in,
+      turnstileTokenPresent: Boolean(turnstileToken),
     });
     try {
-      const payload = buildRegistrationPayload(parents, children, notes, marketing_opt_in);
+      const payload = buildRegistrationPayload(parents, children, notes, marketing_opt_in, turnstileToken);
 
       const res = await fetch("/api/register", {
         method: "POST",
@@ -101,11 +118,12 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
         const { error, field } = parseApiError(body);
         if (field) {
           setErrorField(field);
-          trackEvent("registration_form_validation_error", { field });
+          trackEvent("registration_form_validation_error", { field, turnstileTokenPresent: Boolean(turnstileToken) });
         }
         trackEvent("registration_form_submit_error", {
           message: error,
           field,
+          turnstileTokenPresent: Boolean(turnstileToken),
         });
         throw new Error(error);
       }
@@ -115,7 +133,10 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
         parentCount: parents.length,
         childCount: children.length,
         marketingOptIn: marketing_opt_in,
+        turnstileTokenPresent: Boolean(turnstileToken),
       });
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
       onSubmit?.();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
@@ -123,6 +144,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
       trackEvent("registration_form_submit_error", {
         message: errorMessage,
         field: errorField ?? undefined,
+        turnstileTokenPresent: Boolean(turnstileToken),
       });
     }
   }
@@ -167,6 +189,17 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
           I agree to receive updates about the club.
         </label>
       </div>
+
+      <TurnstileField
+        ref={turnstileRef}
+        statusMessage={turnstileStatusMessage}
+        onTokenChange={(token) => {
+          setTurnstileToken(token);
+          if (token) {
+            setTurnstileStatusMessage(null);
+          }
+        }}
+      />
 
       <div className="flex items-center gap-3">
         <button type="submit" className="button">
