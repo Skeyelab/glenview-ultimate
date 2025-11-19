@@ -1,4 +1,4 @@
-import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
+import { createDirectus, createItem, readItems, readSingleton, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 import { safeParseDate } from "./date-utils";
 import {
@@ -76,7 +76,7 @@ export interface About {
 }
 
 export interface Website {
-  id: number;
+  id?: number | string;
   site_name: string;
   footer_text?: string | null;
   hero_title?: string | null;
@@ -246,23 +246,6 @@ const DEFAULT_SCHEDULE_EVENTS: ScheduleEvent[] = [
 
 const DEFAULT_SCHEDULE: SeasonSchedule = buildSeasonSchedule(DEFAULT_SCHEDULE_EVENTS);
 
-const DEFAULT_WEBSITE: Website = {
-  id: 0,
-  site_name: "Glenview Ultimate",
-  footer_text: null,
-  hero_title: HERO_TITLE,
-  hero_subtitle: HERO_SUBTITLE,
-  hero_tagline: HERO_TAGLINE,
-  hero_message_primary: HERO_MESSAGE_1,
-  hero_message_secondary: HERO_MESSAGE_2,
-  hero_cta_label: HERO_CTA_LABEL,
-  hero_cta_url: HERO_CTA_URL,
-  hero_pre_registration_text: HERO_PRE_REGISTRATION_TEXT,
-  description_paragraphs: null,
-  register_heading: null,
-  register_intro: null,
-};
-
 export function getSchedule(): Promise<SeasonSchedule> {
   return withDirectus(DEFAULT_SCHEDULE, async (client) => {
     const events = await client.request(
@@ -326,11 +309,10 @@ export function getAbout(): Promise<About | null> {
   });
 }
 
-export function getWebsite(): Promise<Website> {
-  return withDirectus(DEFAULT_WEBSITE, async (client) => {
+export function getWebsite(): Promise<Website | null> {
+  return withDirectus<Website | null>(null, async (client) => {
     const data = await client.request(
-      readItems("Website", {
-        limit: 1,
+      readSingleton("Website", {
         fields: [
           "id",
           "site_name",
@@ -349,7 +331,7 @@ export function getWebsite(): Promise<Website> {
         ],
       }),
     );
-    return data[0] ?? DEFAULT_WEBSITE;
+    return data ?? null;
   });
 }
 

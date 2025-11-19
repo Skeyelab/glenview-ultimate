@@ -27,7 +27,7 @@ export interface HeroSectionProps {
 export function HeroSection({ season, logoUrl, website, className }: HeroSectionProps): React.JSX.Element {
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
-  const websiteId = website?.id;
+  const websiteId = website?.id ?? null;
   const heroParagraphClass = "text-lg text-white/90 max-w-2xl mx-auto";
   const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
   const heroTitle = website?.hero_title ?? HERO_TITLE;
@@ -46,11 +46,11 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   ];
 
   const getWebsiteAttr = (fields: string[]) =>
-    editingEnabled && websiteId
+    editingEnabled
       ? {
           "data-directus": setAttr({
             collection: "Website",
-            item: String(websiteId),
+            item: websiteId,
             fields,
             mode: "popover",
           }),
