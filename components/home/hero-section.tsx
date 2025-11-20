@@ -27,7 +27,7 @@ export interface HeroSectionProps {
 export function HeroSection({ season, logoUrl, website, className }: HeroSectionProps): React.JSX.Element {
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
-  
+
   const heroTitle = website?.hero_title ?? HERO_TITLE;
   const heroSubtitle = website?.hero_subtitle ?? HERO_SUBTITLE;
   const heroTagline = website?.hero_tagline ?? HERO_TAGLINE;
@@ -36,7 +36,7 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   const heroCtaLabel = website?.hero_cta_label ?? HERO_CTA_LABEL;
   const heroCtaUrl = website?.hero_cta_url ?? HERO_CTA_URL;
   const heroPreRegistrationText = website?.hero_pre_registration_text ?? HERO_PRE_REGISTRATION_TEXT;
-  
+
   const heroParagraphs = [heroSubtitle, heroTagline, heroMessage1, heroMessage2].filter(Boolean);
   const heroParagraphClass = "text-lg text-white/90 max-w-2xl mx-auto";
   const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);

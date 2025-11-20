@@ -1,4 +1,4 @@
-import { createDirectus, createItem, readItems, rest, staticToken } from "@directus/sdk";
+import { createDirectus, createItem, readItems, readSingleton, rest, staticToken } from "@directus/sdk";
 import type { DirectusClient, RestClient, StaticTokenClient } from "@directus/sdk";
 import { safeParseDate } from "./date-utils";
 
@@ -316,12 +316,11 @@ export function getAbout(): Promise<About | null> {
 export function getWhatIsUltimate(): Promise<WhatIsUltimate | null> {
   return withDirectus<WhatIsUltimate | null>(null, async (client) => {
     const data = await client.request(
-      readItems("WhatIsUltimate", {
-        limit: 1,
+      readSingleton("WhatIsUltimate", {
         fields: ["*"],
       }),
     );
-    return data[0] ?? null;
+    return data;
   });
 }
 
