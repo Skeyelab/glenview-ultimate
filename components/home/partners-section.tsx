@@ -38,7 +38,7 @@ export function PartnersSection({
         {displayPartners.map((p) => (
           <a
             key={p.id}
-            className="border border-white/20 rounded p-3 text-white/90 hover:text-white hover:border-white/40 transition-colors"
+            className="border border-white/20 rounded p-3 text-white/90 hover:text-white hover:border-white/40 transition-colors text-center"
             href={p.url}
             target="_blank"
             rel="noreferrer"
