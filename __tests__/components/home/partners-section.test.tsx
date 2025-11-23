@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { PartnersSection } from '@/components/home/partners-section';
 import type { Partner } from '@/lib/directus';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 

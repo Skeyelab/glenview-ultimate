@@ -1,5 +1,5 @@
-// Learn more: https://github.com/testing-library/jest-dom
-require('@testing-library/jest-dom')
+import '@testing-library/jest-dom/vitest'
+import { beforeAll, afterAll, vi } from 'vitest'
 
 // Suppress React act() warnings in tests
 // These warnings occur when state updates happen asynchronously in components
@@ -25,17 +25,17 @@ afterAll(() => {
 })
 
 // Polyfill Web APIs for Node.js environment (needed for Next.js server components)
-const { TextEncoder, TextDecoder } = require('util')
+import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter() {
     return {
-      push: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
     }
   },
   usePathname() {

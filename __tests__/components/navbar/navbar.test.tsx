@@ -2,16 +2,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import { Navbar } from '@/components/navbar/navbar';
 
 // Mock next/navigation
 const mockPathname = '/';
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
 }));
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href, ...props }: any) => {
     return <a href={href} {...props}>{children}</a>;
@@ -19,7 +20,7 @@ jest.mock('next/link', () => ({
 }));
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...props }: any) => {
     return <img src={src} alt={alt} {...props} />;
@@ -28,7 +29,7 @@ jest.mock('next/image', () => ({
 
 describe('Navbar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     delete process.env.NEXT_PUBLIC_DIRECTUS_URL;
   });
 
@@ -73,7 +74,7 @@ describe('Navbar', () => {
     expect(document.getElementById('mobile-nav')).toBeInTheDocument();
     
     // Change pathname by rerendering with different mock
-    jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/about');
+    vi.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/about');
     rerender(<Navbar />);
     
     // Menu should be closed (not visible)

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { Button } from '@/components/ui/button';
 
 describe('Button', () => {
@@ -20,7 +21,7 @@ describe('Button', () => {
   });
 
   it('should handle click events', async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     const user = userEvent.setup();
     render(<Button onClick={handleClick}>Click me</Button>);
     

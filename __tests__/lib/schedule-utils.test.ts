@@ -1,11 +1,13 @@
+import { beforeEach, afterEach, vi } from 'vitest'
 import { selectUpcomingEvents, groupEventsByMonth } from "@/lib/schedule-utils";
 
 describe("schedule-utils", () => {
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(new Date("2026-03-01T12:00:00.000Z"));
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2026-03-01T12:00:00.000Z"));
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe("selectUpcomingEvents", () => {

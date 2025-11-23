@@ -1,3 +1,4 @@
+import { beforeEach, afterEach, vi } from 'vitest'
 import {
   safeParseDate,
   formatDateRange,
@@ -56,10 +57,11 @@ describe("date-utils", () => {
       ({ date, end_date: end ?? null } as any);
 
     beforeEach(() => {
-      jest.useFakeTimers().setSystemTime(new Date("2026-03-01T12:00:00.000Z"));
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2026-03-01T12:00:00.000Z"));
     });
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("returns null for midnight", () => {

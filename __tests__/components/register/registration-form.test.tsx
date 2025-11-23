@@ -2,17 +2,18 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { beforeEach, afterEach, vi, type Mock, type SpyInstance } from 'vitest';
 import { RegistrationForm } from '@/components/register/registration-form';
 import { sampleParent1, sampleParent2, sampleChild1, sampleChild2, sampleNotes } from '@/__tests__/fixtures/registration';
 import { buildRegistrationPayload } from '@/lib/register-utils';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock window.umami
-const mockTrack = jest.fn();
+const mockTrack = vi.fn();
 global.window = {
   ...global.window,
   umami: {
@@ -21,17 +22,17 @@ global.window = {
 } as any;
 
 describe('RegistrationForm', () => {
-  let mockFetch: jest.SpyInstance;
+  let mockFetch: SpyInstance;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock fetch globally
-    global.fetch = jest.fn() as jest.Mock;
-    mockFetch = global.fetch as jest.Mock;
+    global.fetch = vi.fn() as Mock;
+    mockFetch = global.fetch as SpyInstance;
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('renders the form with initial fields', () => {
@@ -383,7 +384,7 @@ describe('RegistrationForm', () => {
 
   it('calls onSubmit callback on successful submission', async () => {
     const user = userEvent.setup();
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({}),

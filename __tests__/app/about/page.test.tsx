@@ -1,25 +1,24 @@
-/** @jest-environment jsdom */
-
 import React from 'react';
 import { render } from '@testing-library/react';
+import { beforeEach, vi } from 'vitest';
 import AboutPage from '@/app/about/page';
 
 // Mock directus functions
-jest.mock('@/lib/directus', () => ({
-  getAbout: jest.fn(),
-  getTeam: jest.fn(),
+vi.mock('@/lib/directus', () => ({
+  getAbout: vi.fn(),
+  getTeam: vi.fn(),
 }));
 
 // Mock components
-jest.mock('@/components/about/about-header', () => ({
+vi.mock('@/components/about/about-header', () => ({
   AboutHeader: ({ description }: any) => <div data-testid="about-header">{description}</div>,
 }));
 
-jest.mock('@/components/about/what-kids-learn-section', () => ({
+vi.mock('@/components/about/what-kids-learn-section', () => ({
   WhatKidsLearnSection: ({ items }: any) => <div data-testid="what-kids-learn">{JSON.stringify(items)}</div>,
 }));
 
-jest.mock('@/components/about/team-leadership-section', () => ({
+vi.mock('@/components/about/team-leadership-section', () => ({
   TeamLeadershipSection: ({ members }: any) => <div data-testid="team-leadership">{members?.length || 0} members</div>,
 }));
 
@@ -27,7 +26,7 @@ describe('AboutPage', () => {
   const { getAbout, getTeam } = require('@/lib/directus');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with default values when data is null', async () => {

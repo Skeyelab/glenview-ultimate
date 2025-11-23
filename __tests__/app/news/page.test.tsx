@@ -1,20 +1,19 @@
-/** @jest-environment jsdom */
-
 import React from 'react';
 import { render } from '@testing-library/react';
+import { beforeEach, vi } from 'vitest';
 import NewsIndex from '@/app/news/page';
 
 // Mock directus functions
-jest.mock('@/lib/directus', () => ({
-  getNewsList: jest.fn(),
+vi.mock('@/lib/directus', () => ({
+  getNewsList: vi.fn(),
 }));
 
 // Mock components
-jest.mock('@/components/news/news-header', () => ({
+vi.mock('@/components/news/news-header', () => ({
   NewsHeader: () => <div data-testid="news-header">News Header</div>,
 }));
 
-jest.mock('@/components/news/news-list', () => ({
+vi.mock('@/components/news/news-list', () => ({
   NewsList: ({ posts }: any) => <div data-testid="news-list">{posts?.length || 0} posts</div>,
 }));
 
@@ -22,7 +21,7 @@ describe('NewsIndex', () => {
   const { getNewsList } = require('@/lib/directus');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with empty posts array', async () => {

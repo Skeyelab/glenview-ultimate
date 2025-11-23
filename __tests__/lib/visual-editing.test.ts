@@ -1,9 +1,10 @@
+import { beforeEach, vi, type Mock } from 'vitest'
 import { isVisualEditingEnabled, applyVisualEditing, setAttr } from '@/lib/visual-editing';
 
 // Mock @directus/visual-editing
-jest.mock('@directus/visual-editing', () => ({
-  apply: jest.fn(),
-  setAttr: jest.fn(),
+vi.mock('@directus/visual-editing', () => ({
+  apply: vi.fn(),
+  setAttr: vi.fn(),
 }));
 
 describe('visual-editing', () => {
@@ -33,15 +34,15 @@ describe('visual-editing', () => {
     const { apply } = require('@directus/visual-editing');
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it('should call apply with directusUrl and options', async () => {
-      const mockReturn = { remove: jest.fn(), disable: jest.fn(), enable: jest.fn() };
-      (apply as jest.Mock).mockResolvedValue(mockReturn);
+      const mockReturn = { remove: vi.fn(), disable: vi.fn(), enable: vi.fn() };
+      (apply as Mock).mockResolvedValue(mockReturn);
 
       const directusUrl = 'https://example.com';
-      const opts = { elements: document.body, onSaved: jest.fn() };
+      const opts = { elements: document.body, onSaved: vi.fn() };
 
       const result = await applyVisualEditing(directusUrl, opts);
 
@@ -61,8 +62,8 @@ describe('visual-editing', () => {
     });
 
     it('should handle undefined options', async () => {
-      const mockReturn = { remove: jest.fn(), disable: jest.fn(), enable: jest.fn() };
-      (apply as jest.Mock).mockResolvedValue(mockReturn);
+      const mockReturn = { remove: vi.fn(), disable: vi.fn(), enable: vi.fn() };
+      (apply as Mock).mockResolvedValue(mockReturn);
 
       const directusUrl = 'https://example.com';
       const result = await applyVisualEditing(directusUrl);

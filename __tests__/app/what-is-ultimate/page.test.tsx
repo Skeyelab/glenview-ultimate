@@ -1,26 +1,25 @@
-/** @jest-environment jsdom */
-
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 
 // Mock sanitize-html
-jest.mock('sanitize-html', () => {
-  return jest.fn((html: string) => html);
+vi.mock('sanitize-html', () => {
+  return vi.fn((html: string) => html);
 });
 
 // Mock directus functions
-jest.mock('@/lib/directus', () => ({
-  getWhatIsUltimate: jest.fn(),
-  getWhatIsUltimateVideos: jest.fn(),
+vi.mock('@/lib/directus', () => ({
+  getWhatIsUltimate: vi.fn(),
+  getWhatIsUltimateVideos: vi.fn(),
 }));
 
 // Mock components
-jest.mock('@/components/what-is-ultimate/what-is-ultimate-header', () => ({
+vi.mock('@/components/what-is-ultimate/what-is-ultimate-header', () => ({
   WhatIsUltimateHeader: () => <h1>What is Ultimate?</h1>,
 }));
 
-jest.mock('@/components/what-is-ultimate/description-section', () => ({
+vi.mock('@/components/what-is-ultimate/description-section', () => ({
   DescriptionSection: ({ htmlContent, paragraphs }: any) => (
     <div data-testid="description-section">
       {htmlContent ? <div dangerouslySetInnerHTML={{ __html: htmlContent }} /> : null}
@@ -29,7 +28,7 @@ jest.mock('@/components/what-is-ultimate/description-section', () => ({
   ),
 }));
 
-jest.mock('@/components/what-is-ultimate/video-grid', () => ({
+vi.mock('@/components/what-is-ultimate/video-grid', () => ({
   VideoGrid: ({ videos, description }: any) => (
     <div data-testid="video-grid">
       <h2>Learn More Through Videos</h2>
@@ -50,7 +49,7 @@ describe('WhatIsUltimatePage', () => {
   const { getWhatIsUltimate, getWhatIsUltimateVideos } = require('@/lib/directus');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the page title', async () => {

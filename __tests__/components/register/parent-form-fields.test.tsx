@@ -2,15 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import { ParentFormFields } from '@/components/register/parent-form-fields';
 import { sampleParent1 } from '@/__tests__/fixtures/registration';
 
 describe('ParentFormFields', () => {
-  const mockUpdate = jest.fn();
-  const mockRemove = jest.fn();
+  const mockUpdate = vi.fn();
+  const mockRemove = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders all form fields', () => {
