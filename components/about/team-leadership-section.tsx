@@ -2,7 +2,7 @@ import React from "react";
 import type { TeamMember } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 import { normalizeRole } from "./role-utils";
-import { TeamMemberCard } from "./team-member-card";
+import { TeamMemberCard } from "@/components/ui/team-member-card";
 
 export interface TeamLeadershipSectionProps {
   members: TeamMember[];
