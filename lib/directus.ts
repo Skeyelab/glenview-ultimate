@@ -364,12 +364,21 @@ export function getWebsite(): Promise<Website | null> {
 }
 
 // Helper to get Directus asset URL from file UUID
-// Use NEXT_PUBLIC_DIRECTUS_URL for client components, DIRECTUS_URL for server components
+// For server components: uses direct Directus URL with access token
+// For client components: uses the API proxy route to handle authentication
 export function getDirectusAssetUrl(fileId: string | null | undefined): string | null {
   if (!fileId) return null;
-  const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL ?? process.env.DIRECTUS_URL;
-  if (!baseUrl) return null;
-  return `${baseUrl}/assets/${fileId}`;
+
+  // Server-side: if we have DIRECTUS_URL and DIRECTUS_STATIC_TOKEN, use direct URL with token
+  const baseUrl = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_STATIC_TOKEN;
+  if (baseUrl && token) {
+    return `${baseUrl}/assets/${fileId}?access_token=${token}`;
+  }
+
+  // Client-side or when token not available: use API proxy route
+  // This handles authentication server-side via the API route
+  return `/api/assets/${fileId}`;
 }
 
 export function getDirectusRestClient(): DirectusRestClient {
