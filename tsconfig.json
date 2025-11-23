@@ -18,7 +18,9 @@
     "jsx": "preserve",
     "incremental": true,
     "types": [
-      "node"
+      "node",
+      "vitest/globals",
+      "@testing-library/jest-dom"
     ],
     "plugins": [
       {
@@ -37,7 +39,13 @@
     ".next/types/**/*.ts",
     "*.config.mjs",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "**/__tests__/**/*.ts",
+    "**/__tests__/**/*.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "vitest.setup.ts",
+    "vitest.config.ts"
   ],
   "exclude": [
     "node_modules"

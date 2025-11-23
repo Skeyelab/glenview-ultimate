@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import RegisterPage from '@/app/register/page';
 
 // Mock window.umami
-const mockTrack = jest.fn();
+const mockTrack = vi.fn();
 Object.defineProperty(window, 'umami', {
   value: {
     track: mockTrack,
@@ -14,13 +15,13 @@ Object.defineProperty(window, 'umami', {
 });
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
 describe('RegisterPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Ensure window.umami is set up
     if (typeof window !== 'undefined') {
       (window as any).umami = {

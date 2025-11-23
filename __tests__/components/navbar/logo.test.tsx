@@ -1,10 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { Logo } from '@/components/navbar/logo';
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...props }: any) => {
     return <img src={src} alt={alt} {...props} />;
@@ -12,7 +13,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href, ...props }: any) => {
     return <a href={href} {...props}>{children}</a>;

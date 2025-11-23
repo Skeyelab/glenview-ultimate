@@ -1,16 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import { NavLink } from '@/components/navbar/nav-link';
+import * as nextNavigation from 'next/navigation';
 
 // Mock next/navigation
-const mockPathname = '/';
-jest.mock('next/navigation', () => ({
-  usePathname: () => mockPathname,
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(() => '/'),
 }));
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href, ...props }: any) => {
     return <a href={href} {...props}>{children}</a>;
@@ -18,8 +19,11 @@ jest.mock('next/link', () => ({
 }));
 
 describe('NavLink', () => {
+  const usePathname = vi.mocked(nextNavigation.usePathname);
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    usePathname.mockReturnValue('/');
   });
 
   it('should render link with correct href and label', () => {
@@ -30,14 +34,14 @@ describe('NavLink', () => {
   });
 
   it('should apply active styles when pathname matches href', () => {
-    jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/about');
+    usePathname.mockReturnValue('/about');
     render(<NavLink href="/about" label="About" />);
     const link = screen.getByRole('link', { name: /about/i });
     expect(link).toHaveClass('bg-white/20', 'text-white');
   });
 
   it('should not apply active styles when pathname does not match', () => {
-    jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/');
+    usePathname.mockReturnValue('/');
     render(<NavLink href="/about" label="About" />);
     const link = screen.getByRole('link', { name: /about/i });
     expect(link).not.toHaveClass('bg-white/20');

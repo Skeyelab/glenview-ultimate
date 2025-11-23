@@ -1,10 +1,12 @@
+import { beforeEach, afterAll, vi, type Mock } from 'vitest'
+
 // Mock submitRegistration before importing route
-jest.mock('@/lib/directus', () => ({
-  submitRegistration: jest.fn(),
+vi.mock('@/lib/directus', () => ({
+  submitRegistration: vi.fn(),
 }))
 
 // Mock Next.js server modules that use Web APIs
-jest.mock('next/server', () => {
+vi.mock('next/server', () => {
   class MockNextRequest {
     public url: string
     public method: string
@@ -53,7 +55,7 @@ describe('/api/register', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     process.env = {
       ...originalEnv,
       DIRECTUS_URL: 'https://directus.example.com',
@@ -76,7 +78,7 @@ describe('/api/register', () => {
     it('should return error when Directus credentials are missing', async () => {
       delete process.env.DIRECTUS_URL
       const mockError = new Error('Directus not configured')
-      ;(submitRegistration as jest.Mock).mockRejectedValueOnce(mockError)
+      ;(submitRegistration as Mock).mockRejectedValueOnce(mockError)
 
       const req = createRequest({
         parent1_name: 'Test Parent',
@@ -106,7 +108,7 @@ describe('/api/register', () => {
         ],
         response: mockResponse as Response,
       }
-      ;(submitRegistration as jest.Mock).mockRejectedValueOnce(duplicateError)
+      ;(submitRegistration as Mock).mockRejectedValueOnce(duplicateError)
 
       const req = createRequest({
         parent1_name: 'Test Parent',
@@ -128,7 +130,7 @@ describe('/api/register', () => {
         parent1_email: 'test@example.com',
         children: [{ full_name: 'Child 1' }],
       }
-      ;(submitRegistration as jest.Mock).mockResolvedValueOnce(mockRegistration)
+      ;(submitRegistration as Mock).mockResolvedValueOnce(mockRegistration)
 
       const req = createRequest({
         parent1_name: 'Test Parent',

@@ -2,16 +2,17 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import { ChildFormFields } from '@/components/register/child-form-fields';
 import type { Child } from '@/lib/register-types';
 import { sampleChild1 } from '@/__tests__/fixtures/registration';
 
 describe('ChildFormFields', () => {
-  const mockUpdate = jest.fn();
-  const mockRemove = jest.fn();
+  const mockUpdate = vi.fn();
+  const mockRemove = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders all form fields', () => {
