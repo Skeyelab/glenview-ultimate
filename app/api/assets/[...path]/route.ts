@@ -6,7 +6,7 @@ export async function GET(
 ): Promise<NextResponse> {
   try {
     const fileId = params.path[0];
-    
+
     if (!fileId) {
       return NextResponse.json({ error: "File ID is required" }, { status: 400 });
     }
