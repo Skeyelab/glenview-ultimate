@@ -2,10 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: { params: Promise<{ path: string[] }> },
 ): Promise<NextResponse> {
   try {
-    const fileId = params.path[0];
+    const { path } = await params;
+    const fileId = path[0];
 
     if (!fileId) {
       return NextResponse.json({ error: "File ID is required" }, { status: 400 });
