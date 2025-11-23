@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { beforeEach, vi } from 'vitest';
 import AboutPage from '@/app/about/page';
+import * as directusModule from '@/lib/directus';
 
 // Mock directus functions
 vi.mock('@/lib/directus', () => ({
@@ -23,7 +24,8 @@ vi.mock('@/components/about/team-leadership-section', () => ({
 }));
 
 describe('AboutPage', () => {
-  const { getAbout, getTeam } = require('@/lib/directus');
+  const getAbout = vi.mocked(directusModule.getAbout);
+  const getTeam = vi.mocked(directusModule.getTeam);
 
   beforeEach(() => {
     vi.clearAllMocks();

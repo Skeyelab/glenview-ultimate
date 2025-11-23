@@ -2,6 +2,8 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { beforeEach, vi } from 'vitest';
 import SchedulePage from '@/app/schedule/page';
+import * as directusModule from '@/lib/directus';
+import * as scheduleUtilsModule from '@/lib/schedule-utils';
 
 // Mock directus functions
 vi.mock('@/lib/directus', () => ({
@@ -36,8 +38,9 @@ vi.mock('@/components/schedule/season-calendar', () => ({
 }));
 
 describe('SchedulePage', () => {
-  const { getSchedule } = require('@/lib/directus');
-  const { selectUpcomingEvents, groupEventsByMonth } = require('@/lib/schedule-utils');
+  const getSchedule = vi.mocked(directusModule.getSchedule);
+  const selectUpcomingEvents = vi.mocked(scheduleUtilsModule.selectUpcomingEvents);
+  const groupEventsByMonth = vi.mocked(scheduleUtilsModule.groupEventsByMonth);
 
   beforeEach(() => {
     vi.clearAllMocks();

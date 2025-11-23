@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { beforeEach, afterEach, vi, type Mock, type SpyInstance } from 'vitest';
+import { beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { RegistrationForm } from '@/components/register/registration-form';
 import { sampleParent1, sampleParent2, sampleChild1, sampleChild2, sampleNotes } from '@/__tests__/fixtures/registration';
 import { buildRegistrationPayload } from '@/lib/register-utils';
@@ -22,13 +22,13 @@ global.window = {
 } as any;
 
 describe('RegistrationForm', () => {
-  let mockFetch: SpyInstance;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock fetch globally
     global.fetch = vi.fn() as Mock;
-    mockFetch = global.fetch as SpyInstance;
+    mockFetch = global.fetch as ReturnType<typeof vi.fn>;
   });
 
   afterEach(() => {
@@ -75,7 +75,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in parent fields - find inputs by querying empty textboxes
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -103,7 +103,7 @@ describe('RegistrationForm', () => {
         headers: { 'content-type': 'application/json' },
         body: expect.any(String),
       });
-    });
+    }, { container });
 
     const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string);
     const expectedPayload = buildRegistrationPayload(
@@ -129,7 +129,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -142,7 +142,7 @@ describe('RegistrationForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Thanks! Your registration was received./i)).toBeInTheDocument();
-    });
+    }, { container });
   });
 
   it('handles duplicate email error (409) and highlights correct field', async () => {
@@ -156,7 +156,7 @@ describe('RegistrationForm', () => {
       }),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -172,7 +172,7 @@ describe('RegistrationForm', () => {
       const emailInput = emailInputs.find(input => input.getAttribute('type') === 'email');
       expect(emailInput).toHaveClass('border-red-500');
       expect(screen.getByText(/already been registered/i)).toBeInTheDocument();
-    });
+    }, { container });
   });
 
   it('handles duplicate email error for parent2', async () => {
@@ -186,7 +186,7 @@ describe('RegistrationForm', () => {
       }),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Add second parent
     const addParentButton = screen.getByRole('button', { name: /Add second parent/i });
@@ -207,7 +207,7 @@ describe('RegistrationForm', () => {
       const emailInputs = screen.getAllByRole('textbox').filter(input => input.getAttribute('type') === 'email');
       expect(emailInputs[1]).toHaveClass('border-red-500');
       expect(emailInputs[0]).not.toHaveClass('border-red-500');
-    });
+    }, { container });
   });
 
   it('handles generic server error', async () => {
@@ -220,7 +220,7 @@ describe('RegistrationForm', () => {
       }),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -233,7 +233,7 @@ describe('RegistrationForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Internal server error/i)).toBeInTheDocument();
-    });
+    }, { container });
   });
 
   it('shows submitting status during submission', async () => {
@@ -244,7 +244,7 @@ describe('RegistrationForm', () => {
     });
     mockFetch.mockReturnValueOnce(fetchPromise);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -257,7 +257,7 @@ describe('RegistrationForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Submitting.../i)).toBeInTheDocument();
-    });
+    }, { container });
 
     resolveFetch!({
       ok: true,
@@ -272,7 +272,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -290,7 +290,7 @@ describe('RegistrationForm', () => {
     await waitFor(() => {
       const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string);
       expect(callBody.marketing_opt_in).toBe(true);
-    });
+    }, { container });
   });
 
   it('includes parent2 in payload when second parent is added', async () => {
@@ -300,7 +300,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Add second parent
     const addParentButton = screen.getByRole('button', { name: /Add second parent/i });
@@ -325,7 +325,7 @@ describe('RegistrationForm', () => {
       const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string);
       expect(callBody.parent2_name).toBe(sampleParent2.name);
       expect(callBody.parent2_email).toBe(sampleParent2.email);
-    });
+    }, { container });
   });
 
   it('includes multiple children in payload', async () => {
@@ -335,7 +335,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in parent fields - use getAllByDisplayValue to find empty inputs
     const emptyInputs = screen.getAllByDisplayValue('');
@@ -353,7 +353,7 @@ describe('RegistrationForm', () => {
     await waitFor(() => {
       const childLabels = screen.getAllByText('Child Full Name');
       expect(childLabels.length).toBe(2);
-    });
+    }, { container });
 
     // Find the second child's name input by finding all "Child Full Name" labels
     // and getting the input that follows each label in the DOM
@@ -370,7 +370,7 @@ describe('RegistrationForm', () => {
 
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalled();
-    }, { timeout: 3000 });
+    }, { timeout: 3000, container });
 
     // Verify the payload after fetch is called
     expect(mockFetch.mock.calls.length).toBeGreaterThan(0);
@@ -390,7 +390,7 @@ describe('RegistrationForm', () => {
       json: async () => ({}),
     } as Response);
 
-    render(<RegistrationForm onSubmit={mockOnSubmit} />);
+    const { container } = render(<RegistrationForm onSubmit={mockOnSubmit} />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -403,7 +403,7 @@ describe('RegistrationForm', () => {
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledTimes(1);
-    });
+    }, { container });
   });
 
   it('clears error field when parent email is edited after error', async () => {
@@ -417,7 +417,7 @@ describe('RegistrationForm', () => {
       }),
     } as Response);
 
-    render(<RegistrationForm />);
+    const { container } = render(<RegistrationForm />);
 
     // Fill in required fields
     const emptyTextboxes = screen.getAllByDisplayValue('');
@@ -432,7 +432,7 @@ describe('RegistrationForm', () => {
       const emailInputs = screen.getAllByRole('textbox');
       const emailInput = emailInputs.find(input => input.getAttribute('type') === 'email');
       expect(emailInput).toHaveClass('border-red-500');
-    });
+    }, { container });
 
     // Edit email
     const emailInputs = screen.getAllByRole('textbox');
@@ -443,6 +443,6 @@ describe('RegistrationForm', () => {
     // Error styling should be cleared
     await waitFor(() => {
       expect(emailInput).not.toHaveClass('border-red-500');
-    });
+    }, { container });
   });
 });

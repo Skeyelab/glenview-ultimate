@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { beforeEach, vi } from 'vitest';
 import { Navbar } from '@/components/navbar/navbar';
+import * as nextNavigation from 'next/navigation';
 
 // Mock next/navigation
-const mockPathname = '/';
 vi.mock('next/navigation', () => ({
-  usePathname: () => mockPathname,
+  usePathname: vi.fn(() => '/'),
 }));
 
 // Mock next/link
@@ -28,8 +28,11 @@ vi.mock('next/image', () => ({
 }));
 
 describe('Navbar', () => {
+  const usePathname = vi.mocked(nextNavigation.usePathname);
+
   beforeEach(() => {
     vi.clearAllMocks();
+    usePathname.mockReturnValue('/');
     delete process.env.NEXT_PUBLIC_DIRECTUS_URL;
   });
 
@@ -53,10 +56,10 @@ describe('Navbar', () => {
   it('should toggle mobile menu when button is clicked', async () => {
     const user = userEvent.setup();
     render(<Navbar />);
-    
+
     const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
     await user.click(menuButton);
-    
+
     // Mobile menu should be visible (check by id since there are multiple nav elements)
     const mobileNav = document.getElementById('mobile-nav');
     expect(mobileNav).toBeInTheDocument();
@@ -65,18 +68,18 @@ describe('Navbar', () => {
   it('should close mobile menu when pathname changes', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<Navbar />);
-    
+
     // Open menu first by clicking button
     const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
     await user.click(menuButton);
-    
+
     // Verify menu is open
     expect(document.getElementById('mobile-nav')).toBeInTheDocument();
-    
-    // Change pathname by rerendering with different mock
-    vi.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/about');
+
+    // Change pathname by updating the mock
+    usePathname.mockReturnValue('/about');
     rerender(<Navbar />);
-    
+
     // Menu should be closed (not visible)
     const mobileNav = document.getElementById('mobile-nav');
     expect(mobileNav).not.toBeInTheDocument();

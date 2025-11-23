@@ -44,9 +44,11 @@ vi.mock('@/components/what-is-ultimate/video-grid', () => ({
 }));
 
 import WhatIsUltimatePage from '@/app/what-is-ultimate/page';
+import * as directusModule from '@/lib/directus';
 
 describe('WhatIsUltimatePage', () => {
-  const { getWhatIsUltimate, getWhatIsUltimateVideos } = require('@/lib/directus');
+  const getWhatIsUltimate = vi.mocked(directusModule.getWhatIsUltimate);
+  const getWhatIsUltimateVideos = vi.mocked(directusModule.getWhatIsUltimateVideos);
 
   beforeEach(() => {
     vi.clearAllMocks();

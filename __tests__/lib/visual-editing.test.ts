@@ -1,5 +1,6 @@
-import { beforeEach, vi, type Mock } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 import { isVisualEditingEnabled, applyVisualEditing, setAttr } from '@/lib/visual-editing';
+import * as visualEditingModule from '@directus/visual-editing';
 
 // Mock @directus/visual-editing
 vi.mock('@directus/visual-editing', () => ({
@@ -31,7 +32,7 @@ describe('visual-editing', () => {
   });
 
   describe('applyVisualEditing', () => {
-    const { apply } = require('@directus/visual-editing');
+    const apply = vi.mocked(visualEditingModule.apply);
 
     beforeEach(() => {
       vi.clearAllMocks();
@@ -39,7 +40,7 @@ describe('visual-editing', () => {
 
     it('should call apply with directusUrl and options', async () => {
       const mockReturn = { remove: vi.fn(), disable: vi.fn(), enable: vi.fn() };
-      (apply as Mock).mockResolvedValue(mockReturn);
+      apply.mockResolvedValue(mockReturn);
 
       const directusUrl = 'https://example.com';
       const opts = { elements: document.body, onSaved: vi.fn() };
@@ -63,7 +64,7 @@ describe('visual-editing', () => {
 
     it('should handle undefined options', async () => {
       const mockReturn = { remove: vi.fn(), disable: vi.fn(), enable: vi.fn() };
-      (apply as Mock).mockResolvedValue(mockReturn);
+      apply.mockResolvedValue(mockReturn);
 
       const directusUrl = 'https://example.com';
       const result = await applyVisualEditing(directusUrl);
@@ -75,7 +76,8 @@ describe('visual-editing', () => {
 
   describe('setAttr', () => {
     it('should export setAttr from @directus/visual-editing', () => {
-      const { setAttr: mockSetAttr } = require('@directus/visual-editing');
+      const mockSetAttr = vi.mocked(visualEditingModule.setAttr);
+      // setAttr is re-exported from the module, so it should be the same function
       expect(setAttr).toBe(mockSetAttr);
     });
   });
