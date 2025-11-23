@@ -16,6 +16,7 @@ export interface TeamMember {
   email?: string | null;
   bio?: string | null;
   photo?: string | null;
+  squad?: string | null;
 }
 
 export type ScheduleEventType =
