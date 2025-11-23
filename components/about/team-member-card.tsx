@@ -23,8 +23,8 @@ export function TeamMemberCard({
   className,
 }: TeamMemberCardProps): React.JSX.Element {
   const photoUrl = getDirectusAssetUrl(member.photo);
-  const roleTitle = getRoleDisplayTitle(member.role);
-  const normalizedRole = normalizeRole(member.role);
+  const roleTitle = getRoleDisplayTitle(member.role, member.squad);
+  const normalizedRole = normalizeRole(member.role, member.squad);
   const isHeadCoach = normalizedRole === "head_coach";
   const shouldSpanFull = spanFullWidth || isHeadCoach;
 

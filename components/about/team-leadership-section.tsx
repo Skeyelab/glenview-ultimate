@@ -23,24 +23,24 @@ export function TeamLeadershipSection({
 }: TeamLeadershipSectionProps): React.JSX.Element {
   const leadershipRoles = ["boys_team_captain", "girls_team_captain", "head_coach"];
   const allLeadershipMembers = members.filter((member) => {
-    const normalizedRole = normalizeRole(member.role);
+    const normalizedRole = normalizeRole(member.role, member.squad);
     return leadershipRoles.includes(normalizedRole);
   });
 
   // Separate captains and coach
   const captains = allLeadershipMembers
     .filter((member) => {
-      const normalizedRole = normalizeRole(member.role);
+      const normalizedRole = normalizeRole(member.role, member.squad);
       return normalizedRole === "boys_team_captain" || normalizedRole === "girls_team_captain";
     })
     .sort((a, b) => {
-      const normalizedA = normalizeRole(a.role);
-      const normalizedB = normalizeRole(b.role);
+      const normalizedA = normalizeRole(a.role, a.squad);
+      const normalizedB = normalizeRole(b.role, b.squad);
       return captainOrder.indexOf(normalizedA) - captainOrder.indexOf(normalizedB);
     });
 
   const coach = allLeadershipMembers.find((member) => {
-    const normalizedRole = normalizeRole(member.role);
+    const normalizedRole = normalizeRole(member.role, member.squad);
     return normalizedRole === "head_coach";
   });
 
