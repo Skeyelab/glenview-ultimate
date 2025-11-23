@@ -26,8 +26,8 @@ afterAll(() => {
 
 // Polyfill Web APIs for Node.js environment (needed for Next.js server components)
 import { TextEncoder, TextDecoder } from 'util'
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+global.TextEncoder = TextEncoder as typeof globalThis.TextEncoder
+global.TextDecoder = TextDecoder as typeof globalThis.TextDecoder
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
