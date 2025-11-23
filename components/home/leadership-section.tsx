@@ -4,6 +4,7 @@ import type { TeamMember } from "@/lib/directus";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
 import { SectionCard } from "@/components/ui/section-card";
+import { TeamMemberCard } from "@/components/ui/team-member-card";
 
 export interface LeadershipSectionProps {
   people: TeamMember[];
@@ -29,24 +30,15 @@ export function LeadershipSection({
           people.map((p) => (
             <React.Fragment key={p.id}>
               {renderMember?.(p) ?? (
-                <div
-                  className="border border-white/20 rounded p-2"
+                <TeamMemberCard
+                  member={p}
+                  internalGap="compact"
+                  showBio={false}
+                  squareImage={true}
                   {...(editingEnabled
                     ? { "data-directus": setAttr({ collection: "Team", item: p.id, fields: ["name", "role", "email"], mode: "popover" }) }
                     : {})}
-                >
-                  <div className="font-medium text-white">
-                    {p.name}
-                  </div>
-                  <div className="text-sm text-white/70">
-                    {p.role}
-                  </div>
-                  {p.email && (
-                    <a className="text-sm text-white/80 hover:text-white" href={`mailto:${p.email}`}>
-                      {p.email}
-                    </a>
-                  )}
-                </div>
+                />
               )}
             </React.Fragment>
           ))

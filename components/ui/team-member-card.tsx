@@ -4,16 +4,17 @@ import React, { useState } from "react";
 import Image from "next/image";
 import type { TeamMember } from "@/lib/directus";
 import { getDirectusAssetUrl } from "@/lib/directus";
-import { normalizeRole, getRoleDisplayTitle } from "./role-utils";
+import { normalizeRole, getRoleDisplayTitle } from "@/components/about/role-utils";
 import { cn } from "@/lib/utils";
 
-export interface TeamMemberCardProps {
+export interface TeamMemberCardProps extends React.HTMLAttributes<HTMLDivElement> {
   member: TeamMember;
   spanFullWidth?: boolean;
   photoHeight?: string;
   showEmail?: boolean;
   showBio?: boolean;
-  className?: string;
+  internalGap?: "compact" | "normal";
+  squareImage?: boolean;
 }
 
 export function TeamMemberCard({
@@ -22,6 +23,9 @@ export function TeamMemberCard({
   showEmail = true,
   showBio = true,
   className,
+  internalGap = "normal",
+  squareImage = false,
+  ...props
 }: TeamMemberCardProps): React.JSX.Element {
   const photoUrl = getDirectusAssetUrl(member.photo);
   const roleTitle = getRoleDisplayTitle(member.role, member.squad);
@@ -30,11 +34,16 @@ export function TeamMemberCard({
   const shouldSpanFull = spanFullWidth || isHeadCoach;
   const [imageError, setImageError] = useState(false);
 
+  const gapClass = internalGap === "compact" ? "gap-2" : "gap-4";
+  const imageContainerClass = squareImage
+    ? "flex-shrink-0 w-32 h-32 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden"
+    : "flex-shrink-0 w-52 h-64 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden";
+
   return (
-    <div className={cn("card", shouldSpanFull && "md:col-span-2", className)}>
-      <div className="flex gap-4">
+    <div className={cn("card", shouldSpanFull && "md:col-span-2", className)} {...props}>
+      <div className={cn("flex", gapClass)}>
         {/* Photo on the left */}
-        <div className="flex-shrink-0 w-52 h-64 aspect-square rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+        <div className={imageContainerClass}>
           {photoUrl && !imageError ? (
             <Image
               src={photoUrl}
@@ -70,3 +79,4 @@ export function TeamMemberCard({
     </div>
   );
 }
+
