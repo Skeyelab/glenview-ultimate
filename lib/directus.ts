@@ -107,6 +107,21 @@ export interface DirectusSchema {
   Website: Website[];
 }
 
+export type DirectusImageFit = "cover" | "contain" | "inside" | "outside" | "fill";
+
+export type DirectusImageFormat = "auto" | "jpg" | "png" | "webp" | "tiff" | "gif" | "avif";
+
+export interface DirectusAssetTransformOptions {
+  width?: number;
+  height?: number;
+  quality?: number;
+  fit?: DirectusImageFit;
+  format?: DirectusImageFormat;
+  key?: string;
+  withoutEnlargement?: boolean;
+  transforms?: Record<string, string | number | boolean>;
+}
+
 // Removed AuthenticatedRestClient - not used
 
 interface DirectusConfig {
@@ -366,19 +381,58 @@ export function getWebsite(): Promise<Website | null> {
 // Helper to get Directus asset URL from file UUID
 // For server components: uses direct Directus URL with access token
 // For client components: uses the API proxy route to handle authentication
-export function getDirectusAssetUrl(fileId: string | null | undefined): string | null {
+function appendTransformParams(
+  params: URLSearchParams,
+  options?: DirectusAssetTransformOptions,
+): void {
+  if (!options) return;
+
+  const baseEntries: Array<[string, string | number | boolean | undefined]> = [
+    ["width", options.width],
+    ["height", options.height],
+    ["quality", options.quality],
+    ["fit", options.fit],
+    ["format", options.format],
+    ["key", options.key],
+    ["withoutEnlargement", options.withoutEnlargement],
+  ];
+
+  for (const [key, value] of baseEntries) {
+    if (value === undefined || value === null) continue;
+    params.set(key, String(value));
+  }
+
+  if (options.transforms) {
+    for (const [transformKey, value] of Object.entries(options.transforms)) {
+      if (value === undefined || value === null) continue;
+      params.set(transformKey, String(value));
+    }
+  }
+}
+
+export function getDirectusAssetUrl(
+  fileId: string | null | undefined,
+  options?: DirectusAssetTransformOptions,
+): string | null {
   if (!fileId) return null;
 
   // Server-side: if we have DIRECTUS_URL and DIRECTUS_STATIC_TOKEN, use direct URL with token
   const baseUrl = process.env.DIRECTUS_URL;
   const token = process.env.DIRECTUS_STATIC_TOKEN;
   if (baseUrl && token) {
-    return `${baseUrl}/assets/${fileId}?access_token=${token}`;
+    const params = new URLSearchParams();
+    params.set("access_token", token);
+    appendTransformParams(params, options);
+    const queryString = params.toString();
+    return `${baseUrl}/assets/${fileId}?${queryString}`;
   }
 
   // Client-side or when token not available: use API proxy route
   // This handles authentication server-side via the API route
-  return `/api/assets/${fileId}`;
+  const params = new URLSearchParams();
+  appendTransformParams(params, options);
+  const queryString = params.toString();
+  return `/api/assets/${fileId}${queryString ? `?${queryString}` : ""}`;
 }
 
 export function getDirectusRestClient(): DirectusRestClient {

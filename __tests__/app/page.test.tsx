@@ -9,7 +9,10 @@ vi.mock('@/lib/directus', () => ({
   getTeam: vi.fn(),
   getSchedule: vi.fn(),
   getWebsite: vi.fn(),
-  getDirectusAssetUrl: vi.fn((id) => `https://example.com/assets/${id}`),
+  getDirectusAssetUrl: vi.fn((id, options) => {
+    const query = options ? '?opts=true' : '';
+    return `https://example.com/assets/${id}${query}`;
+  }),
 }));
 
 // Mock components

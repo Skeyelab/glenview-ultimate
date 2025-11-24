@@ -7,6 +7,10 @@ import { getDirectusAssetUrl } from "@/lib/directus";
 import { normalizeRole, getRoleDisplayTitle } from "@/components/about/role-utils";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_PHOTO_SIZE = 900;
+const SQUARE_PHOTO_SIZE = 400;
+const PHOTO_QUALITY = 80;
+
 export interface TeamMemberCardProps extends React.HTMLAttributes<HTMLDivElement> {
   member: TeamMember;
   spanFullWidth?: boolean;
@@ -27,7 +31,13 @@ export function TeamMemberCard({
   squareImage = false,
   ...props
 }: TeamMemberCardProps): React.JSX.Element {
-  const photoUrl = getDirectusAssetUrl(member.photo);
+  const targetSize = squareImage ? SQUARE_PHOTO_SIZE : DEFAULT_PHOTO_SIZE;
+  const photoUrl = getDirectusAssetUrl(member.photo, {
+    width: targetSize,
+    height: targetSize,
+    fit: "cover",
+    quality: PHOTO_QUALITY,
+  });
   const roleTitle = getRoleDisplayTitle(member.role, member.squad);
   const normalizedRole = normalizeRole(member.role, member.squad);
   const isHeadCoach = normalizedRole === "head_coach";
@@ -35,13 +45,16 @@ export function TeamMemberCard({
   const [imageError, setImageError] = useState(false);
 
   const gapClass = internalGap === "compact" ? "gap-2" : "gap-4";
-  const imageContainerClass = squareImage
-    ? "flex-shrink-0 w-32 h-32 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden"
-    : "flex-shrink-0 w-52 h-64 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden";
+  const stackedLayout = !squareImage;
+  const imageContainerClass = cn(
+    "flex-shrink-0 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden",
+    squareImage ? "w-32 h-32" : "w-full aspect-square md:w-52 md:h-64"
+  );
+  const infoSectionClass = cn("flex-1 min-w-0", stackedLayout && "pt-4 md:pt-0");
 
   return (
     <div className={cn("card", shouldSpanFull && "md:col-span-2", className)} {...props}>
-      <div className={cn("flex", gapClass)}>
+      <div className={cn("flex", gapClass, stackedLayout && "flex-col md:flex-row")}>
         {/* Photo on the left */}
         <div className={imageContainerClass}>
           {photoUrl && !imageError ? (
@@ -63,7 +76,7 @@ export function TeamMemberCard({
         </div>
 
         {/* Info on the right */}
-        <div className="flex-1 min-w-0">
+        <div className={infoSectionClass}>
           <h3 className="text-xl font-semibold text-white mb-2">{roleTitle}</h3>
           <p className="text-white font-medium mb-1">{member.name}</p>
           {showEmail && member.email && (
