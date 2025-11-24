@@ -14,7 +14,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [parents, setParents] = useState<Parent[]>([{ name: "", email: "", phone: "" }]);
   const [children, setChildren] = useState<Child[]>([{ full_name: "", availability: [] }]);
   const [notes, setNotes] = useState("");
-  const [marketing_opt_in, setOptIn] = useState(false);
+  const [marketing_opt_in, setOptIn] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
 

@@ -11,6 +11,9 @@ const config: Config = {
       colors: {
         'brand-green': '#175030',
       },
+      fontFamily: {
+        sans: ['var(--font-lexend)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       container: {
         center: true,
         padding: "1rem",

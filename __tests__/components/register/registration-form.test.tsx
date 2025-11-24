@@ -110,7 +110,7 @@ describe('RegistrationForm', () => {
       [sampleParent1],
       [{ full_name: sampleChild1.full_name }],
       sampleNotes,
-      false
+      true
     );
     expect(callBody).toMatchObject({
       parent1_name: expectedPayload.parent1_name,
@@ -265,7 +265,7 @@ describe('RegistrationForm', () => {
     } as Response);
   });
 
-  it('includes marketing opt-in in payload when checked', async () => {
+  it('includes marketing opt-in in payload when checked (default)', async () => {
     const user = userEvent.setup();
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -280,9 +280,9 @@ describe('RegistrationForm', () => {
     await user.type(emptyTextboxes[1], sampleParent1.email);
     await user.type(emptyTextboxes[3], sampleChild1.full_name);
 
-    // Check marketing opt-in
+    // Marketing opt-in should be checked by default
     const marketingCheckbox = screen.getByLabelText(/I agree to receive updates/i);
-    await user.click(marketingCheckbox);
+    expect(marketingCheckbox).toBeChecked();
 
     const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
     await user.click(submitButton);
