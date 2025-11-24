@@ -59,6 +59,26 @@ describe('getDirectusAssetUrl', () => {
       'https://example.com/assets/c3db7679-c7b9-4d7d-add9-761a96e59b86?access_token=test-token'
     )
   })
+
+  it('should append transform params when using the API proxy route', async () => {
+    delete process.env.DIRECTUS_URL
+    delete process.env.DIRECTUS_STATIC_TOKEN
+    vi.resetModules()
+    const { getDirectusAssetUrl } = await import('@/lib/directus')
+    expect(
+      getDirectusAssetUrl('transform-id', { width: 400, height: 400, fit: 'cover' }),
+    ).toBe('/api/assets/transform-id?width=400&height=400&fit=cover')
+  })
+
+  it('should append transform params to direct URLs with tokens', async () => {
+    process.env.DIRECTUS_URL = 'https://example.com'
+    process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
+    vi.resetModules()
+    const { getDirectusAssetUrl } = await import('@/lib/directus')
+    expect(
+      getDirectusAssetUrl('transform-id', { quality: 70, format: 'webp' }),
+    ).toBe('https://example.com/assets/transform-id?access_token=test-token&quality=70&format=webp')
+  })
 })
 
 describe('getSchedule', () => {

@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { TeamMemberCard } from '@/components/ui/team-member-card';
 import type { TeamMember } from '@/lib/directus';
+import { getDirectusAssetUrl } from '@/lib/directus';
 
 // Mock next/image
 vi.mock('next/image', () => ({
@@ -16,7 +17,9 @@ vi.mock('next/image', () => ({
 
 // Mock directus functions
 vi.mock('@/lib/directus', () => ({
-  getDirectusAssetUrl: vi.fn((id: string | null) => (id ? `/api/assets/${id}` : null)),
+  getDirectusAssetUrl: vi.fn((id: string | null, _options?: Record<string, unknown>) =>
+    (id ? `/api/assets/${id}` : null),
+  ),
 }));
 
 // Mock role-utils
@@ -36,6 +39,10 @@ vi.mock('@/components/about/role-utils', () => ({
 }));
 
 describe('TeamMemberCard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   const mockTeamMember: TeamMember = {
     id: 1,
     name: 'John Doe',
@@ -70,6 +77,22 @@ describe('TeamMemberCard', () => {
     render(<TeamMemberCard member={mockTeamMember} />);
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('Head Coach')).toBeInTheDocument();
+  });
+
+  it('requests transformed asset for member photos', () => {
+    render(<TeamMemberCard member={mockTeamMember} />);
+    expect(getDirectusAssetUrl).toHaveBeenCalledWith(
+      'photo-id',
+      expect.objectContaining({ width: 900, height: 900, fit: 'cover', quality: 80 }),
+    );
+  });
+
+  it('uses smaller transforms when squareImage is true', () => {
+    render(<TeamMemberCard member={mockTeamMember} squareImage={true} />);
+    expect(getDirectusAssetUrl).toHaveBeenCalledWith(
+      'photo-id',
+      expect.objectContaining({ width: 400, height: 400 }),
+    );
   });
 
   it('renders email link when email is provided and showEmail is true', () => {

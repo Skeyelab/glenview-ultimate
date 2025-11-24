@@ -21,7 +21,9 @@ vi.mock('next/image', () => ({
 
 // Mock directus functions
 vi.mock('@/lib/directus', () => ({
-  getDirectusAssetUrl: vi.fn((id: string | null) => (id ? `/api/assets/${id}` : null)),
+  getDirectusAssetUrl: vi.fn((id: string | null, _options?: Record<string, unknown>) =>
+    (id ? `/api/assets/${id}` : null),
+  ),
 }));
 
 // Mock role-utils

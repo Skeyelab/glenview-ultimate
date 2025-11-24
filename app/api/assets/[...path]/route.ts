@@ -23,7 +23,9 @@ export async function GET(
       return NextResponse.json({ error: "Directus token not configured" }, { status: 500 });
     }
 
-    const assetUrl = `${directusUrl}/assets/${fileId}?access_token=${token}`;
+    const forwardParams = new URLSearchParams(req.nextUrl.searchParams);
+    forwardParams.set("access_token", token);
+    const assetUrl = `${directusUrl}/assets/${fileId}?${forwardParams.toString()}`;
 
     // Fetch the image from Directus
     const response = await fetch(assetUrl, {

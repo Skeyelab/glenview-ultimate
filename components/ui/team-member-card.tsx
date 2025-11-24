@@ -7,6 +7,10 @@ import { getDirectusAssetUrl } from "@/lib/directus";
 import { normalizeRole, getRoleDisplayTitle } from "@/components/about/role-utils";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_PHOTO_SIZE = 900;
+const SQUARE_PHOTO_SIZE = 400;
+const PHOTO_QUALITY = 80;
+
 export interface TeamMemberCardProps extends React.HTMLAttributes<HTMLDivElement> {
   member: TeamMember;
   spanFullWidth?: boolean;
@@ -27,7 +31,13 @@ export function TeamMemberCard({
   squareImage = false,
   ...props
 }: TeamMemberCardProps): React.JSX.Element {
-  const photoUrl = getDirectusAssetUrl(member.photo);
+  const targetSize = squareImage ? SQUARE_PHOTO_SIZE : DEFAULT_PHOTO_SIZE;
+  const photoUrl = getDirectusAssetUrl(member.photo, {
+    width: targetSize,
+    height: targetSize,
+    fit: "cover",
+    quality: PHOTO_QUALITY,
+  });
   const roleTitle = getRoleDisplayTitle(member.role, member.squad);
   const normalizedRole = normalizeRole(member.role, member.squad);
   const isHeadCoach = normalizedRole === "head_coach";
