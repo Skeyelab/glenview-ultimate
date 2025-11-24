@@ -35,13 +35,16 @@ export function TeamMemberCard({
   const [imageError, setImageError] = useState(false);
 
   const gapClass = internalGap === "compact" ? "gap-2" : "gap-4";
-  const imageContainerClass = squareImage
-    ? "flex-shrink-0 w-32 h-32 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden"
-    : "flex-shrink-0 w-52 h-64 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden";
+  const stackedLayout = !squareImage;
+  const imageContainerClass = cn(
+    "flex-shrink-0 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden",
+    squareImage ? "w-32 h-32" : "w-full aspect-[4/3] md:w-52 md:h-64"
+  );
+  const infoSectionClass = cn("flex-1 min-w-0", stackedLayout && "pt-4 md:pt-0");
 
   return (
     <div className={cn("card", shouldSpanFull && "md:col-span-2", className)} {...props}>
-      <div className={cn("flex", gapClass)}>
+      <div className={cn("flex", gapClass, stackedLayout && "flex-col md:flex-row")}>
         {/* Photo on the left */}
         <div className={imageContainerClass}>
           {photoUrl && !imageError ? (
@@ -63,7 +66,7 @@ export function TeamMemberCard({
         </div>
 
         {/* Info on the right */}
-        <div className="flex-1 min-w-0">
+        <div className={infoSectionClass}>
           <h3 className="text-xl font-semibold text-white mb-2">{roleTitle}</h3>
           <p className="text-white font-medium mb-1">{member.name}</p>
           {showEmail && member.email && (

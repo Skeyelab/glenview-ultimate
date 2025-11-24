@@ -154,11 +154,23 @@ describe('TeamMemberCard', () => {
     expect(imageContainer).not.toHaveClass('w-52', 'h-64');
   });
 
+  it('keeps a horizontal layout when squareImage is true', () => {
+    const { container } = render(<TeamMemberCard member={mockTeamMember} squareImage={true} />);
+    const flexContainer = container.querySelector('.flex');
+    expect(flexContainer).not.toHaveClass('flex-col');
+  });
+
   it('uses rectangular image dimensions by default', () => {
     const { container } = render(<TeamMemberCard member={mockTeamMember} />);
     const imageContainer = container.querySelector('.flex-shrink-0');
-    expect(imageContainer).toHaveClass('w-52', 'h-64');
+    expect(imageContainer).toHaveClass('w-full', 'aspect-[4/3]', 'md:w-52', 'md:h-64');
     expect(imageContainer).not.toHaveClass('w-32', 'h-32');
+  });
+
+  it('stacks image above info on mobile for rectangular layout', () => {
+    const { container } = render(<TeamMemberCard member={mockTeamMember} />);
+    const flexContainer = container.querySelector('.flex');
+    expect(flexContainer).toHaveClass('flex-col', 'md:flex-row');
   });
 
   it('passes through HTML attributes', () => {
