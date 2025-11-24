@@ -38,7 +38,7 @@ export function TeamMemberCard({
   const stackedLayout = !squareImage;
   const imageContainerClass = cn(
     "flex-shrink-0 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden",
-    squareImage ? "w-32 h-32" : "w-full aspect-[4/3] md:w-52 md:h-64"
+    squareImage ? "w-32 h-32" : "w-full aspect-square md:w-52 md:h-64"
   );
   const infoSectionClass = cn("flex-1 min-w-0", stackedLayout && "pt-4 md:pt-0");
 

@@ -160,10 +160,10 @@ describe('TeamMemberCard', () => {
     expect(flexContainer).not.toHaveClass('flex-col');
   });
 
-  it('uses rectangular image dimensions by default', () => {
+  it('uses square image ratio on mobile by default', () => {
     const { container } = render(<TeamMemberCard member={mockTeamMember} />);
     const imageContainer = container.querySelector('.flex-shrink-0');
-    expect(imageContainer).toHaveClass('w-full', 'aspect-[4/3]', 'md:w-52', 'md:h-64');
+    expect(imageContainer).toHaveClass('w-full', 'aspect-square', 'md:w-52', 'md:h-64');
     expect(imageContainer).not.toHaveClass('w-32', 'h-32');
   });
 
