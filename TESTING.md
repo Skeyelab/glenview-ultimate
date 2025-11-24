@@ -1,6 +1,6 @@
 # Testing Guide
 
-This project uses [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/react) for testing.
+This project uses [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/react) for testing.
 
 ## Setup
 
@@ -123,10 +123,16 @@ describe('/api/register', () => {
 
 ## CI/CD Integration
 
-Add to your CI pipeline:
+Tests are automatically run in CI via GitHub Actions. The workflow runs:
 
 ```yaml
 - name: Run tests
   run: yarn test:coverage
 ```
+
+## Test Configuration
+
+- Test configuration: `vitest.config.ts`
+- Test setup: `vitest.setup.ts`
+- Coverage reports: Generated in `coverage/` directory
 
