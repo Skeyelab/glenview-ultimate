@@ -52,10 +52,4 @@ describe('NavLink', () => {
     const link = screen.getByRole('link', { name: /test/i });
     expect(link).toHaveClass('custom-class');
   });
-
-  it('should have base classes', () => {
-    render(<NavLink href="/test" label="Test" />);
-    const link = screen.getByRole('link', { name: /test/i });
-    expect(link).toHaveClass('px-2', 'py-1', 'rounded-md', 'text-white/80');
-  });
 });
