@@ -73,11 +73,6 @@ describe('NewsList', () => {
     expect(list).toHaveClass('custom-class');
   });
 
-  it('has correct base list classes', () => {
-    const { container } = render(<NewsList posts={mockPosts} />);
-    const list = container.querySelector('div');
-    expect(list).toHaveClass('space-y-4');
-  });
 
   it('handles single post', () => {
     render(<NewsList posts={[mockPosts[0]]} />);

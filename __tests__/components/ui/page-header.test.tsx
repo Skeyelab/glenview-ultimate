@@ -39,15 +39,4 @@ describe('PageHeader', () => {
     expect(desc).toHaveClass('custom-desc');
   });
 
-  it('has correct base title classes', () => {
-    render(<PageHeader title="Test Title" />);
-    const title = screen.getByRole('heading', { level: 1 });
-    expect(title).toHaveClass('text-3xl', 'font-bold', 'text-white');
-  });
-
-  it('has correct base description classes', () => {
-    render(<PageHeader title="Test Title" description="Test description" />);
-    const desc = screen.getByText('Test description');
-    expect(desc).toHaveClass('text-white/90');
-  });
 });

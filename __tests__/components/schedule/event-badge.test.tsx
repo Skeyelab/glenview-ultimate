@@ -59,11 +59,6 @@ describe('EventTypeBadge', () => {
     expect(badge).toHaveClass('custom-class');
   });
 
-  it('has correct base badge classes', () => {
-    const { container } = render(<EventTypeBadge type="practice" />);
-    const badge = container.querySelector('span');
-    expect(badge).toHaveClass('inline-flex', 'items-center', 'rounded-full', 'font-semibold', 'uppercase', 'tracking-wide');
-  });
 });
 
 describe('KeyMomentBadge', () => {

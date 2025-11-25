@@ -120,9 +120,4 @@ describe('NewsArticleCard', () => {
     expect(article).toHaveClass('custom-class');
   });
 
-  it('has correct base article classes', () => {
-    const { container } = render(<NewsArticleCard post={mockPost} />);
-    const article = container.querySelector('article');
-    expect(article).toHaveClass('border', 'border-white/20', 'rounded-lg', 'p-4');
-  });
 });

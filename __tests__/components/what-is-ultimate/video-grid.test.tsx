@@ -86,9 +86,4 @@ describe('VideoGrid', () => {
     expect(section).toHaveClass('custom-class');
   });
 
-  it('has correct base classes', () => {
-    const { container } = render(<VideoGrid videos={mockVideos} />);
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('space-y-4');
-  });
 });

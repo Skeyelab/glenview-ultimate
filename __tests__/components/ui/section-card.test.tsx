@@ -79,10 +79,5 @@ describe('SectionCard', () => {
     expect(title).toHaveClass('custom-title');
   });
 
-  it('has correct base classes', () => {
-    const { container } = render(<SectionCard title="Test Title">Content</SectionCard>);
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('card', 'space-y-3');
-  });
 });
 

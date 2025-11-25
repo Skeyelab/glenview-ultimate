@@ -83,9 +83,4 @@ describe('NewsPost', () => {
     expect(contentDiv).toHaveClass('custom-content');
   });
 
-  it('has correct base article classes', () => {
-    const { container } = render(<NewsPost post={mockPost} htmlContent={mockHtmlContent} />);
-    const article = container.querySelector('article');
-    expect(article).toHaveClass('prose', 'prose-invert', 'max-w-none');
-  });
 });

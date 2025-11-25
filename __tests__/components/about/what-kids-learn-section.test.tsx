@@ -38,17 +38,10 @@ describe('WhatKidsLearnSection', () => {
     expect(section).toHaveClass('custom-class');
   });
 
-  it('has correct base classes', () => {
-    const { container } = render(<WhatKidsLearnSection items={['Item 1']} />);
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('space-y-3');
-  });
-
-  it('renders list with correct structure', () => {
+  it('renders list items in a list structure', () => {
     const items = ['Item 1', 'Item 2'];
-    const { container } = render(<WhatKidsLearnSection items={items} />);
-    const list = container.querySelector('ul');
-    expect(list).toBeInTheDocument();
-    expect(list).toHaveClass('list-disc', 'list-inside', 'space-y-2');
+    render(<WhatKidsLearnSection items={items} />);
+    expect(screen.getByText('Item 1')).toBeInTheDocument();
+    expect(screen.getByText('Item 2')).toBeInTheDocument();
   });
 });

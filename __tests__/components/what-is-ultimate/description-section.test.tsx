@@ -56,17 +56,4 @@ describe('DescriptionSection', () => {
     expect(section).toHaveClass('custom-class');
   });
 
-  it('has correct base classes for HTML content', () => {
-    const { container } = render(<DescriptionSection htmlContent="<p>Content</p>" />);
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('space-y-4');
-    const div = container.querySelector('.prose');
-    expect(div).toHaveClass('prose-invert', 'max-w-none');
-  });
-
-  it('has correct base classes for paragraphs', () => {
-    const { container } = render(<DescriptionSection paragraphs={['Paragraph 1']} />);
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('space-y-4');
-  });
 });

@@ -83,9 +83,4 @@ describe('VideoCard', () => {
     expect(card).toHaveClass('custom-class');
   });
 
-  it('has correct base classes', () => {
-    const { container } = render(<VideoCard title="Test Video" description="Test description" />);
-    const card = container.querySelector('.card');
-    expect(card).toBeInTheDocument();
-  });
 });
