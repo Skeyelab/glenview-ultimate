@@ -45,10 +45,13 @@ describe('AboutPage', () => {
 
   it('should render with fetched data', async () => {
     const mockAbout = {
+      id: 1,
       club_description: 'Test club description',
       what_kids_learn: ['Skill 1', 'Skill 2'],
     };
-    const mockTeam = [{ id: '1', name: 'John Doe' }];
+    const mockTeam = [
+      { id: 1, name: 'John Doe', role: 'coach', email: null, bio: null, photo: null, squad: null },
+    ];
 
     getAbout.mockResolvedValue(mockAbout);
     getTeam.mockResolvedValue(mockTeam);

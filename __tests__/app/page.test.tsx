@@ -44,7 +44,7 @@ vi.mock('@/components/home/home-visual-editing-provider', () => ({
 
 describe('HomePage', () => {
   let getPartners: any, getTeam: any, getSchedule: any, getWebsite: any, getDirectusAssetUrl: any;
-  
+
   beforeEach(async () => {
     const directus = await import('@/lib/directus');
     getPartners = directus.getPartners;
