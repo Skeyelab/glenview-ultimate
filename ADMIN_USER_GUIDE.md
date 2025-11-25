@@ -160,10 +160,16 @@ Manage site-wide configuration and homepage hero content.
 #### Registrations
 View registration form submissions from the website.
 
+**Automatic Listmonk Integration:**
+- When a registration form is completed with `marketing_opt_in` set to `true`, a new subscriber is **automatically created in Listmonk**
+- The subscriber is added using the Parent 1 email address
+- You can find these subscribers in Listmonk under the **Subscribers** section
+
 **Common Tasks:**
 - View submitted registrations
 - Export registration data
 - Check for duplicate submissions
+- Verify subscribers were created in Listmonk (if marketing opt-in was selected)
 
 **Fields:**
 - Parent 1 Name (required)
@@ -174,7 +180,7 @@ View registration form submissions from the website.
 - Parent 2 Phone (optional)
 - Children (optional) - JSON array of child information
 - Notes (optional)
-- Marketing Opt In (optional)
+- Marketing Opt In (optional) - When `true`, automatically creates Listmonk subscriber
 - Date Created (auto-generated)
 
 ### Visual Editing
@@ -215,8 +221,13 @@ From the admin portal at **login.glenview-ultimate.org**, click on **Listmonk Ad
 #### Subscribers
 Manage your email subscriber list.
 
+**Automatic Subscriber Creation:**
+- When someone completes the registration form on the website and opts in for marketing communications, they are **automatically added as a subscriber** in Listmonk
+- No manual action is required - the integration handles this automatically
+- Subscribers are created using the parent email address from the registration form
+
 **Common Tasks:**
-- View all subscribers
+- View all subscribers (including those added automatically from registrations)
 - Add subscribers manually
 - Import subscribers from CSV
 - Export subscriber list
@@ -301,8 +312,11 @@ Manage images and files for email campaigns.
 
 #### Adding New Subscribers
 
-**From Registration Form:**
-- Subscribers who opt-in during registration are automatically added
+**Automatic from Registration Form:**
+- When someone completes the registration form on **glenview-ultimate.org** and checks the marketing opt-in box, they are **automatically added as a subscriber** in Listmonk
+- The subscriber is created using the Parent 1 email address and name
+- This happens automatically - no manual action needed
+- You can verify new subscribers in Listmonk under **Subscribers** after a registration is submitted
 
 **Manually:**
 1. Go to **Subscribers** → **Add Subscriber**
@@ -318,6 +332,18 @@ Manage images and files for email campaigns.
 ---
 
 ## Common Admin Tasks
+
+### Understanding Registration → Listmonk Integration
+
+When someone registers on the website:
+
+1. Registration form is submitted to **glenview-ultimate.org/api/register**
+2. Registration data is saved to Directus **Registrations** collection
+3. **If marketing opt-in is checked**, a new subscriber is automatically created in Listmonk
+4. The subscriber uses the Parent 1 email address and name
+5. You can view the subscriber in Listmonk under **Subscribers**
+
+**Note:** Only registrations with `marketing_opt_in: true` create Listmonk subscribers. If someone doesn't opt in, they won't be added to Listmonk.
 
 ### Updating Homepage Content
 
