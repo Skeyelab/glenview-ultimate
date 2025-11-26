@@ -58,7 +58,6 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
                 "hero_cta_label",
                 "hero_cta_url",
                 "hero_pre_registration_text",
-                "hero_logo",
               ],
               mode: "popover",
             }),
@@ -66,19 +65,7 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
         : {})}
     >
       {logoUrl && (
-        <div
-          className="flex justify-center mb-6"
-          {...(editingEnabled
-            ? {
-                "data-directus": setAttr({
-                  collection: "Website",
-                  item: "home",
-                  fields: ["hero_logo"],
-                  mode: "popover",
-                }),
-              }
-            : {})}
-        >
+        <div className="flex justify-center mb-6">
           <Image
             src={logoUrl}
             alt="Glenview Ultimate"

@@ -84,7 +84,6 @@ export interface WhatIsUltimateVideo {
 export interface Website {
   id: number;
   site_name: string;
-  footer_text?: string | null;
   hero_title: string;
   hero_subtitle?: string | null;
   hero_tagline?: string | null;
@@ -362,7 +361,6 @@ export function getWebsite(): Promise<Website | null> {
         fields: [
           "id",
           "site_name",
-          "footer_text",
           "hero_title",
           "hero_subtitle",
           "hero_tagline",
