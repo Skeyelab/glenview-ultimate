@@ -85,10 +85,7 @@ export interface Website {
   id: number;
   site_name: string;
   hero_title: string;
-  hero_subtitle?: string | null;
-  hero_tagline?: string | null;
-  hero_message_primary?: string | null;
-  hero_message_secondary?: string | null;
+  hero_block?: string | null;
   hero_cta_label?: string | null;
   hero_cta_url?: string | null;
   hero_pre_registration_text?: string | null;
@@ -358,21 +355,14 @@ export function getWebsite(): Promise<Website | null> {
     const data = await client.request(
       readItems("Website", {
         limit: 1,
-        fields: [
-          "id",
-          "site_name",
-          "hero_title",
-          "hero_subtitle",
-          "hero_tagline",
-          "hero_message_primary",
-          "hero_message_secondary",
-          "hero_cta_label",
-          "hero_cta_url",
-          "hero_pre_registration_text",
-        ],
+        fields: ["*"],
       }),
     );
-    return data[0] ?? null;
+    // Website is a singleton collection, so data could be an array or a single object
+    if (Array.isArray(data)) {
+      return data[0] ?? null;
+    }
+    return data ?? null;
   });
 }
 
