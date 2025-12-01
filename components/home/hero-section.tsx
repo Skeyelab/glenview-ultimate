@@ -6,12 +6,10 @@ import type { SeasonSchedule, Website } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
+import sanitizeHtml from "sanitize-html";
 import {
   HERO_TITLE,
-  HERO_SUBTITLE,
-  HERO_TAGLINE,
-  HERO_MESSAGE_1,
-  HERO_MESSAGE_2,
+  HERO_BLOCK,
   HERO_CTA_LABEL,
   HERO_CTA_URL,
   HERO_PRE_REGISTRATION_TEXT,
@@ -29,16 +27,12 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   const editingEnabled = search.get("visual-editing") === "true";
 
   const heroTitle = website?.hero_title ?? HERO_TITLE;
-  const heroSubtitle = website?.hero_subtitle ?? HERO_SUBTITLE;
-  const heroTagline = website?.hero_tagline ?? HERO_TAGLINE;
-  const heroMessage1 = website?.hero_message_primary ?? HERO_MESSAGE_1;
-  const heroMessage2 = website?.hero_message_secondary ?? HERO_MESSAGE_2;
+  const heroBlock = website?.hero_block ?? HERO_BLOCK;
   const heroCtaLabel = website?.hero_cta_label ?? HERO_CTA_LABEL;
   const heroCtaUrl = website?.hero_cta_url ?? HERO_CTA_URL;
   const heroPreRegistrationText = website?.hero_pre_registration_text ?? HERO_PRE_REGISTRATION_TEXT;
 
-  const heroParagraphs = [heroSubtitle, heroTagline, heroMessage1, heroMessage2].filter(Boolean);
-  const heroParagraphClass = "text-lg text-white/90 max-w-2xl mx-auto";
+  const sanitizedHeroBlock = heroBlock ? sanitizeHtml(heroBlock) : null;
   const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
 
   return (
@@ -51,14 +45,10 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
               item: "home",
               fields: [
                 "hero_title",
-                "hero_subtitle",
-                "hero_tagline",
-                "hero_message_primary",
-                "hero_message_secondary",
+                "hero_block",
                 "hero_cta_label",
                 "hero_cta_url",
                 "hero_pre_registration_text",
-                "hero_logo",
               ],
               mode: "popover",
             }),
@@ -66,19 +56,7 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
         : {})}
     >
       {logoUrl && (
-        <div
-          className="flex justify-center mb-6"
-          {...(editingEnabled
-            ? {
-                "data-directus": setAttr({
-                  collection: "Website",
-                  item: "home",
-                  fields: ["hero_logo"],
-                  mode: "popover",
-                }),
-              }
-            : {})}
-        >
+        <div className="flex justify-center mb-6">
           <Image
             src={logoUrl}
             alt="Glenview Ultimate"
@@ -104,24 +82,22 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
       >
         {heroTitle}
       </h1>
-      {heroParagraphs.map((paragraph, index) => (
-        <p
-          key={`${paragraph}-${index}`}
-          className={heroParagraphClass}
+      {sanitizedHeroBlock && (
+        <div
+          className="text-lg text-white/90 max-w-2xl mx-auto prose prose-invert"
+          dangerouslySetInnerHTML={{ __html: sanitizedHeroBlock }}
           {...(editingEnabled
             ? {
                 "data-directus": setAttr({
                   collection: "Website",
                   item: "home",
-                  fields: ["hero_subtitle", "hero_tagline", "hero_message_primary", "hero_message_secondary"],
+                  fields: ["hero_block"],
                   mode: "popover",
                 }),
               }
             : {})}
-        >
-          {paragraph}
-        </p>
-      ))}
+        />
+      )}
       <div className="mt-4">
         <Link
           className="button"

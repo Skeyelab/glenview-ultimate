@@ -3,12 +3,17 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { HeroSection } from '@/components/home/hero-section';
-import type { SeasonSchedule } from '@/lib/directus';
-import { HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT } from '@/lib/constants';
+import type { SeasonSchedule, Website } from '@/lib/directus';
+import { HERO_CTA_LABEL, HERO_CTA_URL, HERO_PRE_REGISTRATION_TEXT, HERO_BLOCK } from '@/lib/constants';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock sanitize-html
+vi.mock('sanitize-html', () => ({
+  default: vi.fn((html: string) => html),
 }));
 
 // Mock next/image
@@ -47,12 +52,48 @@ describe('HeroSection', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/The Fun Starts/i);
   });
 
-  it('renders hero paragraphs', () => {
-    render(<HeroSection season={null} logoUrl={null} website={null} />);
+  it('renders hero block HTML content when provided', () => {
+    const mockWebsite: Website = {
+      id: 1,
+      site_name: 'Glenview Ultimate',
+      hero_title: 'The Fun Starts - Spring 2026',
+      hero_block: '<p>Introducing Glenview\'s very first Youth Ultimate Frisbee Club</p><p>5th-8th Grade. Boys &amp; Girls.</p><p>Everyone is Welcome. Everyone Plays.</p><p>Come play with us. Join our team.</p>',
+    };
+    const { container } = render(<HeroSection season={null} logoUrl={null} website={mockWebsite} />);
     expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
     expect(screen.getByText(/5th-8th Grade. Boys & Girls./i)).toBeInTheDocument();
     expect(screen.getByText(/Everyone is Welcome. Everyone Plays./i)).toBeInTheDocument();
     expect(screen.getByText(/Come play with us. Join our team./i)).toBeInTheDocument();
+  });
+
+  it('renders fallback hero block when website hero_block is null', () => {
+    const mockWebsite: Website = {
+      id: 1,
+      site_name: 'Glenview Ultimate',
+      hero_title: 'The Fun Starts - Spring 2026',
+      hero_block: null,
+    };
+    const { container } = render(<HeroSection season={null} logoUrl={null} website={mockWebsite} />);
+    const heroBlockDiv = container.querySelector('.prose');
+    expect(heroBlockDiv).toBeInTheDocument();
+    expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
+  });
+
+  it('renders fallback hero block when website is null', () => {
+    render(<HeroSection season={null} logoUrl={null} website={null} />);
+    expect(screen.getByText(/Introducing Glenview's very first Youth Ultimate Frisbee Club/i)).toBeInTheDocument();
+  });
+
+  it('sanitizes hero block HTML content', async () => {
+    const sanitizeHtml = (await import('sanitize-html')).default;
+    const mockWebsite: Website = {
+      id: 1,
+      site_name: 'Glenview Ultimate',
+      hero_title: 'The Fun Starts - Spring 2026',
+      hero_block: '<p>Content</p><script>alert("xss")</script>',
+    };
+    render(<HeroSection season={null} logoUrl={null} website={mockWebsite} />);
+    expect(sanitizeHtml).toHaveBeenCalledWith(mockWebsite.hero_block);
   });
 
   it('renders the CTA link', () => {

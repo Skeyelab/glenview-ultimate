@@ -110,7 +110,6 @@ Site-wide configuration.
 **Fields:**
 - `id` (integer, primary key, auto-increment)
 - `site_name` (string, required)
-- `footer_text` (text, nullable)
 - `hero_title` (string, required)
 - `hero_subtitle` (text, nullable)
 - `hero_tagline` (text, nullable)
