@@ -6,7 +6,6 @@ import HomePage from '@/app/page';
 // Mock directus functions
 vi.mock('@/lib/directus', () => ({
   getPartners: vi.fn(),
-  getTeam: vi.fn(),
   getSchedule: vi.fn(),
   getWebsite: vi.fn(),
   getDirectusAssetUrl: vi.fn((id, options) => {
@@ -30,10 +29,6 @@ vi.mock('@/components/home/season-highlights-card', () => ({
   ),
 }));
 
-vi.mock('@/components/home/leadership-section', () => ({
-  LeadershipSection: ({ people }: any) => <div data-testid="leadership">{people?.length || 0} people</div>,
-}));
-
 vi.mock('@/components/home/partners-section', () => ({
   PartnersSection: ({ partners }: any) => <div data-testid="partners">{partners?.length || 0} partners</div>,
 }));
@@ -43,12 +38,11 @@ vi.mock('@/components/home/home-visual-editing-provider', () => ({
 }));
 
 describe('HomePage', () => {
-  let getPartners: any, getTeam: any, getSchedule: any, getWebsite: any, getDirectusAssetUrl: any;
+  let getPartners: any, getSchedule: any, getWebsite: any, getDirectusAssetUrl: any;
 
   beforeEach(async () => {
     const directus = await import('@/lib/directus');
     getPartners = directus.getPartners;
-    getTeam = directus.getTeam;
     getSchedule = directus.getSchedule;
     getWebsite = directus.getWebsite;
     getDirectusAssetUrl = directus.getDirectusAssetUrl;
@@ -61,7 +55,6 @@ describe('HomePage', () => {
 
   it('should render with empty data', async () => {
     getPartners.mockResolvedValue([]);
-    getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
     getWebsite.mockResolvedValue(null);
 
@@ -70,20 +63,17 @@ describe('HomePage', () => {
 
     expect(getByTestId('hero-section')).toBeInTheDocument();
     expect(getByTestId('season-highlights')).toHaveTextContent('0 highlights');
-    expect(getByTestId('leadership')).toHaveTextContent('0 people');
     expect(getByTestId('partners')).toHaveTextContent('0 partners');
   });
 
   it('should render with fetched data', async () => {
     const mockPartners = [{ id: '1', name: 'Partner 1' }];
-    const mockTeam = [{ id: '1', name: 'Person 1' }];
     const mockSchedule = {
       highlights: [{ id: '1', title: 'Highlight 1' }],
     };
     const mockWebsite = { id: 1, hero_title: 'Test Title' };
 
     getPartners.mockResolvedValue(mockPartners);
-    getTeam.mockResolvedValue(mockTeam);
     getSchedule.mockResolvedValue(mockSchedule);
     getWebsite.mockResolvedValue(mockWebsite);
 
@@ -91,27 +81,23 @@ describe('HomePage', () => {
     const { getByTestId } = render(page);
 
     expect(getByTestId('partners')).toHaveTextContent('1 partners');
-    expect(getByTestId('leadership')).toHaveTextContent('1 people');
     expect(getByTestId('season-highlights')).toHaveTextContent('1 highlights');
   });
 
   it('should fetch all required data', async () => {
     getPartners.mockResolvedValue([]);
-    getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
     getWebsite.mockResolvedValue(null);
 
     await HomePage();
 
     expect(getPartners).toHaveBeenCalledTimes(1);
-    expect(getTeam).toHaveBeenCalledTimes(1);
     expect(getSchedule).toHaveBeenCalledTimes(1);
     expect(getWebsite).toHaveBeenCalledTimes(1);
   });
 
   it('should get logo URL', async () => {
     getPartners.mockResolvedValue([]);
-    getTeam.mockResolvedValue([]);
     getSchedule.mockResolvedValue(null);
     getWebsite.mockResolvedValue(null);
 

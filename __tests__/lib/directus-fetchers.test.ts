@@ -93,6 +93,23 @@ describe('directus fetchers', () => {
       await expect(getNewsBySlug('miss')).resolves.toBeNull();
     });
 
+    it('hasNewsArticles returns true when articles exist', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'News') return [{ id: 1 }];
+        return [];
+      });
+
+      const { hasNewsArticles } = await import('@/lib/directus');
+      await expect(hasNewsArticles()).resolves.toBe(true);
+    });
+
+    it('hasNewsArticles returns false when no articles exist', async () => {
+      mockRequest.mockImplementation(async () => []);
+
+      const { hasNewsArticles } = await import('@/lib/directus');
+      await expect(hasNewsArticles()).resolves.toBe(false);
+    });
+
     it('getNewsBySlug selects first when multiple returned', async () => {
       mockRequest.mockImplementation(async (arg: any) => {
         if (arg?.collection === 'News') {

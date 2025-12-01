@@ -4,6 +4,8 @@ import { Lexend } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer";
+import { hasNewsArticles } from "@/lib/directus";
+import { NAV_LINKS } from "@/components/navbar/nav-links";
 
 const lexend = Lexend({
   weight: ["400", "500", "600", "700"],
@@ -17,7 +19,10 @@ export const metadata: Metadata = {
   description: "Youth Ultimate Frisbee in Glenview, IL",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }): React.JSX.Element {
+export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<React.JSX.Element> {
+  const hasNews = await hasNewsArticles();
+  const filteredLinks = hasNews ? NAV_LINKS : NAV_LINKS.filter((link) => link.href !== "/news");
+
   return (
     <html lang="en" className={lexend.variable}>
       <body className={`${lexend.className} min-h-screen antialiased bg-brand-green text-white`}>
@@ -27,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
           strategy="afterInteractive"
         />
         <header className="border-b border-white/20">
-          <Navbar />
+          <Navbar links={filteredLinks} />
         </header>
         <main className="container py-10">{children}</main>
         <Footer />

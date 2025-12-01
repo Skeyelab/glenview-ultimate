@@ -54,7 +54,7 @@ export function TeamLeadershipSection({
             <div className="grid-2">
               {captains.map((member) => (
                 <React.Fragment key={member.id}>
-                  {renderMemberCard?.(member) ?? <TeamMemberCard member={member} />}
+                  {renderMemberCard?.(member) ?? <TeamMemberCard member={member} showEmail={false} />}
                 </React.Fragment>
               ))}
             </div>
@@ -62,7 +62,7 @@ export function TeamLeadershipSection({
           {/* Coach below, spanning full width */}
           {coach && (
             <div className="grid-2">
-              {renderMemberCard?.(coach) ?? <TeamMemberCard key={coach.id} member={coach} />}
+              {renderMemberCard?.(coach) ?? <TeamMemberCard key={coach.id} member={coach} showEmail={false} />}
             </div>
           )}
         </div>

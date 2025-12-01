@@ -34,6 +34,7 @@ export function LeadershipSection({
                   member={p}
                   internalGap="compact"
                   showBio={false}
+                  showEmail={false}
                   squareImage={true}
                   {...(editingEnabled
                     ? { "data-directus": setAttr({ collection: "Team", item: p.id, fields: ["name", "role", "email"], mode: "popover" }) }

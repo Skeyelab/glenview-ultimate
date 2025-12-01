@@ -124,11 +124,9 @@ describe('LeadershipSection', () => {
     expect(imageContainer).toHaveClass('w-32', 'h-32');
   });
 
-  it('renders email link when email is provided', () => {
+  it('does not render email link in leadership section', () => {
     render(<LeadershipSection people={[mockTeamMember1]} />);
-    const emailLink = screen.getByRole('link', { name: 'john@example.com' });
-    expect(emailLink).toBeInTheDocument();
-    expect(emailLink).toHaveAttribute('href', 'mailto:john@example.com');
+    expect(screen.queryByRole('link', { name: 'john@example.com' })).not.toBeInTheDocument();
   });
 
   it('does not render email link when email is not provided', () => {

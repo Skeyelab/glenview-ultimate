@@ -300,6 +300,18 @@ export function getNewsList(limit = 20): Promise<NewsPost[]> {
   );
 }
 
+export function hasNewsArticles(): Promise<boolean> {
+  return withDirectus(false, async (client) => {
+    const data = await client.request(
+      readItems("News", {
+        limit: 1,
+        fields: ["id"],
+      }),
+    );
+    return data.length > 0;
+  });
+}
+
 export function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   return withDirectus<NewsPost | null>(null, async (client) => {
     const data = await client.request(
