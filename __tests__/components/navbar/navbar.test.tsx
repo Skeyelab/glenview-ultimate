@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { beforeEach, vi } from 'vitest';
 import { Navbar } from '@/components/navbar/navbar';
+import { NAV_LINKS } from '@/components/navbar/nav-links';
 import * as nextNavigation from 'next/navigation';
 
 // Mock next/navigation
@@ -37,17 +38,17 @@ describe('Navbar', () => {
   });
 
   it('should render logo', () => {
-    render(<Navbar />);
+    render(<Navbar links={NAV_LINKS} />);
     expect(screen.getByText('Glenview Ultimate')).toBeInTheDocument();
   });
 
   it('should render desktop navigation', () => {
-    render(<Navbar />);
+    render(<Navbar links={NAV_LINKS} />);
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
   });
 
   it('should render register button', () => {
-    render(<Navbar />);
+    render(<Navbar links={NAV_LINKS} />);
     const registerButton = screen.getByRole('link', { name: /register/i });
     expect(registerButton).toBeInTheDocument();
     expect(registerButton).toHaveAttribute('href', '/register');
@@ -55,7 +56,7 @@ describe('Navbar', () => {
 
   it('should toggle mobile menu when button is clicked', async () => {
     const user = userEvent.setup();
-    render(<Navbar />);
+    render(<Navbar links={NAV_LINKS} />);
 
     const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
     await user.click(menuButton);
@@ -67,7 +68,7 @@ describe('Navbar', () => {
 
   it('should close mobile menu when pathname changes', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(<Navbar />);
+    const { rerender } = render(<Navbar links={NAV_LINKS} />);
 
     // Open menu first by clicking button
     const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
@@ -78,7 +79,7 @@ describe('Navbar', () => {
 
     // Change pathname by updating the mock
     usePathname.mockReturnValue('/about');
-    rerender(<Navbar />);
+    rerender(<Navbar links={NAV_LINKS} />);
 
     // Menu should be closed (not visible)
     const mobileNav = document.getElementById('mobile-nav');
