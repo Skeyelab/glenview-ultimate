@@ -20,10 +20,10 @@ export const DESCRIPTION_PARAGRAPHS = [
  * These may be removed in a future version once CMS migration is complete.
  */
 export const HERO_TITLE = "The Fun Starts - Spring 2026";
-export const HERO_SUBTITLE = "Introducing Glenview's very first Youth Ultimate Frisbee Club";
-export const HERO_TAGLINE = "5th-8th Grade. Boys & Girls.";
-export const HERO_MESSAGE_1 = "Everyone is Welcome. Everyone Plays.";
-export const HERO_MESSAGE_2 = "Come play with us. Join our team.";
+export const HERO_BLOCK = `<p>Introducing Glenview's very first Youth Ultimate Frisbee Club</p>
+<p>5th-8th Grade. Boys &amp; Girls.</p>
+<p>Everyone is Welcome. Everyone Plays.</p>
+<p>Come play with us. Join our team.</p>`;
 export const HERO_CTA_LABEL = "Register";
 export const HERO_CTA_URL = "/register";
 export const HERO_PRE_REGISTRATION_TEXT = "Pre-Registration is now open";
