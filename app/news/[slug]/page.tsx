@@ -12,7 +12,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
   const post = await getNewsBySlug(slug);
   if (!post) return notFound();
 
-  const rawHtml = await marked.parse(post.content);
+  const rawHtml = await marked.parse(post.content, { async: true });
   const html = sanitizeHtml(rawHtml);
 
   return <NewsPost post={post} htmlContent={html} />;

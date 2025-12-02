@@ -95,7 +95,7 @@ describe('NewsPostPage', () => {
 
     await NewsPostPage({ params: Promise.resolve({ slug: 'test-article' }) });
 
-    expect(marked.parse).toHaveBeenCalledWith('# Test Content');
+    expect(marked.parse).toHaveBeenCalledWith('# Test Content', { async: true });
   });
 
   it('sanitizes HTML content', async () => {
