@@ -9,19 +9,12 @@ vi.mock('@/lib/directus', () => ({
   getNewsBySlug: vi.fn(),
 }));
 
-// Mock marked
-vi.mock('marked', () => ({
-  marked: {
-    parse: vi.fn(async (content: string) => {
-      if (content === '# Test Content') return '<h1>Test Content</h1>';
-      return '<p>Parsed content</p>';
-    }),
-  },
-}));
-
-// Mock sanitize-html
-vi.mock('sanitize-html', () => ({
-  default: vi.fn((html: string) => html),
+// Mock markdown-utils
+vi.mock('@/lib/markdown-utils', () => ({
+  parseMarkdown: vi.fn(async (content: string) => {
+    if (content === '# Test Content') return '<h1>Test Content</h1>';
+    return '<p>Parsed content</p>';
+  }),
 }));
 
 // Mock next/navigation
@@ -81,7 +74,7 @@ describe('NewsPostPage', () => {
   });
 
   it('parses markdown content', async () => {
-    const { marked } = await import('marked');
+    const { parseMarkdown } = await import('@/lib/markdown-utils');
     const mockPost = {
       id: 1,
       slug: 'test-article',
@@ -95,25 +88,7 @@ describe('NewsPostPage', () => {
 
     await NewsPostPage({ params: Promise.resolve({ slug: 'test-article' }) });
 
-    expect(marked.parse).toHaveBeenCalledWith('# Test Content');
-  });
-
-  it('sanitizes HTML content', async () => {
-    const sanitizeHtml = (await import('sanitize-html')).default;
-    const mockPost = {
-      id: 1,
-      slug: 'test-article',
-      title: 'Test Article',
-      published_at: '2024-06-15',
-      excerpt: 'Test excerpt',
-      content: '# Test Content',
-    };
-
-    getNewsBySlug.mockResolvedValue(mockPost);
-
-    await NewsPostPage({ params: Promise.resolve({ slug: 'test-article' }) });
-
-    expect(sanitizeHtml).toHaveBeenCalled();
+    expect(parseMarkdown).toHaveBeenCalledWith('# Test Content');
   });
 
   it('passes parsed and sanitized HTML to NewsPost', async () => {
