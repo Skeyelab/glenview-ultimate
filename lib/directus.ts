@@ -413,8 +413,18 @@ function appendTransformParams(
 export function getDirectusAssetUrl(
   fileId: string | null | undefined,
   options?: DirectusAssetTransformOptions,
+  forceProxy = false,
 ): string | null {
   if (!fileId) return null;
+
+  // If forceProxy is explicitly true (for client components), always use proxy
+  // This prevents hydration mismatches in client components
+  if (forceProxy) {
+    const params = new URLSearchParams();
+    appendTransformParams(params, options);
+    const queryString = params.toString();
+    return `/api/assets/${fileId}${queryString ? `?${queryString}` : ""}`;
+  }
 
   // Server-side: if we have DIRECTUS_URL and DIRECTUS_STATIC_TOKEN, use direct URL with token
   const baseUrl = process.env.DIRECTUS_URL;
@@ -427,8 +437,7 @@ export function getDirectusAssetUrl(
     return `${baseUrl}/assets/${fileId}?${queryString}`;
   }
 
-  // Client-side or when token not available: use API proxy route
-  // This handles authentication server-side via the API route
+  // Fallback: use API proxy route
   const params = new URLSearchParams();
   appendTransformParams(params, options);
   const queryString = params.toString();

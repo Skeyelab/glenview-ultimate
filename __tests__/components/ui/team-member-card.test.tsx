@@ -84,6 +84,7 @@ describe('TeamMemberCard', () => {
     expect(getDirectusAssetUrl).toHaveBeenCalledWith(
       'photo-id',
       expect.objectContaining({ width: 900, height: 900, fit: 'cover', quality: 80 }),
+      true,
     );
   });
 
@@ -92,6 +93,7 @@ describe('TeamMemberCard', () => {
     expect(getDirectusAssetUrl).toHaveBeenCalledWith(
       'photo-id',
       expect.objectContaining({ width: 400, height: 400 }),
+      true,
     );
   });
 

@@ -39,7 +39,8 @@ describe('getDirectusAssetUrl', () => {
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
-    expect(getDirectusAssetUrl('test-id')).toBe('https://private.example.com/assets/test-id?access_token=test-token')
+    // Explicitly pass false to test server-side behavior (not forcing proxy)
+    expect(getDirectusAssetUrl('test-id', undefined, false)).toBe('https://private.example.com/assets/test-id?access_token=test-token')
   })
 
   it('should use API proxy route when DIRECTUS_STATIC_TOKEN is not available', async () => {
@@ -55,7 +56,8 @@ describe('getDirectusAssetUrl', () => {
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
-    expect(getDirectusAssetUrl('c3db7679-c7b9-4d7d-add9-761a96e59b86')).toBe(
+    // Explicitly pass false to test server-side behavior (not forcing proxy)
+    expect(getDirectusAssetUrl('c3db7679-c7b9-4d7d-add9-761a96e59b86', undefined, false)).toBe(
       'https://example.com/assets/c3db7679-c7b9-4d7d-add9-761a96e59b86?access_token=test-token'
     )
   })
@@ -75,8 +77,9 @@ describe('getDirectusAssetUrl', () => {
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
+    // Explicitly pass false to test server-side behavior (not forcing proxy)
     expect(
-      getDirectusAssetUrl('transform-id', { quality: 70, format: 'webp' }),
+      getDirectusAssetUrl('transform-id', { quality: 70, format: 'webp' }, false),
     ).toBe('https://example.com/assets/transform-id?access_token=test-token&quality=70&format=webp')
   })
 })
