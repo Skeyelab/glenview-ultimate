@@ -6,7 +6,7 @@
 @theme {
   /* Custom brand color - using hex directly for simplicity */
   --color-brand-green: #175030;
-  
+
   /* Custom font family */
   --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
 }
@@ -29,16 +29,20 @@
   /* Container with center and padding */
   .container {
     width: 100%;
+    max-width: 64rem !important;
     margin-left: auto;
     margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
-    
-    @media (min-width: 64rem) {
-      max-width: 64rem;
+  }
+
+  /* Override Tailwind's default container responsive breakpoints */
+  @media (min-width: 96rem) {
+    .container {
+      max-width: 64rem !important;
     }
   }
-  
+
   .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-brand-green text-sm font-medium hover:bg-white/90 transition-colors; }
   .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10; }
   .input { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
