@@ -17,7 +17,7 @@ A Next.js website for [Glenview Ultimate](https://glenview-ultimate.org), a yout
 
 - **Next.js 16** - React framework with App Router
 - **TypeScript** - Type-safe development
-- **Tailwind CSS v4** - Utility-first styling with `@tailwindcss/forms` and `@tailwindcss/typography`
+- **Tailwind CSS** - Utility-first styling with `@tailwindcss/forms` and `@tailwindcss/typography`
 - **Directus SDK** - CMS integration for content management
 - **Directus Visual Editing** - In-context content editing
 - **Vitest & React Testing Library** - Testing framework

@@ -1,15 +1,6 @@
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
-@plugin "@tailwindcss/typography";
-
-/* Tailwind v4 Theme Configuration */
-@theme {
-  /* Custom brand color - using hex directly for simplicity */
-  --color-brand-green: #175030;
-  
-  /* Custom font family */
-  --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Light theme baseline */
 :root { color-scheme: light; }
@@ -17,7 +8,7 @@
 @layer base {
   html, body {
     @apply min-h-screen antialiased;
-    background-color: var(--color-brand-green);
+    background-color: #175230;
     color: #ffffff;
   }
   a { @apply text-inherit no-underline; }
@@ -26,24 +17,11 @@
 }
 
 @layer components {
-  /* Container with center and padding */
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    
-    @media (min-width: 64rem) {
-      max-width: 64rem;
-    }
-  }
-  
-  .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-brand-green text-sm font-medium hover:bg-white/90 transition-colors; }
+  .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-[#175230] text-sm font-medium hover:bg-white/90 transition-colors; }
   .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10; }
   .input { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
   .select { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2; }
-  .select option { @apply bg-brand-green text-white; }
+  .select option { @apply bg-[#175230] text-white; }
   .textarea { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
   .label { @apply block text-white text-sm mb-1; }
   .card { @apply rounded-xl border border-white/20 bg-white/5 p-4; }
