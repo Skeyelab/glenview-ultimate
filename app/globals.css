@@ -1,6 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* Custom brand color - using hex directly for simplicity */
+  --color-brand-green: #175030;
+  
+  /* Custom font family */
+  --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+  
+  /* Container max-width overrides */
+  --container-lg: 64rem;
+  --container-2xl: 64rem;
+}
 
 /* Light theme baseline */
 :root { color-scheme: light; }
