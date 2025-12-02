@@ -1,9 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Light theme baseline */
 :root { color-scheme: light; }
+
+@theme {
+  --color-brand-green: #175030;
+  --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+}
 
 @layer base {
   html, body {

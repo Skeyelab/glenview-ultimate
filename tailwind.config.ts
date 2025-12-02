@@ -7,17 +7,12 @@ const config: Config = {
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        'brand-green': '#175030',
-      },
-      fontFamily: {
-        sans: ['var(--font-lexend)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      },
-      container: {
-        center: true,
-        padding: "1rem",
-        screens: { lg: "64rem", "2xl": "64rem" },
+    container: {
+      center: true,
+      padding: "1rem",
+      screens: {
+        lg: "64rem",
+        "2xl": "64rem",
       },
     },
   },
