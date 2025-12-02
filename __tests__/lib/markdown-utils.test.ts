@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { parseMarkdown } from '@/lib/markdown-utils';
+import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
+
 // Mock marked
 vi.mock('marked', () => ({
   marked: {
@@ -12,10 +16,6 @@ vi.mock('marked', () => ({
 vi.mock('sanitize-html', () => ({
   default: vi.fn((html: string) => html),
 }));
-
-import { parseMarkdown } from '@/lib/markdown-utils';
-import { marked } from 'marked';
-import sanitizeHtml from 'sanitize-html';
 
 const mockParse = vi.mocked(marked.parse);
 const mockSanitizeHtml = vi.mocked(sanitizeHtml);

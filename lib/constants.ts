@@ -1,7 +1,7 @@
 export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
 
 export const DEFAULT_CLUB_DESCRIPTION =
-  "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin Carrigan, his sister, and his father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'.";
+  "The Glenview Ultimate Frisbee Club is a community based & parent run youth sports program in Glenview Illinois. Started in 2026 by Colin and Riley Carrigan, along with their father. We teach the basics of Ultimate Frisbee with a heavy emphasis on 'Spirit of The Game'.";
 
 export const DEFAULT_WHAT_KIDS_LEARN = [
   "Rules of Ultimate",
