@@ -5,9 +5,9 @@ This repository is a Next.js + Directus starter for the Glenview Ultimate Frisbe
 ## Project Overview
 
 **Tech Stack:**
-- **Frontend:** Next.js 14 (App Router) with React 18, TypeScript 5.6
+- **Frontend:** Next.js 16 (App Router) with React 19, TypeScript 5.6
 - **Backend/CMS:** Directus (headless CMS)
-- **Styling:** Tailwind CSS 3.4 with custom utilities
+- **Styling:** Tailwind CSS 4.1 with custom utilities
 - **Testing:** Jest 29 with React Testing Library
 - **Code Quality:** ESLint with `eslint-config-love` (strict TypeScript rules)
 
