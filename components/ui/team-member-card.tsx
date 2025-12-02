@@ -32,12 +32,13 @@ export function TeamMemberCard({
   ...props
 }: TeamMemberCardProps): React.JSX.Element {
   const targetSize = squareImage ? SQUARE_PHOTO_SIZE : DEFAULT_PHOTO_SIZE;
+  // Force proxy route for client components to prevent hydration mismatches
   const photoUrl = getDirectusAssetUrl(member.photo, {
     width: targetSize,
     height: targetSize,
     fit: "cover",
     quality: PHOTO_QUALITY,
-  });
+  }, true);
   const roleTitle = getRoleDisplayTitle(member.role, member.squad);
   const normalizedRole = normalizeRole(member.role, member.squad);
   const isHeadCoach = normalizedRole === "head_coach";

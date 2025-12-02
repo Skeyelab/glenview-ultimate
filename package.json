@@ -20,11 +20,11 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@directus/sdk": "^20.1.1",
+    "@directus/sdk": "^20.2.0",
     "@directus/visual-editing": "1.1.0",
     "@radix-ui/react-slot": "^1.2.4",
     "marked": "12.0.2",
-    "next": "^15.1.0",
+    "next": "^16.0.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sanitize-html": "^2.17.0",
@@ -41,12 +41,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/sanitize-html": "^2.16.0",
-    "@typescript-eslint/eslint-plugin": "^8.46.4",
-    "@typescript-eslint/parser": "^8.46.4",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "@vitejs/plugin-react": "^5.1.1",
-    "@vitest/coverage-v8": "^4.0.13",
-    "@vitest/ui": "^4.0.13",
-    "autoprefixer": "10.4.20",
+    "@vitest/coverage-v8": "^4.0.14",
+    "@vitest/ui": "^4.0.14",
+    "autoprefixer": "10.4.22",
     "class-variance-authority": "0.7.0",
     "dotenv": "^16.4.0",
     "eslint": "^9.35.0",
@@ -56,11 +56,11 @@
     "eslint-plugin-promise": "^7.2.1",
     "jsdom": "^27.2.0",
     "lucide-react": "0.460.0",
-    "postcss": "8.4.47",
+    "postcss": "8.5.6",
     "tailwind-merge": "2.5.2",
     "tailwindcss": "3.4.10",
     "tsx": "^4.0.0",
     "typescript": "5.6.3",
-    "vitest": "^4.0.13"
+    "vitest": "^4.0.14"
   }
 }
