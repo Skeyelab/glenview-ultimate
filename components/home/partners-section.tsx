@@ -38,7 +38,8 @@ export function PartnersSection({
     <SectionCard title={title} className={className}>
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${minColumnWidth}, 1fr))` }}>
         {displayPartners.map((p) => {
-          const logoUrl = getDirectusAssetUrl(p.logo, { fit: "contain" });
+          // Force proxy route for client components to prevent hydration mismatches
+          const logoUrl = getDirectusAssetUrl(p.logo, { fit: "contain" }, true);
           return (
             <a
               key={p.id}

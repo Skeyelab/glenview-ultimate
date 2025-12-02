@@ -1,8 +1,7 @@
 import React from "react";
 import { getNewsBySlug } from "@/lib/directus";
-import { marked } from "marked";
+import { parseMarkdown } from "@/lib/markdown-utils";
 import { notFound } from "next/navigation";
-import sanitizeHtml from "sanitize-html";
 import { NewsPost } from "@/components/news/news-post";
 
 export const revalidate = 300;
@@ -12,8 +11,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
   const post = await getNewsBySlug(slug);
   if (!post) return notFound();
 
-  const rawHtml = await marked.parse(post.content);
-  const html = sanitizeHtml(rawHtml);
+  const html = await parseMarkdown(post.content);
 
   return <NewsPost post={post} htmlContent={html} />;
 }
