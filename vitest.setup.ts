@@ -1,6 +1,9 @@
 import '@testing-library/jest-dom/vitest'
 import { beforeAll, afterAll, vi } from 'vitest'
 
+// Polyfill Web APIs for Node.js environment (needed for Next.js server components)
+import { TextEncoder, TextDecoder } from 'util'
+
 // Suppress React act() warnings in tests
 // These warnings occur when state updates happen asynchronously in components
 // and are generally safe to ignore in test environments
@@ -23,9 +26,6 @@ beforeAll(() => {
 afterAll(() => {
   console.error = originalError
 })
-
-// Polyfill Web APIs for Node.js environment (needed for Next.js server components)
-import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder as typeof globalThis.TextEncoder
 global.TextDecoder = TextDecoder as typeof globalThis.TextDecoder
 

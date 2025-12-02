@@ -3,6 +3,9 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { beforeEach, vi } from 'vitest';
 
+import WhatIsUltimatePage from '@/app/what-is-ultimate/page';
+import * as directusModule from '@/lib/directus';
+
 // Mock sanitize-html
 vi.mock('sanitize-html', () => {
   return vi.fn((html: string) => html);
@@ -42,9 +45,6 @@ vi.mock('@/components/what-is-ultimate/video-grid', () => ({
     </div>
   ),
 }));
-
-import WhatIsUltimatePage from '@/app/what-is-ultimate/page';
-import * as directusModule from '@/lib/directus';
 
 describe('WhatIsUltimatePage', () => {
   const getWhatIsUltimate = vi.mocked(directusModule.getWhatIsUltimate);
