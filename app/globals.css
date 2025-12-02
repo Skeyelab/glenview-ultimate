@@ -9,10 +9,6 @@
   
   /* Custom font family */
   --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
-  
-  /* Container max-width overrides */
-  --container-lg: 64rem;
-  --container-2xl: 64rem;
 }
 
 /* Light theme baseline */
@@ -30,6 +26,19 @@
 }
 
 @layer components {
+  /* Container with center and padding */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+  }
+  
   .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-[#175230] text-sm font-medium hover:bg-white/90 transition-colors; }
   .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10; }
   .input { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
