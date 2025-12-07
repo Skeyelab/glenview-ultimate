@@ -70,8 +70,8 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    // Wait for useEffect to run
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Wait for useEffect to run (including the 100ms delay)
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     expect(mockIsVisualEditingEnabled).toHaveBeenCalled();
     expect(mockApplyVisualEditing).toHaveBeenCalledWith('https://example.com');
@@ -90,8 +90,8 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    // Wait for useEffect to run
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Wait for useEffect to run (including the 100ms delay)
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     unmount();
 
@@ -111,7 +111,7 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Change pathname
     mockPathname = '/about';
@@ -123,7 +123,7 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Should be called again due to pathname change
     expect(mockApplyVisualEditing).toHaveBeenCalledTimes(2);
@@ -142,7 +142,7 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Change search params
     const newSearchParams = new URLSearchParams();
@@ -157,7 +157,7 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Should be called again due to search params change
     expect(mockApplyVisualEditing).toHaveBeenCalledTimes(2);
@@ -177,7 +177,8 @@ describe('HomeVisualEditingProvider', () => {
       </HomeVisualEditingProvider>,
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Wait for useEffect to run (including the 100ms delay)
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     expect(mockApplyVisualEditing).toHaveBeenCalled();
   });

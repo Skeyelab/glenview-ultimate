@@ -26,6 +26,9 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
 
+  // Ensure we have a valid website ID for visual editing
+  const websiteId = website?.id;
+
   const heroTitle = website?.hero_title ?? HERO_TITLE;
   const heroBlock = website?.hero_block ?? HERO_BLOCK;
   const heroCtaLabel = website?.hero_cta_label ?? HERO_CTA_LABEL;
@@ -36,25 +39,7 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
 
   return (
-    <section
-      className={cn("text-center space-y-4", className)}
-      {...(editingEnabled
-        ? {
-            "data-directus": setAttr({
-              collection: "Website",
-              item: "home",
-              fields: [
-                "hero_title",
-                "hero_block",
-                "hero_cta_label",
-                "hero_cta_url",
-                "hero_pre_registration_text",
-              ],
-              mode: "popover",
-            }),
-          }
-        : {})}
-    >
+    <section className={cn("text-center space-y-4", className)}>
       {logoUrl && (
         <div className="flex justify-center mb-6">
           <Image
@@ -69,11 +54,11 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
       )}
       <h1
         className="text-3xl md:text-5xl font-bold text-white"
-        {...(editingEnabled
+        {...(editingEnabled && websiteId
           ? {
               "data-directus": setAttr({
                 collection: "Website",
-                item: "home",
+                item: websiteId,
                 fields: ["hero_title"],
                 mode: "popover",
               }),
@@ -81,16 +66,16 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
           : {})}
       >
         {heroTitle}
-      </h1>
+    </h1>
       {sanitizedHeroBlock && (
         <div
           className="text-lg text-white/90 max-w-2xl mx-auto prose prose-invert"
           dangerouslySetInnerHTML={{ __html: sanitizedHeroBlock }}
-          {...(editingEnabled
+          {...(editingEnabled && websiteId
             ? {
                 "data-directus": setAttr({
                   collection: "Website",
-                  item: "home",
+                  item: websiteId,
                   fields: ["hero_block"],
                   mode: "popover",
                 }),
@@ -102,11 +87,11 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
         <Link
           className="button"
           href={heroCtaUrl}
-          {...(editingEnabled
+          {...(editingEnabled && websiteId
             ? {
                 "data-directus": setAttr({
                   collection: "Website",
-                  item: "home",
+                  item: websiteId,
                   fields: ["hero_cta_label", "hero_cta_url"],
                   mode: "popover",
                 }),
@@ -119,11 +104,11 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
       {heroPreRegistrationText && (
         <p
           className="text-sm text-white/70 mt-2"
-          {...(editingEnabled
+          {...(editingEnabled && websiteId
             ? {
                 "data-directus": setAttr({
                   collection: "Website",
-                  item: "home",
+                  item: websiteId,
                   fields: ["hero_pre_registration_text"],
                   mode: "popover",
                 }),
