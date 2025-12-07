@@ -7,7 +7,7 @@ import { LatestContentCard } from "@/components/home/latest-content-card";
 import { PartnersSection } from "@/components/home/partners-section";
 import { HomeVisualEditingProvider } from "../components/home/home-visual-editing-provider";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function HomePage(): Promise<React.JSX.Element> {
   const [partners, season, website, newsList, videos] = await Promise.all([

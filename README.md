@@ -39,6 +39,7 @@ DIRECTUS_URL=https://your-directus.example.com
 DIRECTUS_STATIC_TOKEN=YOUR_STATIC_TOKEN
 NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
 NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+REVALIDATE_SECRET=your_webhook_secret_token
 ```
 
 ### Commands
@@ -150,6 +151,7 @@ The project includes the following API routes:
 
 - **`/api/register`** - POST endpoint for registration submissions
 - **`/api/assets/[...path]`** - Proxy route for Directus assets (handles authentication)
+- **`/api/revalidate`** - Webhook endpoint for cache invalidation (receives Directus webhooks)
 
 For detailed API documentation, see [API.md](./API.md).
 

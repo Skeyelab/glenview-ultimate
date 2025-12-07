@@ -7,7 +7,7 @@ import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
 import { SeasonCalendar } from "@/components/schedule/season-calendar";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();
