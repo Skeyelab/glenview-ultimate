@@ -1,4 +1,4 @@
 ---
 alwaysApply: true
 ---
-always run nvm use when opening a new shell
+we use version 22.19.0
