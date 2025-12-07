@@ -90,6 +90,23 @@ describe('WhatIsUltimatePage', () => {
     expect(screen.getByText(/HTML/)).toBeInTheDocument();
   });
 
+  it('should use Directus data when available instead of defaults', async () => {
+    const mockWhatIsUltimate = {
+      id: 1,
+      Description: '<p class="text-white/90">Directus description content from CMS</p>',
+    };
+    getWhatIsUltimate.mockResolvedValue(mockWhatIsUltimate);
+    getWhatIsUltimateVideos.mockResolvedValue([]);
+
+    const page = await WhatIsUltimatePage();
+    render(page);
+
+    // Should show Directus data, not defaults
+    expect(screen.getByText(/Directus description content from CMS/)).toBeInTheDocument();
+    // Should NOT show fallback paragraphs when Directus data is available
+    expect(screen.queryByText(/emphasizing sportsmanship and fair play/i)).not.toBeInTheDocument();
+  });
+
   it('renders the Learn More section heading', async () => {
     getWhatIsUltimate.mockResolvedValue(null);
     getWhatIsUltimateVideos.mockResolvedValue([]);

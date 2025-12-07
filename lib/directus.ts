@@ -333,7 +333,11 @@ export function getAbout(): Promise<About | null> {
         fields: ["*"],
       }),
     );
-    return data[0] ?? null;
+    // About is a singleton collection, so data could be an array or a single object
+    if (Array.isArray(data)) {
+      return data[0] ?? null;
+    }
+    return data ?? null;
   });
 }
 
@@ -345,7 +349,11 @@ export function getWhatIsUltimate(): Promise<WhatIsUltimate | null> {
         fields: ["*"],
       }),
     );
-    return data[0] ?? null;
+    // WhatIsUltimate is a singleton collection, so data could be an array or a single object
+    if (Array.isArray(data)) {
+      return data[0] ?? null;
+    }
+    return data ?? null;
   });
 }
 
