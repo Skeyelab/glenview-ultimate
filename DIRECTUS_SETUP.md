@@ -17,7 +17,10 @@ DIRECTUS_URL=https://your-directus.example.com
 DIRECTUS_STATIC_TOKEN=your_static_token_here
 NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
 NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+REVALIDATE_SECRET=your_webhook_secret_token
 ```
+
+**Note:** `REVALIDATE_SECRET` is used to secure the webhook endpoint for cache invalidation. Generate a strong random string for production use.
 
 ## Required Collections
 
@@ -186,6 +189,43 @@ Visual editing works with:
 - Hero section content (Website collection)
 - Partners section (Partners collection)
 - Leadership section (Team collection)
+
+## Cache Invalidation Webhook
+
+The application supports on-demand cache invalidation via Directus webhooks. When content is updated in Directus, the webhook immediately invalidates the affected Next.js pages, allowing content editors to see changes instantly.
+
+### Flow Configuration
+
+A Directus flow (`Update Webhook`) is configured to trigger on content updates:
+
+- **Trigger Events**: `items.create`, `items.update`, `items.delete`
+- **Collections**: Team, Registrations, Schedule, Partners, Website, About, WhatIsUltimateVideos, WhatIsUltimate, News
+- **Operation**: HTTP Request to `/api/revalidate` endpoint
+
+### Webhook Endpoint
+
+The webhook endpoint (`/api/revalidate`) requires:
+- **Secret Token**: Must match `REVALIDATE_SECRET` environment variable
+- **Header**: `X-Revalidate-Secret` with the secret token, OR
+- **Body**: `secret` field with the secret token
+- **Payload**: JSON with `event`, `collection`, and optional `payload` fields
+
+### Collection to Page Mapping
+
+The webhook automatically maps Directus collections to Next.js pages:
+
+- `Website` → `/` (home page)
+- `About` → `/about`
+- `Team` → `/about`
+- `WhatIsUltimate` → `/what-is-ultimate`
+- `WhatIsUltimateVideos` → `/what-is-ultimate`, `/` (home page)
+- `Schedule` → `/schedule`, `/` (home page)
+- `Partners` → `/` (home page)
+- `News` → `/news`, `/news/[slug]` (when slug is provided)
+
+### Fallback Revalidation
+
+Pages use ISR (Incremental Static Regeneration) with a 1-hour revalidation period as a fallback. This ensures content stays fresh even if webhooks fail, while webhooks provide instant updates when content changes.
 
 ## Fallback Data
 

@@ -4,7 +4,7 @@ import { parseMarkdown } from "@/lib/markdown-utils";
 import { notFound } from "next/navigation";
 import { NewsPost } from "@/components/news/news-post";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }): Promise<React.JSX.Element> {
   const { slug } = await params;

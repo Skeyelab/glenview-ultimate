@@ -29,6 +29,7 @@ DIRECTUS_URL=https://your-directus.example.com
 DIRECTUS_STATIC_TOKEN=your_production_static_token
 NEXT_PUBLIC_DIRECTUS_URL=https://your-directus.example.com
 NEXT_PUBLIC_SITE_NAME=Glenview Ultimate
+REVALIDATE_SECRET=your_webhook_secret_token
 ```
 
 **Security Notes:**

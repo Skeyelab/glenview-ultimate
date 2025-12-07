@@ -157,6 +157,120 @@ Returns the image file with appropriate `Content-Type` header and caching header
 curl https://glenview-ultimate.org/api/assets/c3db7679-c7b9-4d7d-add9-761a96e59b86?width=400&quality=80
 ```
 
+## Cache Revalidation API
+
+### `POST /api/revalidate`
+
+Webhook endpoint for cache invalidation. Receives notifications from Directus when content is updated and immediately revalidates affected Next.js pages.
+
+**Note:** This endpoint is intended for use by Directus webhooks only. It requires authentication via a secret token.
+
+#### Request Headers
+
+- `Content-Type`: `application/json` (required)
+- `Authorization`: `Bearer <token>` - Secret token matching `REVALIDATE_SECRET` environment variable (required, unless provided via other methods)
+- `X-Revalidate-Secret`: Secret token matching `REVALIDATE_SECRET` environment variable (alternative to Authorization header)
+
+#### Request Body
+
+```typescript
+{
+  event: string;                    // Required: Event type ("items.create", "items.update", "items.delete")
+  collection: string;                // Required: Directus collection name
+  payload?: {                       // Optional: Additional payload data
+    key?: Array<{                   // Optional: Array of affected items
+      id?: number;                  // Optional: Item ID
+      slug?: string;                // Optional: Item slug (for News collection)
+    }>;
+  };
+  secret?: string;                   // Optional: Secret token (alternative to header)
+}
+```
+
+#### Success Response
+
+**Status:** `200 OK`
+
+```json
+{
+  "revalidated": true,
+  "collection": "News",
+  "paths": ["/news", "/news/test-article"]
+}
+```
+
+#### Error Responses
+
+**Status:** `400 Bad Request` - Missing required field or invalid payload
+
+```json
+{
+  "error": "Missing required field: collection"
+}
+```
+
+**Status:** `401 Unauthorized` - Invalid or missing secret token
+
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Collection to Page Mapping
+
+The endpoint automatically maps Directus collections to Next.js pages:
+
+- `Website` → `/` (home page)
+- `About` → `/about`
+- `Team` → `/about`
+- `WhatIsUltimate` → `/what-is-ultimate`
+- `WhatIsUltimateVideos` → `/what-is-ultimate`, `/` (home page)
+- `Schedule` → `/schedule`, `/` (home page)
+- `Partners` → `/` (home page)
+- `News` → `/news`, `/news/[slug]` (when slug is provided in payload)
+
+#### Example Requests
+
+Using Authorization Bearer token (recommended for Directus flows):
+
+```bash
+curl -X POST https://glenview-ultimate.org/api/revalidate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-secret-token" \
+  -d '{
+    "event": "items.update",
+    "collection": "News",
+    "payload": {
+      "key": [{"id": 1, "slug": "test-article"}]
+    }
+  }'
+```
+
+Using X-Revalidate-Secret header:
+
+```bash
+curl -X POST https://glenview-ultimate.org/api/revalidate \
+  -H "Content-Type: application/json" \
+  -H "X-Revalidate-Secret: your-secret-token" \
+  -d '{
+    "event": "items.update",
+    "collection": "News",
+    "payload": {
+      "key": [{"id": 1, "slug": "test-article"}]
+    }
+  }'
+```
+
+#### Security
+
+- The endpoint requires a secret token that matches the `REVALIDATE_SECRET` environment variable
+- The token can be provided via:
+  - `Authorization: Bearer <token>` header (recommended for Directus flows)
+  - `X-Revalidate-Secret` header
+  - `secret` field in the request body
+- Requests without a valid secret token are rejected with a 401 Unauthorized response
+
 ## Implementation Details
 
 ### Registration Endpoint
@@ -172,4 +286,12 @@ curl https://glenview-ultimate.org/api/assets/c3db7679-c7b9-4d7d-add9-761a96e59b
 - **Purpose**: Proxies Directus asset requests to handle authentication server-side
 - **Caching**: Long-term caching headers for performance
 - **Security**: Access token is added server-side, never exposed to client
+
+### Revalidation Endpoint
+
+- **Location**: `app/api/revalidate/route.ts`
+- **Purpose**: Receives webhook notifications from Directus and invalidates Next.js page cache
+- **Security**: Requires secret token authentication via `REVALIDATE_SECRET` environment variable
+- **Cache Strategy**: Uses `revalidatePath` from Next.js to invalidate specific pages
+- **Integration**: Configured via Directus flow that triggers on content updates
 
