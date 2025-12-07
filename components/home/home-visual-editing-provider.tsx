@@ -19,6 +19,9 @@ export function HomeVisualEditingProvider({
     let mounted = true;
     async function run() {
       if (!isVisualEditingEnabled(search)) return;
+      // Small delay to ensure DOM is fully updated with React changes
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (!mounted) return;
       const result = await applyVisualEditing(directusUrl);
       if (!result) return;
       cleanupRef.current = result.remove;
