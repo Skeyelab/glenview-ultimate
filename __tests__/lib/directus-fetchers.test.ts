@@ -151,6 +151,81 @@ describe('directus fetchers', () => {
       await expect(getAbout()).resolves.toBeNull();
     });
 
+    it('getAbout handles JSON field what_kids_learn as array', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'About') {
+          return [
+            {
+              id: 1,
+              club_description: 'Test description',
+              what_kids_learn: ['Rule 1', 'Rule 2', 'Rule 3'],
+            },
+          ];
+        }
+        return [];
+      });
+
+      const { getAbout } = await import('@/lib/directus');
+      const result = await getAbout();
+      expect(result).toEqual({
+        id: 1,
+        club_description: 'Test description',
+        what_kids_learn: ['Rule 1', 'Rule 2', 'Rule 3'],
+      });
+      expect(Array.isArray(result?.what_kids_learn)).toBe(true);
+    });
+
+    it('getAbout handles singleton collection correctly (array response)', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'About') {
+          return [{ id: 1, club_description: 'Singleton data', what_kids_learn: null }];
+        }
+        return [];
+      });
+
+      const { getAbout } = await import('@/lib/directus');
+      const result = await getAbout();
+      expect(result).not.toBeNull();
+      expect(result?.id).toBe(1);
+    });
+
+    it('getWhatIsUltimate returns first or null', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'WhatIsUltimate') {
+          return [{ id: 1, Description: 'Test description' }];
+        }
+        return [];
+      });
+
+      const { getWhatIsUltimate } = await import('@/lib/directus');
+      await expect(getWhatIsUltimate()).resolves.toEqual({ id: 1, Description: 'Test description' });
+    });
+
+    it('getWhatIsUltimate returns null when API returns empty', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'WhatIsUltimate') return [];
+        return [];
+      });
+
+      const { getWhatIsUltimate } = await import('@/lib/directus');
+      await expect(getWhatIsUltimate()).resolves.toBeNull();
+    });
+
+    it('getWhatIsUltimate handles singleton collection correctly (array response)', async () => {
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'WhatIsUltimate') {
+          return [{ id: 1, Description: 'Singleton description' }];
+        }
+        return [];
+      });
+
+      const { getWhatIsUltimate } = await import('@/lib/directus');
+      const result = await getWhatIsUltimate();
+      expect(result).not.toBeNull();
+      expect(result?.id).toBe(1);
+      expect(result?.Description).toBe('Singleton description');
+    });
+
     it('getTeam and getPartners return arrays', async () => {
       mockRequest.mockImplementation(async (arg: any) => {
         if (arg?.collection === 'Team') return [{ id: 1, name: 'Alice', role: 'Coach' }];

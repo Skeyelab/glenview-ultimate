@@ -60,7 +60,41 @@ describe('AboutPage', () => {
     const { getByTestId } = render(page);
 
     expect(getByTestId('about-header')).toHaveTextContent('Test club description');
+    expect(getByTestId('what-kids-learn')).toHaveTextContent('["Skill 1","Skill 2"]');
     expect(getByTestId('team-leadership')).toHaveTextContent('1 members');
+  });
+
+  it('should use Directus data when available instead of defaults', async () => {
+    const mockAbout = {
+      id: 1,
+      club_description: 'Directus club description from CMS',
+      what_kids_learn: ['Directus skill 1', 'Directus skill 2', 'Directus skill 3'],
+    };
+    getAbout.mockResolvedValue(mockAbout);
+    getTeam.mockResolvedValue([]);
+
+    const page = await AboutPage();
+    const { getByTestId } = render(page);
+
+    // Should show Directus data, not defaults
+    expect(getByTestId('about-header')).toHaveTextContent('Directus club description from CMS');
+    expect(getByTestId('what-kids-learn')).toHaveTextContent('Directus skill 1');
+    expect(getByTestId('what-kids-learn')).toHaveTextContent('Directus skill 2');
+    expect(getByTestId('what-kids-learn')).toHaveTextContent('Directus skill 3');
+  });
+
+  it('should fall back to defaults when Directus returns null', async () => {
+    getAbout.mockResolvedValue(null);
+    getTeam.mockResolvedValue([]);
+
+    const page = await AboutPage();
+    const { getByTestId } = render(page);
+
+    // Should show default values
+    const header = getByTestId('about-header');
+    expect(header).toBeInTheDocument();
+    // Default description should be present (from constants)
+    expect(header.textContent).toBeTruthy();
   });
 
   it('should fetch about and team data', async () => {
