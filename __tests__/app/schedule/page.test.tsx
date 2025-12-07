@@ -1,89 +1,43 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import { beforeEach, vi } from 'vitest';
-import SchedulePage from '@/app/schedule/page';
-import * as directusModule from '@/lib/directus';
-import * as scheduleUtilsModule from '@/lib/schedule-utils';
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { beforeEach, afterEach, vi } from "vitest";
+import SchedulePage from "@/app/schedule/page";
+import * as directus from "@/lib/directus";
+import { mockSchedule } from "@/__tests__/fixtures/schedule";
 
-// Mock directus functions
-vi.mock('@/lib/directus', () => ({
+vi.mock("@/lib/directus", () => ({
   getSchedule: vi.fn(),
 }));
 
-// Mock schedule utils
-vi.mock('@/lib/schedule-utils', () => ({
-  selectUpcomingEvents: vi.fn((events) => events.filter((e: any) => e.date >= new Date().toISOString())),
-  groupEventsByMonth: vi.fn((events) => ({ '2024-01': events })),
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock components
-vi.mock('@/components/schedule/schedule-header', () => ({
-  ScheduleHeader: () => <div data-testid="schedule-header">Schedule Header</div>,
-}));
-
-vi.mock('@/components/schedule/upcoming-events-card', () => ({
-  UpcomingEventsCard: ({ events }: any) => <div data-testid="upcoming-events">{events?.length || 0} events</div>,
-}));
-
-vi.mock('@/components/schedule/highlights-card', () => ({
-  SeasonHighlightsCard: ({ highlights }: any) => <div data-testid="highlights">{highlights?.length || 0} highlights</div>,
-}));
-
-vi.mock('@/components/schedule/season-timeline', () => ({
-  SeasonTimeline: ({ events }: any) => <div data-testid="timeline">{events?.length || 0} events</div>,
-}));
-
-vi.mock('@/components/schedule/season-calendar', () => ({
-  SeasonCalendar: ({ groups }: any) => <div data-testid="calendar">{Object.keys(groups || {}).length} months</div>,
-}));
-
-describe('SchedulePage', () => {
-  const getSchedule = vi.mocked(directusModule.getSchedule);
-  const selectUpcomingEvents = vi.mocked(scheduleUtilsModule.selectUpcomingEvents);
-  const groupEventsByMonth = vi.mocked(scheduleUtilsModule.groupEventsByMonth);
+describe("SchedulePage (integration)", () => {
+  const directusMock = vi.mocked(directus);
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-01-01T00:00:00Z"));
     vi.clearAllMocks();
+    directusMock.getSchedule.mockResolvedValue(mockSchedule);
   });
 
-  it('should render with empty schedule', async () => {
-    getSchedule.mockResolvedValue({ events: [], highlights: [] });
-    selectUpcomingEvents.mockReturnValue([]);
-    groupEventsByMonth.mockReturnValue({});
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
+  it("renders schedule header, upcoming events, highlights, timeline, and calendar with real components", async () => {
     const page = await SchedulePage();
-    const { getByTestId } = render(page);
+    render(page);
 
-    expect(getByTestId('schedule-header')).toBeInTheDocument();
-    expect(getByTestId('upcoming-events')).toBeInTheDocument();
-    expect(getByTestId('highlights')).toBeInTheDocument();
-  });
-
-  it('should render with schedule data', async () => {
-    const mockSchedule = {
-      events: [
-        { id: '1', title: 'Event 1', date: '2024-12-01' },
-        { id: '2', title: 'Event 2', date: '2024-12-15' },
-      ],
-      highlights: [{ id: '1', title: 'Highlight 1' }],
-    };
-
-    getSchedule.mockResolvedValue(mockSchedule);
-    selectUpcomingEvents.mockReturnValue(mockSchedule.events);
-    groupEventsByMonth.mockReturnValue({ '2024-12': mockSchedule.events });
-
-    const page = await SchedulePage();
-    const { getByTestId } = render(page);
-
-    expect(getByTestId('upcoming-events')).toHaveTextContent('2 events');
-    expect(getByTestId('highlights')).toHaveTextContent('1 highlights');
-  });
-
-  it('should fetch schedule data', async () => {
-    getSchedule.mockResolvedValue({ events: [], highlights: [] });
-
-    await SchedulePage();
-
-    expect(getSchedule).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("heading", { level: 1, name: /spring 2026 season/i })).toBeInTheDocument();
+    expect(screen.getByText(/Season runs from/i)).toBeInTheDocument();
+    expect(screen.getByText("Highlight 1")).toBeInTheDocument();
+    expect(screen.getByText("Highlight 2")).toBeInTheDocument();
+    expect(screen.getAllByText("Championship Game").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Practice Session").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Season Calendar/)).toBeInTheDocument();
   });
 });

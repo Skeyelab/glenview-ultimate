@@ -37,52 +37,30 @@ describe('Navbar', () => {
     delete process.env.NEXT_PUBLIC_DIRECTUS_URL;
   });
 
-  it('should render logo', () => {
+  it('renders brand and primary nav links', () => {
     render(<Navbar links={NAV_LINKS} />);
     expect(screen.getByText('Glenview Ultimate')).toBeInTheDocument();
-  });
-
-  it('should render desktop navigation', () => {
-    render(<Navbar links={NAV_LINKS} />);
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/register');
   });
 
-  it('should render register button', () => {
+  it('applies active styles to the current route', () => {
+    usePathname.mockReturnValue('/about');
     render(<Navbar links={NAV_LINKS} />);
-    const registerButton = screen.getByRole('link', { name: /register/i });
-    expect(registerButton).toBeInTheDocument();
-    expect(registerButton).toHaveAttribute('href', '/register');
+    const aboutLink = screen.getByRole('link', { name: /about/i });
+    expect(aboutLink).toHaveClass('bg-white/20', 'text-white');
   });
 
-  it('should toggle mobile menu when button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<Navbar links={NAV_LINKS} />);
-
-    const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
-    await user.click(menuButton);
-
-    // Mobile menu should be visible (check by id since there are multiple nav elements)
-    const mobileNav = document.getElementById('mobile-nav');
-    expect(mobileNav).toBeInTheDocument();
-  });
-
-  it('should close mobile menu when pathname changes', async () => {
+  it('toggles mobile menu and closes on route change', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<Navbar links={NAV_LINKS} />);
 
-    // Open menu first by clicking button
     const menuButton = screen.getByRole('button', { name: /toggle navigation/i });
     await user.click(menuButton);
-
-    // Verify menu is open
     expect(document.getElementById('mobile-nav')).toBeInTheDocument();
 
-    // Change pathname by updating the mock
     usePathname.mockReturnValue('/about');
     rerender(<Navbar links={NAV_LINKS} />);
-
-    // Menu should be closed (not visible)
-    const mobileNav = document.getElementById('mobile-nav');
-    expect(mobileNav).not.toBeInTheDocument();
+    expect(document.getElementById('mobile-nav')).not.toBeInTheDocument();
   });
 });
