@@ -11,7 +11,7 @@ describe('Footer', () => {
     expect(screen.getByText(`© ${currentYear} Glenview Ultimate`)).toBeInTheDocument();
   });
 
-  it('should render "made by ericdahl.dev" link', () => {
+  it('should render "made with love by ericdahl.dev" link', () => {
     render(<Footer />);
 
     const link = screen.getByRole('link', { name: /ericdahl\.dev/i });
