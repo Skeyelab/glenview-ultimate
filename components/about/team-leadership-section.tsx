@@ -49,7 +49,13 @@ export function TeamLeadershipSection({
       <h2 className="text-2xl font-bold text-white">{title}</h2>
       {captains.length > 0 || coach ? (
         <div className="space-y-4">
-          {/* Captains side by side */}
+          {/* Coach first, spanning full width */}
+          {coach && (
+            <div className="grid-2">
+              {renderMemberCard?.(coach) ?? <TeamMemberCard key={coach.id} member={coach} showEmail={false} />}
+            </div>
+          )}
+          {/* Captains below, side by side */}
           {captains.length > 0 && (
             <div className="grid-2">
               {captains.map((member) => (
@@ -57,12 +63,6 @@ export function TeamLeadershipSection({
                   {renderMemberCard?.(member) ?? <TeamMemberCard member={member} showEmail={false} />}
                 </React.Fragment>
               ))}
-            </div>
-          )}
-          {/* Coach below, spanning full width */}
-          {coach && (
-            <div className="grid-2">
-              {renderMemberCard?.(coach) ?? <TeamMemberCard key={coach.id} member={coach} showEmail={false} />}
             </div>
           )}
         </div>
