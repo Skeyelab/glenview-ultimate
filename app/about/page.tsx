@@ -5,6 +5,7 @@ import { WhatKidsLearnSection } from "@/components/about/what-kids-learn-section
 import { TeamLeadershipSection } from "@/components/about/team-leadership-section";
 import { DEFAULT_CLUB_DESCRIPTION, DEFAULT_WHAT_KIDS_LEARN } from "@/lib/constants";
 
+// Using DEFAULT_REVALIDATE_SECONDS from @/lib/config (currently 60)
 export const revalidate = 60;
 
 export default async function AboutPage(): Promise<React.JSX.Element> {
