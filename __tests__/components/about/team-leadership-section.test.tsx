@@ -97,10 +97,14 @@ describe('TeamLeadershipSection', () => {
     expect(screen.getByTestId('team-member-2')).toBeInTheDocument();
   });
 
-  it('renders coach below captains', () => {
-    render(<TeamLeadershipSection members={[mockBoysCaptain, mockHeadCoach]} />);
+  it('renders coach above captains', () => {
+    const { container } = render(<TeamLeadershipSection members={[mockBoysCaptain, mockHeadCoach]} />);
     expect(screen.getByTestId('team-member-1')).toBeInTheDocument();
     expect(screen.getByTestId('team-member-3')).toBeInTheDocument();
+    // Verify coach appears before captain in DOM order
+    const members = container.querySelectorAll('[data-testid^="team-member-"]');
+    expect(members[0]).toHaveAttribute('data-testid', 'team-member-3'); // Coach first
+    expect(members[1]).toHaveAttribute('data-testid', 'team-member-1'); // Captain second
   });
 
   it('orders captains by captainOrder prop', () => {
@@ -174,9 +178,14 @@ describe('TeamLeadershipSection', () => {
   });
 
   it('handles multiple captains and coach together', () => {
-    render(<TeamLeadershipSection members={[mockBoysCaptain, mockGirlsCaptain, mockHeadCoach]} />);
+    const { container } = render(<TeamLeadershipSection members={[mockBoysCaptain, mockGirlsCaptain, mockHeadCoach]} />);
     expect(screen.getByTestId('team-member-1')).toBeInTheDocument();
     expect(screen.getByTestId('team-member-2')).toBeInTheDocument();
     expect(screen.getByTestId('team-member-3')).toBeInTheDocument();
+    // Verify coach appears before captains in DOM order
+    const members = container.querySelectorAll('[data-testid^="team-member-"]');
+    expect(members[0]).toHaveAttribute('data-testid', 'team-member-3'); // Coach first
+    expect(members[1]).toHaveAttribute('data-testid', 'team-member-1'); // Boys captain second
+    expect(members[2]).toHaveAttribute('data-testid', 'team-member-2'); // Girls captain third
   });
 });
