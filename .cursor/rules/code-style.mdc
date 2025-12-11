@@ -3,6 +3,8 @@ description: Glenview Ultimate code style & architecture guardrails
 alwaysApply: true
 ---
 
+we prefer the most accepted coding format from major compaies
+
 ## TypeScript & Modules
 - Stick with TypeScript everywhere (`strict: true`); import `React` whenever you need JSX return types or hooks, and annotate component outputs as `React.JSX.Element`/`React.ReactElement`.
 - Prefer named exports for components and utilities; reserve default exports for Next.js route handlers or page components only.

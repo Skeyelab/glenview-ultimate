@@ -5,7 +5,7 @@ import { WhatKidsLearnSection } from "@/components/about/what-kids-learn-section
 import { TeamLeadershipSection } from "@/components/about/team-leadership-section";
 import { DEFAULT_CLUB_DESCRIPTION, DEFAULT_WHAT_KIDS_LEARN } from "@/lib/constants";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export default async function AboutPage(): Promise<React.JSX.Element> {
   const [about, teamMembers] = await Promise.all([getAbout(), getTeam()]);
