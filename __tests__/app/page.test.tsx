@@ -1,133 +1,59 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import { beforeEach, vi } from 'vitest';
-import HomePage from '@/app/page';
+import React from 'react'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { beforeEach, vi } from 'vitest'
+import * as directus from '@/lib/directus'
+import HomePage from '@/app/page'
 
-// Mock directus functions
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/',
+}))
+
+vi.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: any) => <img {...props} />,
+}))
+
 vi.mock('@/lib/directus', () => ({
   getPartners: vi.fn(),
   getSchedule: vi.fn(),
   getWebsite: vi.fn(),
   getNewsList: vi.fn(),
   getWhatIsUltimateVideos: vi.fn(),
-  getDirectusAssetUrl: vi.fn((id, options) => {
-    const query = options ? '?opts=true' : '';
-    return `https://example.com/assets/${id}${query}`;
-  }),
-}));
+  getDirectusAssetUrl: vi.fn(() => 'https://example.com/assets/logo.png'),
+}))
 
-// Mock components
-vi.mock('@/components/home/hero-section', () => ({
-  HeroSection: ({ season, logoUrl, website }: any) => (
-    <div data-testid="hero-section">
-      {season ? 'Has season' : 'No season'} - {logoUrl ? 'Has logo' : 'No logo'} - {website ? 'Has website' : 'No website'}
-    </div>
-  ),
-}));
+describe('HomePage (integration)', () => {
+  const mockPartners = [{ id: 'p1', name: 'Partner 1', url: 'https://p1.test', logo: 'logo-id' }]
+  const mockSchedule = { highlights: ['Highlight 1'], events: [] } as any
+  const mockWebsite = {
+    id: 1,
+    hero_title: 'Custom Hero',
+    hero_block: '<p>Welcome to Glenview Ultimate</p>',
+    hero_cta_label: 'Sign Up',
+    hero_cta_url: '/register',
+  }
+  const mockNews = [{ id: 1, slug: 'test', title: 'Test News', published_at: '2026-01-01', content: 'Content' }]
 
-vi.mock('@/components/home/season-highlights-card', () => ({
-  SeasonHighlightsCard: ({ highlights }: any) => (
-    <div data-testid="season-highlights">{highlights?.length || 0} highlights</div>
-  ),
-}));
-
-vi.mock('@/components/home/latest-content-card', () => ({
-  LatestContentCard: ({ latestNews, firstVideo }: any) => (
-    <div data-testid="latest-content">
-      {latestNews ? 'Has news' : 'No news'} - {firstVideo ? 'Has video' : 'No video'}
-    </div>
-  ),
-}));
-
-vi.mock('@/components/home/partners-section', () => ({
-  PartnersSection: ({ partners }: any) => <div data-testid="partners">{partners?.length || 0} partners</div>,
-}));
-
-vi.mock('@/components/home/home-visual-editing-provider', () => ({
-  HomeVisualEditingProvider: ({ children }: any) => <div data-testid="visual-editing">{children}</div>,
-}));
-
-describe('HomePage', () => {
-  let getPartners: any, getSchedule: any, getWebsite: any, getNewsList: any, getWhatIsUltimateVideos: any, getDirectusAssetUrl: any;
-
-  beforeEach(async () => {
-    const directus = await import('@/lib/directus');
-    getPartners = directus.getPartners;
-    getSchedule = directus.getSchedule;
-    getWebsite = directus.getWebsite;
-    getNewsList = directus.getNewsList;
-    getWhatIsUltimateVideos = directus.getWhatIsUltimateVideos;
-    getDirectusAssetUrl = directus.getDirectusAssetUrl;
-  });
+  const directusMock = vi.mocked(directus)
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    delete process.env.DIRECTUS_URL;
-  });
+    vi.clearAllMocks()
+    directusMock.getPartners.mockResolvedValue(mockPartners)
+    directusMock.getSchedule.mockResolvedValue(mockSchedule)
+    directusMock.getWebsite.mockResolvedValue(mockWebsite)
+    directusMock.getNewsList.mockResolvedValue(mockNews)
+    directusMock.getWhatIsUltimateVideos.mockResolvedValue([])
+  })
 
-  it('should render with empty data', async () => {
-    getPartners.mockResolvedValue([]);
-    getSchedule.mockResolvedValue(null);
-    getWebsite.mockResolvedValue(null);
-    getNewsList.mockResolvedValue([]);
-    getWhatIsUltimateVideos.mockResolvedValue([]);
+  it('renders hero, highlights, latest news, and partners using real components', async () => {
+    const page = await HomePage()
+    render(page)
 
-    const page = await HomePage();
-    const { getByTestId } = render(page);
-
-    expect(getByTestId('hero-section')).toBeInTheDocument();
-    expect(getByTestId('season-highlights')).toHaveTextContent('0 highlights');
-    expect(getByTestId('latest-content')).toBeInTheDocument();
-    expect(getByTestId('partners')).toHaveTextContent('0 partners');
-  });
-
-  it('should render with fetched data', async () => {
-    const mockPartners = [{ id: '1', name: 'Partner 1' }];
-    const mockSchedule = {
-      highlights: ['Highlight 1'],
-    };
-    const mockWebsite = { id: 1, hero_title: 'Test Title' };
-    const mockNews = [{ id: 1, slug: 'test', title: 'Test News', published_at: '2026-01-01', content: 'Content' }];
-
-    getPartners.mockResolvedValue(mockPartners);
-    getSchedule.mockResolvedValue(mockSchedule);
-    getWebsite.mockResolvedValue(mockWebsite);
-    getNewsList.mockResolvedValue(mockNews);
-    getWhatIsUltimateVideos.mockResolvedValue([]);
-
-    const page = await HomePage();
-    const { getByTestId } = render(page);
-
-    expect(getByTestId('partners')).toHaveTextContent('1 partners');
-    expect(getByTestId('season-highlights')).toHaveTextContent('1 highlights');
-    expect(getByTestId('latest-content')).toHaveTextContent('Has news');
-  });
-
-  it('should fetch all required data', async () => {
-    getPartners.mockResolvedValue([]);
-    getSchedule.mockResolvedValue(null);
-    getWebsite.mockResolvedValue(null);
-    getNewsList.mockResolvedValue([]);
-    getWhatIsUltimateVideos.mockResolvedValue([]);
-
-    await HomePage();
-
-    expect(getPartners).toHaveBeenCalledTimes(1);
-    expect(getSchedule).toHaveBeenCalledTimes(1);
-    expect(getWebsite).toHaveBeenCalledTimes(1);
-    expect(getNewsList).toHaveBeenCalledWith(1);
-    expect(getWhatIsUltimateVideos).toHaveBeenCalledTimes(1);
-  });
-
-  it('should get logo URL', async () => {
-    getPartners.mockResolvedValue([]);
-    getSchedule.mockResolvedValue(null);
-    getWebsite.mockResolvedValue(null);
-    getNewsList.mockResolvedValue([]);
-    getWhatIsUltimateVideos.mockResolvedValue([]);
-
-    await HomePage();
-
-    expect(getDirectusAssetUrl).toHaveBeenCalled();
-  });
-});
+    expect(screen.getByRole('heading', { level: 1, name: /custom hero/i })).toBeInTheDocument()
+    expect(screen.getByText('Highlight 1')).toBeInTheDocument()
+    expect(screen.getByText('Test News')).toBeInTheDocument()
+    expect(screen.getByText('Partner 1')).toBeInTheDocument()
+  })
+})

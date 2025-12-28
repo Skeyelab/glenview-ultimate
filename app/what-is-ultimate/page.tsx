@@ -5,7 +5,7 @@ import { DescriptionSection } from "@/components/what-is-ultimate/description-se
 import { VideoGrid, type VideoItem } from "@/components/what-is-ultimate/video-grid";
 import { DESCRIPTION_PARAGRAPHS } from "@/lib/constants";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function WhatIsUltimatePage(): Promise<React.JSX.Element> {
   const [whatIsUltimate, videos] = await Promise.all([
