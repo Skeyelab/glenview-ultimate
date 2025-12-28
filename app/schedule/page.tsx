@@ -7,8 +7,7 @@ import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
 import { SeasonCalendar } from "@/components/schedule/season-calendar";
 
-// Using DEFAULT_REVALIDATE_SECONDS from @/lib/config (currently 60)
-export const revalidate = 60;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();

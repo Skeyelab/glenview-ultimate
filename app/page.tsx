@@ -7,8 +7,7 @@ import { LatestContentCard } from "@/components/home/latest-content-card";
 import { PartnersSection } from "@/components/home/partners-section";
 import { HomeVisualEditingProvider } from "../components/home/home-visual-editing-provider";
 
-// Using DEFAULT_REVALIDATE_SECONDS from @/lib/config (currently 60)
-export const revalidate = 60;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function HomePage(): Promise<React.JSX.Element> {
   const [partners, season, website, newsList, videos] = await Promise.all([

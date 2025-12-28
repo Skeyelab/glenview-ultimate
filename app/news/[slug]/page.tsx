@@ -4,8 +4,7 @@ import { parseMarkdown } from "@/lib/markdown-utils";
 import { notFound } from "next/navigation";
 import { NewsPost } from "@/components/news/news-post";
 
-// Using DEFAULT_REVALIDATE_SECONDS from @/lib/config (currently 60)
-export const revalidate = 60;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }): Promise<React.JSX.Element> {
   const { slug } = await params;

@@ -5,8 +5,7 @@ import { DescriptionSection } from "@/components/what-is-ultimate/description-se
 import { VideoGrid, type VideoItem } from "@/components/what-is-ultimate/video-grid";
 import { DESCRIPTION_PARAGRAPHS } from "@/lib/constants";
 
-// Using DEFAULT_REVALIDATE_SECONDS from @/lib/config (currently 60)
-export const revalidate = 60;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function WhatIsUltimatePage(): Promise<React.JSX.Element> {
   const [whatIsUltimate, videos] = await Promise.all([
