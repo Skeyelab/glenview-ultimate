@@ -21,7 +21,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
   const highlights = season?.highlights ?? [];
   const latestNews = newsList.length > 0 ? newsList[0] : null;
   const firstVideo = videos.length > 0 ? videos[0] : null;
-  const logoUrl = getDirectusAssetUrl(LOGO_ID);
+  const logoUrl = getDirectusAssetUrl(LOGO_ID, { quality: 90 });
   const directusUrl = process.env.DIRECTUS_URL ?? "";
 
   return (
