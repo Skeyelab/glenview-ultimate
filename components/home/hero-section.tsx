@@ -45,9 +45,11 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
           <Image
             src={logoUrl}
             alt="Glenview Ultimate"
-            width={300}
-            height={300}
-            className="h-auto w-auto"
+            width={600}
+            height={600}
+            className="h-auto w-auto max-w-[300px]"
+            sizes="(max-width: 768px) 80vw, 300px"
+            quality={90}
             priority
           />
         </div>

@@ -83,7 +83,7 @@ describe('TeamMemberCard', () => {
     render(<TeamMemberCard member={mockTeamMember} />);
     expect(getDirectusAssetUrl).toHaveBeenCalledWith(
       'photo-id',
-      expect.objectContaining({ width: 900, height: 900, fit: 'cover', quality: 80 }),
+      expect.objectContaining({ width: 900, height: 900, fit: 'cover', quality: 90 }),
       true,
     );
   });
