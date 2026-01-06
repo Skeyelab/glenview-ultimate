@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const DEFAULT_PHOTO_SIZE = 900;
 const SQUARE_PHOTO_SIZE = 400;
-const PHOTO_QUALITY = 80;
+const PHOTO_QUALITY = 90;
 
 export interface TeamMemberCardProps extends React.HTMLAttributes<HTMLDivElement> {
   member: TeamMember;
@@ -53,6 +53,10 @@ export function TeamMemberCard({
   );
   const infoSectionClass = cn("flex-1 min-w-0", stackedLayout && "pt-4 md:pt-0");
 
+  // Image dimensions: square = 128x128, non-square = 208x256 on desktop, responsive on mobile
+  const imageWidth = squareImage ? 128 : 208;
+  const imageHeight = squareImage ? 128 : 256;
+
   return (
     <div className={cn("card", shouldSpanFull && "md:col-span-2", className)} {...props}>
       <div className={cn("flex", gapClass, stackedLayout && "flex-col md:flex-row")}>
@@ -62,9 +66,11 @@ export function TeamMemberCard({
             <Image
               src={photoUrl}
               alt={member.name}
-              width={96}
-              height={96}
+              width={imageWidth}
+              height={imageHeight}
               className="h-full w-full object-cover"
+              sizes={squareImage ? "128px" : "(max-width: 768px) 100vw, 208px"}
+              quality={PHOTO_QUALITY}
               onError={() => {
                 // eslint-disable-next-line no-console
                 console.error(`[TeamMemberCard] Failed to load image for ${member.name}:`, photoUrl);

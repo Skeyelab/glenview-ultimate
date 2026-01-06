@@ -6,6 +6,6 @@ describe('config', () => {
   });
 
   it('should export DEFAULT_REVALIDATE_SECONDS constant', () => {
-    expect(DEFAULT_REVALIDATE_SECONDS).toBe(300);
+    expect(DEFAULT_REVALIDATE_SECONDS).toBe(0);
   });
 });

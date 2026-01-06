@@ -56,9 +56,11 @@ export function PartnersSection({
                   <Image
                     src={logoUrl}
                     alt={p.name}
-                    width={120}
-                    height={80}
+                    width={240}
+                    height={160}
                     className="max-w-full max-h-full w-auto h-auto object-contain"
+                    sizes="(max-width: 768px) 160px, 240px"
+                    quality={90}
                   />
                 </div>
               )}

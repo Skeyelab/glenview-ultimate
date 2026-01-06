@@ -3,7 +3,7 @@ import { getNewsList } from "@/lib/directus";
 import { NewsHeader } from "@/components/news/news-header";
 import { NewsList } from "@/components/news/news-list";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic'; // @NextJS
 
 export default async function NewsIndex(): Promise<React.JSX.Element> {
   const posts = await getNewsList();
