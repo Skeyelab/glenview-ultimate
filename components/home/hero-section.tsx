@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { SeasonSchedule, Website } from "@/lib/directus";
+import type { Website } from "@/lib/directus";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { setAttr } from "@/lib/visual-editing";
@@ -12,17 +12,15 @@ import {
   HERO_BLOCK,
   HERO_CTA_LABEL,
   HERO_CTA_URL,
-  HERO_PRE_REGISTRATION_TEXT,
 } from "@/lib/constants";
 
 export interface HeroSectionProps {
-  season: SeasonSchedule | null;
   logoUrl: string | null;
   website: Website | null;
   className?: string;
 }
 
-export function HeroSection({ season, logoUrl, website, className }: HeroSectionProps): React.JSX.Element {
+export function HeroSection({ logoUrl, website, className }: HeroSectionProps): React.JSX.Element {
   const search = useSearchParams();
   const editingEnabled = search.get("visual-editing") === "true";
 
@@ -33,10 +31,9 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
   const heroBlock = website?.hero_block ?? HERO_BLOCK;
   const heroCtaLabel = website?.hero_cta_label ?? HERO_CTA_LABEL;
   const heroCtaUrl = website?.hero_cta_url ?? HERO_CTA_URL;
-  const heroPreRegistrationText = website?.hero_pre_registration_text ?? HERO_PRE_REGISTRATION_TEXT;
 
   const sanitizedHeroBlock = heroBlock ? sanitizeHtml(heroBlock) : null;
-  const seasonLabel = season?.title ?? (season ? `${season.year} Season` : null);
+  const sanitizedSeasonSummary = website?.season_summary ? sanitizeHtml(website.season_summary) : null;
 
   return (
     <section className={cn("text-center space-y-4", className)}>
@@ -103,27 +100,21 @@ export function HeroSection({ season, logoUrl, website, className }: HeroSection
           {heroCtaLabel}
         </Link>
       </div>
-      {heroPreRegistrationText && (
-        <p
-          className="text-sm text-white/70 mt-2"
+      {sanitizedSeasonSummary && (
+        <div
+          className="text-lg text-white/90 max-w-2xl mx-auto prose prose-invert"
+          dangerouslySetInnerHTML={{ __html: sanitizedSeasonSummary }}
           {...(editingEnabled && websiteId
             ? {
                 "data-directus": setAttr({
                   collection: "Website",
                   item: websiteId,
-                  fields: ["hero_pre_registration_text"],
+                  fields: ["season_summary"],
                   mode: "popover",
                 }),
               }
             : {})}
-        >
-          {heroPreRegistrationText}
-        </p>
-      )}
-      {season && seasonLabel && (
-        <p className="text-sm text-white/70 mt-2">
-          {seasonLabel} ({season.start_month ?? "Mar"}–{season.end_month ?? "May"})
-        </p>
+        />
       )}
     </section>
   );
