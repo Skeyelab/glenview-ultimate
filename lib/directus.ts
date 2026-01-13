@@ -89,6 +89,7 @@ export interface Website {
   hero_cta_label?: string | null;
   hero_cta_url?: string | null;
   hero_pre_registration_text?: string | null;
+  season_summary?: string | null;
 }
 
 export interface DirectusSchema {
