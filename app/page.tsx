@@ -18,7 +18,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
     getWhatIsUltimateVideos(),
   ]);
 
-  const highlights = season?.highlights ?? [];
+  const highlightedEvents = season?.events.filter((e) => e.highlight) ?? [];
   const latestNews = newsList.length > 0 ? newsList[0] : null;
   const firstVideo = videos.length > 0 ? videos[0] : null;
   const logoUrl = getDirectusAssetUrl(LOGO_ID, { quality: 90 });
@@ -28,9 +28,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
     <Suspense fallback={null}>
       <HomeVisualEditingProvider directusUrl={directusUrl}>
         <div className="space-y-10">
-          <HeroSection season={season} logoUrl={logoUrl} website={website} />
+
+          <HeroSection logoUrl={logoUrl} website={website} />
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            <SeasonHighlightsCard highlights={highlights} />
+            <SeasonHighlightsCard events={highlightedEvents} />
             <LatestContentCard latestNews={latestNews} firstVideo={firstVideo} />
           </section>
           <PartnersSection partners={partners} />
