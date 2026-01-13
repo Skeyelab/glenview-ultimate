@@ -26,7 +26,22 @@ vi.mock('@/lib/directus', () => ({
 
 describe('HomePage (integration)', () => {
   const mockPartners = [{ id: 'p1', name: 'Partner 1', url: 'https://p1.test', logo: 'logo-id' }]
-  const mockSchedule = { highlights: ['Highlight 1'], events: [] } as any
+  const mockSchedule = {
+    highlights: [],
+    events: [
+      {
+        id: 1,
+        season_year: 2026,
+        event_type: 'season_start',
+        title: 'Season Kickoff',
+        date: '2026-03-01T10:00:00.000Z',
+        end_date: null,
+        location: 'Main Field',
+        description: null,
+        highlight: true,
+      },
+    ],
+  } as any
   const mockWebsite = {
     id: 1,
     hero_title: 'Custom Hero',
@@ -52,7 +67,7 @@ describe('HomePage (integration)', () => {
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: /custom hero/i })).toBeInTheDocument()
-    expect(screen.getByText('Highlight 1')).toBeInTheDocument()
+    expect(screen.getByText('Season Kickoff')).toBeInTheDocument()
     expect(screen.getByText('Test News')).toBeInTheDocument()
     expect(screen.getByText('Partner 1')).toBeInTheDocument()
   })
