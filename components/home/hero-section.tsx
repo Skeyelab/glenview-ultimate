@@ -36,7 +36,11 @@ export function HeroSection({ logoUrl, website, className }: HeroSectionProps): 
   const sanitizedSeasonSummary = website?.season_summary ? sanitizeHtml(website.season_summary) : null;
 
   return (
-    <section className={cn("text-center space-y-4", className)}>
+    <section className={cn("relative text-center space-y-5 py-6", className)}>
+      {/* ambient glow behind logo */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex justify-center" aria-hidden="true">
+        <div className="h-64 w-96 rounded-full bg-white/5 blur-3xl" />
+      </div>
       {logoUrl && (
         <div className="flex justify-center mb-6">
           <Image
@@ -52,7 +56,7 @@ export function HeroSection({ logoUrl, website, className }: HeroSectionProps): 
         </div>
       )}
       <h1
-        className="text-3xl md:text-5xl font-bold text-white"
+        className="text-4xl md:text-6xl font-bold text-white leading-tight"
         {...(editingEnabled && websiteId
           ? {
               "data-directus": setAttr({

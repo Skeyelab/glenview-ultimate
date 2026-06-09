@@ -26,7 +26,7 @@ describe('Footer', () => {
     const footer = container.querySelector('footer');
 
     expect(footer).toBeInTheDocument();
-    expect(footer).toHaveClass('border-t', 'border-white/20', 'mt-4');
+    expect(footer).toHaveClass('border-t', 'border-white/20', 'mt-8');
   });
 
   it('should have container div with correct classes', () => {
@@ -34,6 +34,6 @@ describe('Footer', () => {
     const containerDiv = container.querySelector('.container');
 
     expect(containerDiv).toBeInTheDocument();
-    expect(containerDiv).toHaveClass('py-8', 'text-sm', 'text-white/70', 'flex', 'justify-between', 'items-center');
+    expect(containerDiv).toHaveClass('py-8', 'space-y-6');
   });
 });

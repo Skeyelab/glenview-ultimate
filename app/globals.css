@@ -15,14 +15,27 @@
 :root { color-scheme: light; }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   html, body {
-    @apply min-h-screen antialiased;
+    min-height: 100dvh;
+    @apply antialiased;
     background-color: var(--color-brand-green);
     color: #ffffff;
   }
   a { @apply text-inherit no-underline; }
   *, *::before, *::after { @apply box-border; }
   input, select, textarea, button { @apply font-sans; }
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 @layer components {
@@ -43,14 +56,27 @@
     }
   }
 
-  .button { @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-brand-green text-sm font-medium hover:bg-white/90 transition-colors; }
-  .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10; }
-  .input { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
-  .select { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2; }
+  .button {
+    @apply inline-flex items-center justify-center rounded-lg border border-white bg-white px-4 py-2 text-brand-green text-sm font-medium transition-all duration-200;
+    @apply hover:bg-white/90;
+  }
+  .button:active { transform: scale(0.97) translateY(1px); }
+  .button.secondary { @apply bg-transparent text-white border-white/30 hover:bg-white/10 hover:border-white/50; }
+  .input { @apply w-full rounded-lg border border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50 transition-colors duration-150 hover:border-white/50 focus:border-white/60; }
+  .select { @apply w-full rounded-lg border border-white/30 bg-white/10 text-white px-3 py-2; }
   .select option { @apply bg-brand-green text-white; }
-  .textarea { @apply w-full rounded-lg border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50; }
+  .textarea { @apply w-full rounded-lg border border-white/30 bg-white/10 text-white px-3 py-2 placeholder:text-white/50 transition-colors duration-150 hover:border-white/50; }
   .label { @apply block text-white text-sm mb-1; }
-  .card { @apply rounded-xl border border-white/20 bg-white/5 p-4; }
+  .card {
+    @apply rounded-xl border border-white/20 bg-white/5 p-4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
   .notice { @apply rounded-lg border border-white/20 bg-white/10 p-4; }
   .grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed top-4 left-4 z-50 px-4 py-2 rounded-lg bg-white text-brand-green text-sm font-semibold;
+  }
 }

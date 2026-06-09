@@ -48,7 +48,7 @@ describe('Navbar', () => {
     usePathname.mockReturnValue('/about');
     render(<Navbar links={NAV_LINKS} />);
     const aboutLink = screen.getByRole('link', { name: /about/i });
-    expect(aboutLink).toHaveClass('bg-white/20', 'text-white');
+    expect(aboutLink).toHaveClass('text-white', 'after:opacity-100');
   });
 
   it('toggles mobile menu and closes on route change', async () => {

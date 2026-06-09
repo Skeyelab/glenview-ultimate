@@ -17,8 +17,9 @@ export function NavLink({ href, label, className }: NavLinkProps): React.JSX.Ele
     <Link
       href={href}
       className={cn(
-        "px-2 py-1 rounded-md text-white/80 hover:text-white transition-colors",
-        isActive && "bg-white/20 text-white",
+        "relative px-1 py-1 text-white/70 hover:text-white transition-colors duration-150",
+        "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:rounded-full after:bg-white after:transition-opacity after:duration-150",
+        isActive ? "text-white after:opacity-100" : "after:opacity-0 hover:after:opacity-30",
         className
       )}
     >
