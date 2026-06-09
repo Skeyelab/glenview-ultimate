@@ -1,7 +1,8 @@
 import React from "react";
 import type { SeasonSchedule, ScheduleEvent } from "@/lib/directus";
+import type { ScheduleEventType } from "@/lib/directus";
 import { NextKeyDate } from "./next-key-date";
-import { listEventTypeLabels } from "./event-badge";
+import { EVENT_TYPE_LABELS, EVENT_TYPE_STYLES } from "./event-badge";
 
 interface ScheduleHeaderProps {
   schedule: SeasonSchedule;
@@ -10,31 +11,40 @@ interface ScheduleHeaderProps {
 }
 
 export function ScheduleHeader({ schedule, events, featuredEvent }: ScheduleHeaderProps): React.JSX.Element {
-  const labels = listEventTypeLabels(events);
+  const seenTypes = new Set<ScheduleEventType>();
+  const uniqueTypes: ScheduleEventType[] = [];
+  for (const e of events) {
+    if (!seenTypes.has(e.event_type)) {
+      seenTypes.add(e.event_type);
+      uniqueTypes.push(e.event_type);
+    }
+  }
 
   return (
-    <header className="card space-y-4">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-white/60">Season {schedule.season_year}</p>
-          <h1 className="text-3xl font-bold text-white">{schedule.title}</h1>
+    <header className="card space-y-5">
+      <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-1">
+          <p className="text-xs uppercase tracking-widest text-white/50 font-medium">
+            Season {schedule.season_year}
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-white">{schedule.title}</h1>
           {schedule.start_month && schedule.end_month && (
-            <p className="text-white/80 mt-2">
-              Season runs from <strong>{schedule.start_month}</strong> through <strong>{schedule.end_month}</strong>{" "}
-              {schedule.season_year}
+            <p className="text-white/70 mt-2 text-sm">
+              {schedule.start_month} – {schedule.end_month} {schedule.season_year}
             </p>
           )}
         </div>
         {featuredEvent && <NextKeyDate event={featuredEvent} />}
       </div>
-      {labels.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
-          {labels.map((label) => (
+
+      {uniqueTypes.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10">
+          {uniqueTypes.map((type) => (
             <span
-              key={label}
-              className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80"
+              key={type}
+              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${EVENT_TYPE_STYLES[type]}`}
             >
-              {label}
+              {EVENT_TYPE_LABELS[type]}
             </span>
           ))}
         </div>
