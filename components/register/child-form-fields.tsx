@@ -20,7 +20,7 @@ export function ChildFormFields({
   canRemove,
 }: ChildFormFieldsProps): React.JSX.Element {
   return (
-    <div className="border border-white/20 rounded p-3 grid gap-3">
+    <div className="rounded-lg border border-white/15 bg-white/5 p-4 grid gap-3">
       <div className="grid-2">
         <div>
           <label className="label">Child Full Name</label>

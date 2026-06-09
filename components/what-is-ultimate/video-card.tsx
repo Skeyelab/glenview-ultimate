@@ -39,9 +39,11 @@ export function VideoCard({
           ) : null
         ) : (
           placeholder ?? (
-            <div className="text-center">
-              <p className="text-white/60 text-sm">YouTube Video Embed</p>
-              <p className="text-white/40 text-xs mt-1">Coming Soon</p>
+            <div className="flex flex-col items-center gap-2 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/30" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <p className="text-white/40 text-xs tracking-wide uppercase">Video coming soon</p>
             </div>
           )
         )}

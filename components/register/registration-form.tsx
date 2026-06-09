@@ -109,7 +109,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
         });
         throw new Error(error);
       }
-      setStatus("✅ Thanks! Your registration was received.");
+      setStatus("success");
       setErrorField(null);
       trackEvent("registration_form_submit_success", {
         parentCount: parents.length,
@@ -119,7 +119,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
       onSubmit?.();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-      setStatus("❌ " + errorMessage);
+      setStatus("error:" + errorMessage);
       trackEvent("registration_form_submit_error", {
         message: errorMessage,
         field: errorField ?? undefined,
@@ -168,11 +168,20 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
         </label>
       </div>
 
+      {status === "success" && (
+        <div className="notice border-emerald-400/40 bg-emerald-500/10">
+          <p className="text-sm font-medium text-emerald-100">Registration received. We will be in touch soon.</p>
+        </div>
+      )}
+      {status?.startsWith("error:") && (
+        <div className="notice border-red-400/40 bg-red-500/10">
+          <p className="text-sm font-medium text-red-100">{status.replace("error:", "")}</p>
+        </div>
+      )}
       <div className="flex items-center gap-3">
-        <button type="submit" className="button">
+        <button type="submit" className="button" disabled={status === "success"}>
           Submit Registration
         </button>
-        {status && <span className="text-sm text-white/90">{status}</span>}
       </div>
     </form>
   );

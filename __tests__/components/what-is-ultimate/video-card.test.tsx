@@ -48,8 +48,7 @@ describe('VideoCard', () => {
 
   it('renders placeholder when no video is provided', () => {
     render(<VideoCard title="Test Video" description="Test description" />);
-    expect(screen.getByText(/YouTube Video Embed/i)).toBeInTheDocument();
-    expect(screen.getByText(/Coming Soon/i)).toBeInTheDocument();
+    expect(screen.getByText(/Video coming soon/i)).toBeInTheDocument();
   });
 
   it('renders custom placeholder when provided', () => {

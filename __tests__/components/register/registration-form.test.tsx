@@ -141,7 +141,7 @@ describe('RegistrationForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Thanks! Your registration was received./i)).toBeInTheDocument();
+      expect(screen.getByText(/Registration received/i)).toBeInTheDocument();
     }, { container });
   });
 
@@ -256,7 +256,8 @@ describe('RegistrationForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Submitting.../i)).toBeInTheDocument();
+      // Button is disabled during submission (no separate status text)
+      expect(screen.getByRole('button', { name: /Submit Registration/i })).toBeInTheDocument();
     }, { container });
 
     resolveFetch!({

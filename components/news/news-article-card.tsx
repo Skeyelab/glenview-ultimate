@@ -18,7 +18,7 @@ export function NewsArticleCard({
   post,
   showExcerpt = true,
   showReadMore = true,
-  readMoreLabel = "Read more",
+  readMoreLabel = "Read more →",
   dateFormat = formatFullDate,
   className,
   titleAs: TitleTag = "h2",
@@ -26,21 +26,30 @@ export function NewsArticleCard({
   const publishedAt = post.published_at ? dateFormat(post.published_at) : null;
 
   return (
-    <article className={cn("border border-white/20 rounded-lg p-4", className)}>
-      <TitleTag className="text-xl font-semibold text-white">
-        <Link href={`/news/${post.slug}`} className="hover:text-white/80">
-          {post.title}
-        </Link>
-      </TitleTag>
-      {publishedAt && <div className="text-xs text-white/70">{publishedAt}</div>}
-      {showExcerpt && post.excerpt && <p className="text-white/90 mt-2">{post.excerpt}</p>}
-      {showReadMore && (
-        <div className="mt-2">
-          <Link className="text-sm underline text-white/80 hover:text-white" href={`/news/${post.slug}`}>
-            {readMoreLabel}
+    <article className={cn("group border border-white/20 rounded-xl p-5 transition-colors duration-150 hover:border-white/40 hover:bg-white/5", className)}>
+      <div className="space-y-2">
+        {publishedAt && (
+          <div className="text-xs uppercase tracking-widest text-white/40 font-medium">{publishedAt}</div>
+        )}
+        <TitleTag className="text-xl font-semibold text-white">
+          <Link href={`/news/${post.slug}`} className="hover:text-white/80 transition-colors">
+            {post.title}
           </Link>
-        </div>
-      )}
+        </TitleTag>
+        {showExcerpt && post.excerpt && (
+          <p className="text-white/70 text-sm leading-relaxed">{post.excerpt}</p>
+        )}
+        {showReadMore && (
+          <div className="pt-1">
+            <Link
+              className="text-sm font-medium text-white/60 hover:text-white transition-colors"
+              href={`/news/${post.slug}`}
+            >
+              {readMoreLabel}
+            </Link>
+          </div>
+        )}
+      </div>
     </article>
   );
 }

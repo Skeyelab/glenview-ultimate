@@ -22,9 +22,9 @@ export function DescriptionSection({ htmlContent, paragraphs, className }: Descr
   // Fallback to paragraphs array for backward compatibility
   if (paragraphs && paragraphs.length > 0) {
     return (
-      <section className={cn("space-y-4", className)}>
+      <section className={cn("space-y-4 max-w-2xl", className)}>
         {paragraphs.map((paragraph, index) => (
-          <p key={`${paragraph}-${index}`} className="text-white/90">
+          <p key={`${paragraph}-${index}`} className="text-white/80 leading-relaxed">
             {paragraph}
           </p>
         ))}
