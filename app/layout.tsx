@@ -25,16 +25,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" className={lexend.variable}>
-      <body className={`${lexend.className} min-h-screen antialiased bg-brand-green text-white`}>
+      <body className={`${lexend.className} min-h-dvh antialiased bg-brand-green text-white`}>
         <Script
           src="https://umami.glenview-ultimate.org/script.js"
           data-website-id="c374c9b6-a4c4-4c42-837e-681db5fb70f0"
           strategy="afterInteractive"
         />
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <header className="border-b border-white/20">
           <Navbar links={filteredLinks} />
         </header>
-        <main className="container py-10">{children}</main>
+        <main id="main-content" className="container py-10">{children}</main>
         <Footer />
       </body>
     </html>
