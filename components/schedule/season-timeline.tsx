@@ -20,27 +20,37 @@ export function SeasonTimeline({
 }: SeasonTimelineProps): React.JSX.Element {
   return (
     <section className="card">
-      <h2 className="text-xl font-semibold text-white mb-4">{title}</h2>
+      <h2 className="text-xl font-semibold text-white mb-6">{title}</h2>
       {events.length > 0 ? (
-        <ol className="relative pl-4 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-px before:bg-white/20">
+        <ol className="relative pl-5 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-px before:bg-white/20">
           {events.map((event, index) => {
             const timeRange = formatTimeRange(event);
+            const isFirst = index === 0;
             return (
               <li
                 key={event.id}
-                className="relative pl-6 pb-6 last:pb-0 md:grid md:grid-cols-[minmax(180px,240px)_1fr] md:gap-6"
+                className="group relative pl-7 pb-8 last:pb-0 md:grid md:grid-cols-[minmax(160px,220px)_1fr] md:gap-6"
               >
-                <span className="absolute left-0 top-1.5 h-3 w-3 rounded-full border-2 border-white/40 bg-[#175230]" />
-                <div className="mb-3 md:mb-0">
-                  <div className="text-xs uppercase tracking-wide text-white/60">{formatDay(event.date)}</div>
+                {/* timeline dot — white fill for first event, ring-only for rest */}
+                <span
+                  className={`absolute left-0 top-1.5 h-[18px] w-[18px] rounded-full border-2 transition-colors duration-200 ${
+                    isFirst
+                      ? "border-white bg-white"
+                      : "border-white/50 bg-transparent group-hover:border-white group-hover:bg-white/20"
+                  }`}
+                />
+                <div className="mb-3 md:mb-0 pt-0.5">
+                  <div className="text-[0.65rem] uppercase tracking-widest text-white/40 font-medium">
+                    {formatDay(event.date)}
+                  </div>
                   <div className="text-sm font-semibold text-white">{formatDateRange(event)}</div>
-                  {timeRange && <div className="text-xs text-white/60 mt-1">{timeRange}</div>}
+                  {timeRange && <div className="text-xs text-white/50 mt-0.5">{timeRange}</div>}
                 </div>
                 {renderEventCard?.(event, index) ?? (
                   <ScheduleEventCard
                     event={event}
                     highlightLabel={highlightLabel}
-                    withOutline={index === 0}
+                    withOutline={isFirst}
                     showDescription
                     showLocation
                   />

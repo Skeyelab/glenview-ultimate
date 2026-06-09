@@ -13,7 +13,7 @@ export const EVENT_TYPE_LABELS: Record<ScheduleEventType, string> = {
   other: "Event",
 };
 
-const EVENT_TYPE_STYLES: Record<ScheduleEventType, string> = {
+export const EVENT_TYPE_STYLES: Record<ScheduleEventType, string> = {
   season_start: "bg-emerald-500/20 text-emerald-100 border border-emerald-400/40",
   season_end: "bg-rose-500/20 text-rose-100 border border-rose-400/40",
   registration_open: "bg-sky-500/20 text-sky-100 border border-sky-400/40",

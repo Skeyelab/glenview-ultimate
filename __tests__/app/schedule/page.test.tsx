@@ -33,7 +33,7 @@ describe('SchedulePage (integration)', () => {
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: /spring 2026 season/i })).toBeInTheDocument()
-    expect(screen.getByText(/Season runs from/i)).toBeInTheDocument()
+    expect(screen.getByText(/Season 2026/i)).toBeInTheDocument()
     expect(screen.getByText('Highlight 1')).toBeInTheDocument()
     expect(screen.getByText('Highlight 2')).toBeInTheDocument()
     expect(screen.getAllByText('Championship Game').length).toBeGreaterThan(0)

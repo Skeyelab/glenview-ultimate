@@ -53,8 +53,8 @@ export function ScheduleEventCard({
   return (
     <div
       className={cn(
-        "rounded-lg border border-white/10 bg-white/5 p-4",
-        withOutline && "ring-1 ring-white/15",
+        "rounded-lg border border-white/15 bg-white/5 p-4 transition-colors duration-150 hover:bg-white/10 hover:border-white/25",
+        withOutline && "border-white/30 bg-white/8",
         className,
       )}
     >

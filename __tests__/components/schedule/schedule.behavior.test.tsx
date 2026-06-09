@@ -60,8 +60,8 @@ describe('Schedule UI (behavior-focused)', () => {
 
     const { container } = render(<SeasonTimeline events={[mockEvent2, mockEvent1]} highlightLabel="Next Up" />)
     expect(screen.getByText('Practice Session')).toBeInTheDocument()
-    // First event card gets the outline styles
-    const outlined = container.querySelector('.ring-white\\/15')
+    // First event card gets the outline border styles
+    const outlined = container.querySelector('.border-white\\/30')
     expect(outlined).toBeInTheDocument()
   })
 
