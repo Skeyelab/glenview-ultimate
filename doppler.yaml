@@ -1,0 +1,7 @@
+# Binds this repo to Doppler. Run `doppler setup` after clone (or `doppler setup --no-interactive`).
+# https://docs.doppler.com/docs/cli#assign-directory-to-config
+setup:
+  - project: glenview-ultimate
+    config: dev
+# Other configs (same keys, env-specific values): stg, prd
+# Switch: doppler setup --config stg
