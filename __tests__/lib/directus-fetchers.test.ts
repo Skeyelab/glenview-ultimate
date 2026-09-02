@@ -65,6 +65,22 @@ describe('directus fetchers', () => {
       vi.resetModules();
     });
 
+    it('getTeamPhotos requests only active photos, newest season first', async () => {
+      let captured: any = null;
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'TeamPhotos') {
+          captured = arg.params;
+          return [{ id: 1, title: 'U14', image: 'img-1', season_year: 2026, sort: 1, active: true }];
+        }
+        return [];
+      });
+
+      const { getTeamPhotos } = await import('@/lib/directus');
+      await expect(getTeamPhotos()).resolves.toHaveLength(1);
+      expect(captured.filter).toEqual({ active: { _eq: true } });
+      expect(captured.sort).toEqual(['-season_year', 'sort']);
+    });
+
     it('getNewsList returns list from client', async () => {
       const items = [
         { id: 1, slug: 'a', title: 'A', published_at: '2026-01-01T00:00:00Z', content: 'x' },

@@ -253,6 +253,23 @@ describe('/api/revalidate', () => {
       expect(data.paths).toContain('/about')
     })
 
+    it('should revalidate /team-photos for TeamPhotos collection', async () => {
+      const req = createRequest(
+        {
+          event: 'items.create',
+          collection: 'TeamPhotos',
+        },
+        { 'X-Revalidate-Secret': validSecret }
+      )
+
+      const response = await POST(req)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockRevalidatePath).toHaveBeenCalledWith('/team-photos')
+      expect(data.paths).toContain('/team-photos')
+    })
+
     it('should revalidate /about for Team collection', async () => {
       const req = createRequest(
         {
