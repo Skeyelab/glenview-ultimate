@@ -12,6 +12,31 @@ export function selectUpcomingEvents(events: ScheduleEvent[]): ScheduleEvent[] {
     .slice(0, 3);
 }
 
+const MAX_HIGHLIGHTS = 4;
+
+/**
+ * Highlighted events that have not happened yet, soonest first, capped.
+ *
+ * The `highlight` flag in Directus is permanent, so without a date filter a
+ * finished season keeps rendering forever and the card becomes a duplicate of
+ * the schedule page. Returning [] lets the caller show an honest empty state.
+ */
+export function selectUpcomingHighlights(events: ScheduleEvent[], limit = MAX_HIGHLIGHTS): ScheduleEvent[] {
+  const now = Date.now();
+  return events
+    .filter((event) => {
+      if (!event.highlight) return false;
+      const eventDate = safeParseDate(event.end_date ?? event.date);
+      return eventDate ? eventDate.getTime() >= now : false;
+    })
+    .sort((a, b) => {
+      const da = safeParseDate(a.date)?.getTime() ?? Number.POSITIVE_INFINITY;
+      const db = safeParseDate(b.date)?.getTime() ?? Number.POSITIVE_INFINITY;
+      return da - db;
+    })
+    .slice(0, limit);
+}
+
 export function groupEventsByMonth(events: ScheduleEvent[]): MonthlyEventGroup[] {
   const formatter = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
   const buckets = new Map<string, { label: string; events: ScheduleEvent[] }>();

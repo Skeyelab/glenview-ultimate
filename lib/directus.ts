@@ -394,6 +394,19 @@ export function getTeamPhotos(): Promise<TeamPhoto[]> {
   });
 }
 
+export function hasTeamPhotos(): Promise<boolean> {
+  return withDirectus(false, async (client) => {
+    const data = await client.request(
+      readItems("TeamPhotos", {
+        limit: 1,
+        fields: ["id"],
+        filter: { active: { _eq: true } },
+      }),
+    );
+    return data.length > 0;
+  });
+}
+
 export function getWebsite(): Promise<Website | null> {
   return withDirectus<Website | null>(null, async (client) => {
     const data = await client.request(
