@@ -17,8 +17,8 @@ vi.mock('@/components/ui/section-card', () => ({
 
 // Mock NewsArticleCard
 vi.mock('@/components/news/news-article-card', () => ({
-  NewsArticleCard: ({ post }: { post: NewsPost }) => (
-    <div data-testid="news-article-card">
+  NewsArticleCard: ({ post, variant }: { post: NewsPost; variant?: string }) => (
+    <div data-testid="news-article-card" data-variant={variant}>
       <h3>{post.title}</h3>
     </div>
   ),
@@ -78,6 +78,14 @@ describe('LatestContentCard', () => {
     render(<LatestContentCard />);
     expect(screen.getByRole('heading', { level: 2, name: /Latest Updates/i })).toBeInTheDocument();
     expect(screen.getByText(/Content coming soon./i)).toBeInTheDocument();
+  });
+
+  it('renders the news card plain so it does not nest inside SectionCard', () => {
+    // SectionCard is itself .card and NewsArticleCard defaults to .card, so
+    // without variant="plain" the homepage shows a visible double border.
+    render(<LatestContentCard latestNews={mockNewsPost} firstVideo={null} />);
+
+    expect(screen.getByTestId('news-article-card')).toHaveAttribute('data-variant', 'plain');
   });
 
   it('applies custom className when provided', () => {

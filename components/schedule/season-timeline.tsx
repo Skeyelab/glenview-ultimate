@@ -40,11 +40,11 @@ export function SeasonTimeline({
                   }`}
                 />
                 <div className="mb-3 md:mb-0 pt-0.5">
-                  <div className="text-[0.65rem] uppercase tracking-widest text-white/40 font-medium">
+                  <div className="text-[0.65rem] uppercase tracking-widest text-white/70 font-medium">
                     {formatDay(event.date)}
                   </div>
                   <div className="text-sm font-semibold text-white">{formatDateRange(event)}</div>
-                  {timeRange && <div className="text-xs text-white/50 mt-0.5">{timeRange}</div>}
+                  {timeRange && <div className="text-xs text-white/70 mt-0.5">{timeRange}</div>}
                 </div>
                 {renderEventCard?.(event, index) ?? (
                   <ScheduleEventCard

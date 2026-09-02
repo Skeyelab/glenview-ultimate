@@ -19,7 +19,7 @@ export function NextKeyDate({ event, title = "Next Key Date", className = "" }: 
 
   return (
     <div className={`shrink-0 rounded-xl border border-white/25 bg-white/10 p-4 md:min-w-[220px] space-y-2 ${className}`}>
-      <p className="text-[0.65rem] uppercase tracking-widest text-white/50 font-semibold">{title}</p>
+      <p className="text-[0.65rem] uppercase tracking-widest text-white/70 font-semibold">{title}</p>
       <div className="space-y-1.5">
         <EventTypeBadge type={event.event_type} size="sm" />
         <p className="font-semibold text-white leading-snug">{event.title}</p>

@@ -19,7 +19,7 @@ export function LatestContentCard({
   if (latestNews) {
     return (
       <SectionCard title="Latest News" className={className}>
-        <NewsArticleCard post={latestNews} />
+        <NewsArticleCard post={latestNews} variant="plain" />
       </SectionCard>
     );
   }

@@ -12,6 +12,12 @@ export interface NewsArticleCardProps {
   dateFormat?: (date: string) => string | null;
   className?: string;
   titleAs?: keyof React.JSX.IntrinsicElements;
+  /**
+   * "card" (default) for standalone use on /news. "plain" when the caller
+   * already provides a card container, so the two do not nest into a
+   * visible double border.
+   */
+  variant?: "card" | "plain";
 }
 
 export function NewsArticleCard({
@@ -22,11 +28,12 @@ export function NewsArticleCard({
   dateFormat = formatFullDate,
   className,
   titleAs: TitleTag = "h2",
+  variant = "card",
 }: NewsArticleCardProps): React.JSX.Element {
   const publishedAt = post.published_at ? dateFormat(post.published_at) : null;
 
   return (
-    <article className={cn("border border-white/20 rounded-lg p-4", className)}>
+    <article className={cn(variant === "card" && "card", className)}>
       <TitleTag className="text-xl font-semibold text-white">
         <Link href={`/news/${post.slug}`} className="hover:text-white/80">
           {post.title}
