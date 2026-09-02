@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import { getPartners, getSchedule, getWebsite, getDirectusAssetUrl, getNewsList, getWhatIsUltimateVideos } from "@/lib/directus";
 import { LOGO_ID } from "@/lib/config";
+import { selectUpcomingHighlights } from "@/lib/schedule-utils";
 import { HeroSection } from "@/components/home/hero-section";
 import { SeasonHighlightsCard } from "@/components/home/season-highlights-card";
 import { LatestContentCard } from "@/components/home/latest-content-card";
@@ -18,7 +19,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
     getWhatIsUltimateVideos(),
   ]);
 
-  const highlightedEvents = season?.events.filter((e) => e.highlight) ?? [];
+  const highlightedEvents = selectUpcomingHighlights(season?.events ?? []);
   const latestNews = newsList.length > 0 ? newsList[0] : null;
   const firstVideo = videos.length > 0 ? videos[0] : null;
   const logoUrl = getDirectusAssetUrl(LOGO_ID, { quality: 90 });

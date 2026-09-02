@@ -158,8 +158,15 @@ Vitest hoists `vi.mock(...)` but linting flags import order. Suppress with `// e
 ### CI uses yarn with frozen lockfile
 The CI workflow runs `yarn install --frozen-lockfile`. If you add dependencies locally with `npm install`, the lockfile won't match. Use `yarn add` or commit an updated `yarn.lock`.
 
-### Turnstile env vars required for build
-CI sets `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Without them some registration logic may error. Copy from `.env.example` and set test values locally.
+### Turnstile is NOT implemented
+CI sets `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, and this file
+previously claimed the registration form used Cloudflare Turnstile. It does not.
+`grep -rin turnstile app components lib` returns nothing — there is no widget in
+`registration-form.tsx` and no server-side verification in `app/api/register/route.ts`.
+
+**`POST /api/register` currently has no bot or spam protection.** The env vars are
+vestigial; the build does not need them. Do not assume the endpoint is protected, and
+do not re-add the claim to this file without also adding the implementation.
 
 ### `export const dynamic = 'force-dynamic'`
 The homepage has this directive. `DEFAULT_REVALIDATE_SECONDS = 0` in `lib/config.ts` signals the same intent for other pages. The site does not use static generation by default.

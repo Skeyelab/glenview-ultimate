@@ -66,6 +66,12 @@ describe('Schedule UI (behavior-focused)', () => {
   })
 
   it('shows next key date with formatted range and handles missing event', () => {
+    // NextKeyDate hides events that have already passed, so the clock is pinned
+    // before the fixture's 2026-05-15 date. Otherwise this test's meaning changes
+    // the moment that date goes by.
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-05-01T00:00:00Z'))
+
     const { container } = render(<NextKeyDate event={mockEventWithTime} title="Upcoming" />)
     expect(screen.getByText('Upcoming')).toBeInTheDocument()
     expect(screen.getByText('Game 1')).toBeInTheDocument()
@@ -73,5 +79,7 @@ describe('Schedule UI (behavior-focused)', () => {
 
     const nullState = render(<NextKeyDate />)
     expect(nullState.container.firstChild).toBeNull()
+
+    vi.useRealTimers()
   })
 })

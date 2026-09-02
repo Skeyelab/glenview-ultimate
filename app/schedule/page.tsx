@@ -13,7 +13,10 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();
   const { events } = schedule;
   const upcomingEvents = selectUpcomingEvents(events);
-  const upcomingDisplay = upcomingEvents.length > 0 ? upcomingEvents : events.slice(0, Math.min(3, events.length));
+  // No fallback to events.slice(0, n): that returned the OLDEST events on file,
+  // so a finished season rendered its first practice as "Up Next". An empty list
+  // lets UpcomingEventsCard show its honest "coming soon" message instead.
+  const upcomingDisplay = upcomingEvents;
   const monthlyGroups = groupEventsByMonth(events);
 
   return (

@@ -6,6 +6,8 @@ import { buildRegistrationPayload, parseApiError } from "@/lib/register-utils";
 import { ParentFormSection } from "./parent-form-section";
 import { ChildFormSection } from "./child-form-section";
 
+const SUBMITTING_STATUS = "Submitting...";
+
 interface RegistrationFormProps {
   onSubmit?: () => void;
 }
@@ -16,6 +18,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [notes, setNotes] = useState("");
   const [marketing_opt_in, setOptIn] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
+  const isSubmitting = status === SUBMITTING_STATUS;
   const [errorField, setErrorField] = useState<string | null>(null);
 
   const trackEvent = React.useCallback((eventName: string, data?: Record<string, unknown>): void => {
@@ -81,7 +84,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    setStatus("Submitting...");
+    setStatus(SUBMITTING_STATUS);
     setErrorField(null);
     trackEvent("registration_form_submit", {
       parentCount: parents.length,
@@ -169,7 +172,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
       </div>
 
       <div className="flex items-center gap-3">
-        <button type="submit" className="button">
+        <button type="submit" className="button" disabled={isSubmitting}>
           Submit Registration
         </button>
         {status && <span className="text-sm text-white/90">{status}</span>}
