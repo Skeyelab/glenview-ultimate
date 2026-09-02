@@ -114,6 +114,16 @@ describe('NewsArticleCard', () => {
     expect(title?.tagName).toBe('H2');
   });
 
+  it('uses the shared .card class rather than hand-rolled borders', () => {
+    const { container } = render(<NewsArticleCard post={mockPost} />)
+    expect(container.querySelector('article')).toHaveClass('card')
+  })
+
+  it('renders plain when the caller already supplies a card container', () => {
+    const { container } = render(<NewsArticleCard post={mockPost} variant="plain" />)
+    expect(container.querySelector('article')).not.toHaveClass('card')
+  })
+
   it('applies custom className when provided', () => {
     const { container } = render(<NewsArticleCard post={mockPost} className="custom-class" />);
     const article = container.querySelector('article');

@@ -28,7 +28,7 @@ export function SeasonCalendar({
     <section className="space-y-5">
       <div className="space-y-0.5">
         <h2 className="text-xl font-semibold text-white">{title}</h2>
-        {subtitle && <p className="text-sm text-white/50">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-white/70">{subtitle}</p>}
       </div>
       {groups.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
@@ -36,7 +36,7 @@ export function SeasonCalendar({
             <article key={group.key} className="card space-y-4">
               <header className="flex items-baseline justify-between border-b border-white/10 pb-3">
                 <h3 className="text-base font-semibold text-white">{group.label}</h3>
-                <span className="text-xs text-white/40 tabular-nums">
+                <span className="text-xs text-white/70 tabular-nums">
                   {group.events.length} {group.events.length === 1 ? "event" : "events"}
                 </span>
               </header>
@@ -46,7 +46,7 @@ export function SeasonCalendar({
                     {renderEvent?.(event) ?? (
                       <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-3 transition-colors duration-150 hover:bg-white/10 hover:border-white/20">
                         <div className="shrink-0 text-right min-w-[44px]">
-                          <p className="text-[0.6rem] uppercase tracking-widest text-white/40 leading-none">
+                          <p className="text-[0.6rem] uppercase tracking-widest text-white/70 leading-none">
                             {formatDay(event.date).slice(0, 3)}
                           </p>
                           <p className="text-sm font-bold text-white leading-snug">{formatDateShort(event.date)}</p>
@@ -57,10 +57,10 @@ export function SeasonCalendar({
                           </div>
                           <p className="text-sm text-white font-medium leading-snug">{event.title}</p>
                           {event.location && (
-                            <p className="text-xs text-white/50">Location: {event.location}</p>
+                            <p className="text-xs text-white/70">Location: {event.location}</p>
                           )}
                           {event.description && (
-                            <p className="text-xs text-white/50 line-clamp-2">{event.description}</p>
+                            <p className="text-xs text-white/70 line-clamp-2">{event.description}</p>
                           )}
                         </div>
                       </div>

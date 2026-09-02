@@ -24,7 +24,7 @@ export function ScheduleHeader({ schedule, events, featuredEvent }: ScheduleHead
     <header className="card space-y-5">
       <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-widest text-white/50 font-medium">
+          <p className="text-xs uppercase tracking-widest text-white/70 font-medium">
             Season {schedule.season_year}
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-white">{schedule.title}</h1>

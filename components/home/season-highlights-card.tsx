@@ -40,7 +40,7 @@ export function SeasonHighlightsCard({
               </div>
               <span className="text-white/90 font-medium">{event.title}</span>
               {event.location && (
-                <span className="text-xs text-white/50">{event.location}</span>
+                <span className="text-xs text-white/70">{event.location}</span>
               )}
             </li>
           ))}

@@ -24,7 +24,7 @@ export function Footer(): React.JSX.Element {
             </Link>
           ))}
         </nav>
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-white/50">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-white/70">
           <div>© {new Date().getFullYear()} Glenview Ultimate</div>
           <div>
             made with love by{" "}

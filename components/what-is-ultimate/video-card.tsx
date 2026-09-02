@@ -41,7 +41,7 @@ export function VideoCard({
           placeholder ?? (
             <div className="text-center">
               <p className="text-white/60 text-sm">YouTube Video Embed</p>
-              <p className="text-white/40 text-xs mt-1">Coming Soon</p>
+              <p className="text-white/70 text-xs mt-1">Coming Soon</p>
             </div>
           )
         )}
