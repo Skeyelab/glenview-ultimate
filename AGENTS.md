@@ -31,6 +31,54 @@ yarn lint
 
 ---
 
+## Messaging
+
+Brian Carrigan owns Glenview Ultimate and is the client for this site. When the ask is
+"check messages", "any new messages", or "what did Brian say", that means **his iMessage
+thread and nothing else**. His feature requests and bug reports in that thread are the
+primary source of work on this repo.
+
+Read it with **imsg-read**, not by querying `chat.db` yourself:
+
+```bash
+python3 ~/Documents/GitHub/ericdahl.dev/imsg-read/imsgread.py --contact brian -n 20 --text
+```
+
+`--contact <name>` resolves through that repo's `contacts.toml`, keeping phone numbers out
+of shell history and transcripts. `python3 imsgread.py --contacts` lists configured names.
+Add `--oldest-first` to read forwards; drop `--text` for JSON; `-n` sets how many messages.
+
+Do not hand-roll the SQL. Two things go wrong every time:
+
+- Most message bodies are not in `message.text` — they're in `attributedBody` as a
+  serialized NSAttributedString. A query reading only `text` comes back blank and looks
+  like an empty conversation.
+- `chat.db` holds every conversation on the machine. **Never run an unfiltered time-window
+  query over it.** imsg-read has no code path that reads across threads — it requires a
+  chat identifier and exits non-zero without one.
+
+Three gotchas that cost real time:
+
+- **imsgread prints UTC.** Its `16:44` is `12:44` Eastern.
+- **Full Disk Access** is required, and applies to the process running the query, not to
+  Claude in the abstract. Grant it to the terminal in System Settings → Privacy & Security
+  → Full Disk Access. It does not reach an already-running process — restart the session
+  (`claude --resume`) afterwards or reads still fail.
+- **Sending goes through AppleScript**, reading the body from a UTF-8 file. Inline quoting
+  mangles apostrophes and emoji:
+
+```bash
+osascript -e 'on run argv
+set t to (read (POSIX file (item 1 of argv)) as «class utf8»)
+tell application "Messages" to send t to participant "+1XXXXXXXXXX" of (first account whose service type is iMessage)
+end run' "$PWD/message.txt"
+```
+
+Anything sent as Eric must follow `~/.claude/imessage-voice.md` and its pre-send checklist,
+including one-line replies. Confirm the exact text with him before sending.
+
+---
+
 ## Architecture Overview
 
 ```
