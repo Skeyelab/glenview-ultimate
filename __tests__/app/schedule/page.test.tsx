@@ -28,6 +28,17 @@ describe('SchedulePage (integration)', () => {
     vi.useRealTimers()
   })
 
+  it('does not present past events as upcoming when the season has ended', async () => {
+    // Every event in the fixture is before this date, matching the real CMS
+    // state where a finished season is the only data on file.
+    vi.setSystemTime(new Date('2030-01-01T00:00:00Z'))
+
+    render(await SchedulePage())
+
+    expect(screen.getByText(/Season events coming soon/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Next Key Date/i)).not.toBeInTheDocument()
+  })
+
   it('renders schedule header, upcoming events, highlights, timeline, and calendar with real components', async () => {
     const page = await SchedulePage()
     render(page)

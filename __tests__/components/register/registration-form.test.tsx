@@ -265,6 +265,36 @@ describe('RegistrationForm', () => {
     } as Response);
   });
 
+  it('disables the submit button while the request is in flight', async () => {
+    const user = userEvent.setup();
+    let resolveFetch: (value: Response) => void;
+    const fetchPromise = new Promise<Response>((resolve) => {
+      resolveFetch = resolve;
+    });
+    mockFetch.mockReturnValueOnce(fetchPromise);
+
+    const { container } = render(<RegistrationForm />);
+
+    const emptyTextboxes = screen.getAllByDisplayValue('');
+    await user.type(emptyTextboxes[0], sampleParent1.name);
+    await user.type(emptyTextboxes[1], sampleParent1.email);
+    await user.type(emptyTextboxes[3], sampleChild1.full_name);
+
+    const submitButton = screen.getByRole('button', { name: /Submit Registration/i });
+    await user.click(submitButton);
+
+    // A second tap on a slow connection must not fire a duplicate POST, which
+    // the API would reject as a duplicate email on the parent's first attempt.
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Submit Registration/i })).toBeDisabled();
+    }, { container });
+
+    await user.click(screen.getByRole('button', { name: /Submit Registration/i }));
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    resolveFetch!({ ok: true, json: async () => ({}) } as Response);
+  });
+
   it('includes marketing opt-in in payload when checked (default)', async () => {
     const user = userEvent.setup();
     mockFetch.mockResolvedValueOnce({
