@@ -20,6 +20,7 @@ const COLLECTION_TO_PATHS: Record<string, string[]> = {
   Schedule: ["/schedule", "/"],
   Partners: ["/"],
   News: ["/news"],
+  TeamPhotos: ["/team-photos"],
 };
 
 function getPathsForCollection(collection: string, payload?: WebhookPayload["payload"]): string[] {

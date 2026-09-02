@@ -81,6 +81,15 @@ export interface WhatIsUltimateVideo {
   active?: boolean | null;
 }
 
+export interface TeamPhoto {
+  id: number;
+  title?: string | null;
+  image: string;
+  season_year: number;
+  sort?: number | null;
+  active?: boolean | null;
+}
+
 export interface Website {
   id: number;
   site_name: string;
@@ -100,6 +109,7 @@ export interface DirectusSchema {
   About: About[];
   WhatIsUltimate: WhatIsUltimate[];
   WhatIsUltimateVideos: WhatIsUltimateVideo[];
+  TeamPhotos: TeamPhoto[];
   Registrations: Registration[];
   Website: Website[];
 }
@@ -368,6 +378,19 @@ export function getWhatIsUltimateVideos(): Promise<WhatIsUltimateVideo[]> {
       }),
     );
     return videos;
+  });
+}
+
+export function getTeamPhotos(): Promise<TeamPhoto[]> {
+  return withDirectus<TeamPhoto[]>([], async (client) => {
+    const photos = await client.request(
+      readItems("TeamPhotos", {
+        fields: ["id", "title", "image", "season_year", "sort", "active"],
+        filter: { active: { _eq: true } },
+        sort: ["-season_year", "sort"],
+      }),
+    );
+    return photos;
   });
 }
 

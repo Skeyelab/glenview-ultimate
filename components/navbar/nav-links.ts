@@ -9,5 +9,6 @@ export const NAV_LINKS: readonly NavLinkItem[] = [
   { href: "/what-is-ultimate", label: "What is Ultimate?" },
   { href: "/news", label: "News" },
   { href: "/schedule", label: "Schedule" },
+  { href: "/team-photos", label: "Team Photos" },
 ];
 
