@@ -1,6 +1,6 @@
 import React from "react";
 import type { ScheduleEvent } from "@/lib/directus";
-import { formatDateRange } from "@/lib/date-utils";
+import { formatDateRange, formatTimeRange } from "@/lib/date-utils";
 import { SectionCard } from "@/components/ui/section-card";
 import { ScheduleEventCard } from "./event-card";
 
@@ -31,7 +31,17 @@ export function UpcomingEventsCard({
                   showDescription={false}
                   showLocation
                   highlightLabel={highlightLabel}
-                  meta={<p className="text-sm text-white/70">{formatDateRange(event)}</p>}
+                  meta={
+                    <div className="text-sm text-white/70">
+                      <p>{formatDateRange(event)}</p>
+                      {/* Time is the fact a parent is actually checking against
+                          another activity, so it renders here rather than only
+                          deep in the season timeline. */}
+                      {formatTimeRange(event) && (
+                        <p className="font-medium text-white/90">{formatTimeRange(event)}</p>
+                      )}
+                    </div>
+                  }
                 />
               )}
             </li>
