@@ -30,4 +30,23 @@ describe('SeasonGallery asset transform', () => {
     expect(opts.transforms).not.toHaveProperty('quality')
     expect(opts.transforms).toMatchObject({ width: 800, height: 600, fit: 'cover' })
   })
+
+  it('requests a larger uncropped image for the lightbox, still without quality', () => {
+    render(
+      <SeasonGallery
+        group={{ seasonYear: 2026, label: '2026 Season', photos: [
+          { id: 1, title: 'x', image: 'img-1', season_year: 2026, sort: 1, active: true },
+        ] }}
+      />,
+    )
+
+    const calls = vi.mocked(directus.getDirectusAssetUrl).mock.calls
+    expect(calls).toHaveLength(2)
+
+    const full = calls[1][1] as any
+    expect(full.transforms).not.toHaveProperty('quality')
+    expect(full.transforms.width).toBeGreaterThan(800)
+    // `inside` rather than `cover`: the lightbox shows the whole photo.
+    expect(full.transforms.fit).toBe('inside')
+  })
 })
