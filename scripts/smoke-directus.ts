@@ -90,14 +90,28 @@ async function main(): Promise<void> {
 
   // Asset transforms are a separate failure surface from the SDK: a rejected
   // transformation renders every photo as a blank box while the API is fine.
-  const src = getDirectusAssetUrl(firstPhoto?.image, {
+  //
+  // Hit Directus directly rather than through getDirectusAssetUrl. That helper
+  // returns a relative /api/assets path, which only resolves inside a running
+  // Next server - fetch() here cannot follow it. What matters is whether
+  // Directus accepts the transformation, which this asks it directly.
+  const path = getDirectusAssetUrl(firstPhoto?.image, {
     transforms: { width: 800, height: 600, fit: "cover" },
   });
-  if (src) {
-    const res = await fetch(src);
-    check("asset transform", res.ok, `${res.status} for ${src.split("?")[0].slice(-12)}`);
+  check("getDirectusAssetUrl builds a tokenless proxy path", 
+    path !== null && path.startsWith("/api/assets/") && !path.includes("access_token"),
+    String(path));
+
+  if (firstPhoto?.image) {
+    const direct = new URL(`${process.env.DIRECTUS_URL}/assets/${firstPhoto.image}`);
+    direct.searchParams.set("access_token", process.env.DIRECTUS_STATIC_TOKEN ?? "");
+    direct.searchParams.set("width", "800");
+    direct.searchParams.set("height", "600");
+    direct.searchParams.set("fit", "cover");
+    const res = await fetch(direct);
+    check("directus accepts the transform", res.ok, `${res.status} for ${firstPhoto.image.slice(-12)}`);
   } else {
-    check("asset transform", false, "getDirectusAssetUrl returned null");
+    check("directus accepts the transform", false, "no photo to test with");
   }
 
   console.log(`\n${checks - failures.length}/${checks} passed`);
