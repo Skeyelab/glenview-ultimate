@@ -81,6 +81,13 @@ export default [
     }
   },
   {
+    // CLI scripts are supposed to print to stdout - that is their interface.
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'no-console': 'off',
+    }
+  },
+  {
     ignores: [
       'node_modules/**',
       '.next/**',
