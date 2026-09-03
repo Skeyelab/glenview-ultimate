@@ -95,6 +95,8 @@ describe('/api/register', () => {
     it('should handle duplicate email error', async () => {
       const mockResponse = { status: 400 } as Partial<Response>;
       const duplicateError: DirectusError<Response> = {
+        // @directus/sdk v25 added `name` as a required field on DirectusError.
+        name: 'DirectusError',
         message: 'Duplicate entry',
         errors: [
           {
