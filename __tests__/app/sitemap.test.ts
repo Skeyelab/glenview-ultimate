@@ -110,8 +110,11 @@ describe('sitemap', () => {
     const result = await sitemap();
     const newsEntry = result.find((entry) => entry.url.includes('/news/article-1'));
 
-    expect(newsEntry?.lastModified).toBeInstanceOf(Date);
-    expect(newsEntry?.lastModified?.toISOString()).toContain('2024-06-15');
+    // MetadataRoute.Sitemap types lastModified as string | Date, so narrow
+    // after asserting it really is a Date rather than widening the assertion.
+    const lastModified = newsEntry?.lastModified;
+    expect(lastModified).toBeInstanceOf(Date);
+    expect((lastModified as Date).toISOString()).toContain('2024-06-15');
   });
 
   it('sets correct priority and changeFrequency for news entries', async () => {
