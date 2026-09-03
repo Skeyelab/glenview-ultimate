@@ -61,6 +61,31 @@ describe('SchedulePage (integration)', () => {
     expect(screen.queryByText(/Season Highlights/i)).not.toBeInTheDocument()
   })
 
+  it('links a webcal subscribe URL right under the practice pattern line', async () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    directusMock.getSchedule.mockResolvedValue({
+      ...mockSchedule,
+      events: [{
+        id: 101, season_year: 2026, event_type: 'practice', title: 'Practice',
+        date: '2026-09-08T17:00:00', end_date: '2026-09-08T19:00:00',
+        location: 'Flick Park', description: null, highlight: true,
+      }],
+    } as any)
+    vi.setSystemTime(new Date('2026-09-03T00:00:00Z'))
+
+    render(await SchedulePage())
+
+    // "Subscribe" is a real claim: webcal:// (not a plain https link) is what
+    // gets Apple/Google calendar apps to offer live subscription rather than
+    // a one-time import dialog.
+    const link = screen.getByRole('link', { name: /subscribe to calendar/i })
+    expect(link).toHaveAttribute('href', 'webcal://www.glenview-ultimate.org/schedule.ics')
+
+    const pattern = screen.getByText(/Practices are Tuesdays/i)
+    // DOCUMENT_POSITION_FOLLOWING (4): the link comes after the pattern line.
+    expect(pattern.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('hides past events from the timeline by default, behind a disclosure', async () => {
     const past = {
       id: 100, season_year: 2026, event_type: 'practice', title: 'Old Spring Practice',
