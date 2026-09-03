@@ -4,8 +4,7 @@ import { Lexend } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer";
-import { hasNewsArticles, hasTeamPhotos } from "@/lib/directus";
-import { NAV_LINKS } from "@/components/navbar/nav-links";
+import { getNavLinks } from "@/components/navbar/get-nav-links";
 
 const lexend = Lexend({
   weight: ["400", "500", "600", "700"],
@@ -20,12 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<React.JSX.Element> {
-  const [hasNews, hasPhotos] = await Promise.all([hasNewsArticles(), hasTeamPhotos()]);
-  const filteredLinks = NAV_LINKS.filter((link) => {
-    if (link.href === "/news") return hasNews;
-    if (link.href === "/team-photos") return hasPhotos;
-    return true;
-  });
+  const filteredLinks = await getNavLinks();
 
   return (
     <html lang="en" className={lexend.variable}>
