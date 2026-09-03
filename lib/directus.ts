@@ -455,34 +455,24 @@ function appendTransformParams(
   }
 }
 
+/**
+ * URL for a Directus asset, always routed through /api/assets.
+ *
+ * This deliberately never embeds `access_token`. These URLs are rendered into
+ * public HTML - and next/image passes them through as a query parameter - so a
+ * token here is readable by anyone who views source. That leaked the static
+ * token, which could read the Registrations collection.
+ *
+ * The proxy route attaches the token server-side, so transforms still work and
+ * nothing sensitive reaches the browser. The old `forceProxy` argument is gone:
+ * proxying is no longer optional.
+ */
 export function getDirectusAssetUrl(
   fileId: string | null | undefined,
   options?: DirectusAssetTransformOptions,
-  forceProxy = false,
 ): string | null {
   if (!fileId) return null;
 
-  // If forceProxy is explicitly true (for client components), always use proxy
-  // This prevents hydration mismatches in client components
-  if (forceProxy) {
-    const params = new URLSearchParams();
-    appendTransformParams(params, options);
-    const queryString = params.toString();
-    return `/api/assets/${fileId}${queryString ? `?${queryString}` : ""}`;
-  }
-
-  // Server-side: if we have DIRECTUS_URL and DIRECTUS_STATIC_TOKEN, use direct URL with token
-  const baseUrl = process.env.DIRECTUS_URL;
-  const token = process.env.DIRECTUS_STATIC_TOKEN;
-  if (baseUrl && token) {
-    const params = new URLSearchParams();
-    params.set("access_token", token);
-    appendTransformParams(params, options);
-    const queryString = params.toString();
-    return `${baseUrl}/assets/${fileId}?${queryString}`;
-  }
-
-  // Fallback: use API proxy route
   const params = new URLSearchParams();
   appendTransformParams(params, options);
   const queryString = params.toString();

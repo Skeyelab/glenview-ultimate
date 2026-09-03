@@ -7,7 +7,7 @@ import { getDirectusAssetUrl } from "@/lib/directus";
 export function Logo(): React.JSX.Element {
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
   // Force proxy route for client components to prevent hydration mismatches
-  const logoUrl = directusUrl ? getDirectusAssetUrl(LOGO_ID, undefined, true) : null;
+  const logoUrl = directusUrl ? getDirectusAssetUrl(LOGO_ID, undefined) : null;
 
   return (
     <Link href="/" className="flex items-center gap-3">

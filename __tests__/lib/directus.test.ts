@@ -34,13 +34,28 @@ describe('getDirectusAssetUrl', () => {
     expect(getDirectusAssetUrl('test-id')).toBe('/api/assets/test-id')
   })
 
-  it('should use direct URL with token when DIRECTUS_URL and DIRECTUS_STATIC_TOKEN are available', async () => {
+  it('never puts the Directus token in a URL, even when one is configured', async () => {
+    // These URLs are rendered into public HTML. A token here is readable by
+    // anyone who views source, and was exposing the Registrations collection.
+    process.env.DIRECTUS_URL = 'https://private.example.com'
+    process.env.DIRECTUS_STATIC_TOKEN = 'super-secret-token'
+    vi.resetModules()
+    const { getDirectusAssetUrl } = await import('@/lib/directus')
+
+    const url = getDirectusAssetUrl('test-id', { transforms: { width: 800, fit: 'cover' } })
+
+    expect(url).not.toContain('super-secret-token')
+    expect(url).not.toContain('access_token')
+    expect(url).toContain('/api/assets/test-id')
+  })
+
+  it('proxies even when a token is configured, rather than embedding it', async () => {
     process.env.DIRECTUS_URL = 'https://private.example.com'
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
-    // Explicitly pass false to test server-side behavior (not forcing proxy)
-    expect(getDirectusAssetUrl('test-id', undefined, false)).toBe('https://private.example.com/assets/test-id?access_token=test-token')
+
+    expect(getDirectusAssetUrl('test-id')).toBe('/api/assets/test-id')
   })
 
   it('should use API proxy route when DIRECTUS_STATIC_TOKEN is not available', async () => {
@@ -51,14 +66,16 @@ describe('getDirectusAssetUrl', () => {
     expect(getDirectusAssetUrl('test-id')).toBe('/api/assets/test-id')
   })
 
-  it('should construct correct asset URL with token for server-side', async () => {
+  it('builds the same proxy URL server-side as client-side', async () => {
     process.env.DIRECTUS_URL = 'https://example.com'
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
-    // Explicitly pass false to test server-side behavior (not forcing proxy)
-    expect(getDirectusAssetUrl('c3db7679-c7b9-4d7d-add9-761a96e59b86', undefined, false)).toBe(
-      'https://example.com/assets/c3db7679-c7b9-4d7d-add9-761a96e59b86?access_token=test-token'
+
+    // One URL for both rendering contexts, so there is no hydration mismatch
+    // and no environment where a token can leak.
+    expect(getDirectusAssetUrl('c3db7679-c7b9-4d7d-add9-761a96e59b86')).toBe(
+      '/api/assets/c3db7679-c7b9-4d7d-add9-761a96e59b86'
     )
   })
 
@@ -72,15 +89,16 @@ describe('getDirectusAssetUrl', () => {
     ).toBe('/api/assets/transform-id?width=400&height=400&fit=cover')
   })
 
-  it('should append transform params to direct URLs with tokens', async () => {
+  it('carries transform params through the proxy when a token is configured', async () => {
     process.env.DIRECTUS_URL = 'https://example.com'
     process.env.DIRECTUS_STATIC_TOKEN = 'test-token'
     vi.resetModules()
     const { getDirectusAssetUrl } = await import('@/lib/directus')
-    // Explicitly pass false to test server-side behavior (not forcing proxy)
+
+    // The proxy route attaches the token itself and forwards these on.
     expect(
-      getDirectusAssetUrl('transform-id', { quality: 70, format: 'webp' }, false),
-    ).toBe('https://example.com/assets/transform-id?access_token=test-token&quality=70&format=webp')
+      getDirectusAssetUrl('transform-id', { quality: 70, format: 'webp' }),
+    ).toBe('/api/assets/transform-id?quality=70&format=webp')
   })
 })
 
