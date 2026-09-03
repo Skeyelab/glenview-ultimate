@@ -6,7 +6,6 @@ import type { SeasonPhotoGroup } from "@/lib/team-photos-utils";
 
 const PHOTO_WIDTH = 800;
 const PHOTO_HEIGHT = 600;
-const PHOTO_QUALITY = 85;
 
 export interface SeasonGalleryProps {
   group: SeasonPhotoGroup;
@@ -20,8 +19,12 @@ export function SeasonGallery({ group }: SeasonGalleryProps): React.JSX.Element 
     >
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {group.photos.map((photo) => {
+          // No `quality` here on purpose. Directus rejects a transformation
+          // containing quality when the source exceeds its max dimension, which
+          // every photo straight off a camera does. Omitting it resizes any
+          // source fine, and Directus applies its own default quality.
           const src = getDirectusAssetUrl(photo.image, {
-            transforms: { width: PHOTO_WIDTH, height: PHOTO_HEIGHT, fit: "cover", quality: PHOTO_QUALITY },
+            transforms: { width: PHOTO_WIDTH, height: PHOTO_HEIGHT, fit: "cover" },
           });
           if (!src) return null;
 
