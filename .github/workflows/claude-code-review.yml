@@ -12,6 +12,11 @@ on:
 
 jobs:
   claude-review:
+    # Dependabot-triggered runs read from GitHub's separate Dependabot secret
+    # store, so secrets.ANTHROPIC_API_KEY is empty and the action fails in
+    # seconds without reviewing anything. Reviewing a version bump adds little
+    # anyway, so skip rather than leave a permanent red X on every bump.
+    if: github.actor != 'dependabot[bot]'
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
