@@ -4,8 +4,11 @@ import { SectionCard } from "@/components/ui/section-card";
 import { PhotoLightbox, type LightboxPhoto } from "./photo-lightbox";
 import type { SeasonPhotoGroup } from "@/lib/team-photos-utils";
 
-const THUMB_WIDTH = 800;
-const THUMB_HEIGHT = 600;
+// The source next/image downscales from, not the rendered size. It cannot
+// upscale, so an 800px source made every entry in the responsive srcSet return
+// byte-identical output. 1600 covers a 3x phone in a full-width cell.
+const THUMB_WIDTH = 1600;
+const THUMB_HEIGHT = 1200;
 const FULL_WIDTH = 1600;
 const FULL_HEIGHT = 1600;
 
