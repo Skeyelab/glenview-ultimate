@@ -132,4 +132,14 @@ describe('PhotoLightbox', () => {
     await user.click(screen.getByRole('dialog'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
+
+  it('tells the browser how wide thumbnails render, so it can pick a size', () => {
+    render(<PhotoLightbox photos={photos} />)
+
+    // Without `sizes`, next/image emits a fixed 1x/2x pair and every device
+    // downloads the same bytes regardless of how small the grid cell is.
+    const thumb = screen.getAllByRole('img')[0]
+    expect(thumb).toHaveAttribute('sizes')
+    expect(thumb.getAttribute('sizes')).toMatch(/vw/)
+  })
 })

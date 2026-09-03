@@ -80,6 +80,10 @@ export function PhotoLightbox({ photos }: PhotoLightboxProps): React.JSX.Element
                 alt={photo.alt}
                 width={800}
                 height={600}
+                // Mirrors the grid below: 3 columns from lg, 2 from sm, 1 under
+                // that. Without this next/image emits a fixed 1x/2x pair and a
+                // phone downloads the same bytes as a desktop.
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                 className="h-full w-full object-cover"
               />
             </button>

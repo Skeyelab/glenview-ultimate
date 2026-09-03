@@ -28,7 +28,7 @@ describe('SeasonGallery asset transform', () => {
 
     const opts = vi.mocked(directus.getDirectusAssetUrl).mock.calls[0][1] as any
     expect(opts.transforms).not.toHaveProperty('quality')
-    expect(opts.transforms).toMatchObject({ width: 800, height: 600, fit: 'cover' })
+    expect(opts.transforms).toMatchObject({ fit: 'cover' })
   })
 
   it('requests a larger uncropped image for the lightbox, still without quality', () => {
@@ -48,5 +48,21 @@ describe('SeasonGallery asset transform', () => {
     expect(full.transforms.width).toBeGreaterThan(800)
     // `inside` rather than `cover`: the lightbox shows the whole photo.
     expect(full.transforms.fit).toBe('inside')
+  })
+
+  it('asks Directus for a thumbnail source big enough to downscale from', () => {
+    render(
+      <SeasonGallery
+        group={{ seasonYear: 2026, label: '2026 Season', photos: [
+          { id: 1, title: 'x', image: 'img-1', season_year: 2026, sort: 1, active: true },
+        ] }}
+      />,
+    )
+
+    // next/image cannot upscale: with an 800px source every entry in the
+    // responsive srcSet returned byte-identical output, making it decorative.
+    const thumb = (vi.mocked(directus.getDirectusAssetUrl).mock.calls[0][1] as any).transforms
+    expect(thumb.width).toBeGreaterThanOrEqual(1600)
+    expect(thumb).not.toHaveProperty('quality')
   })
 })
