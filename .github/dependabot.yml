@@ -1,0 +1,59 @@
+version: 2
+
+updates:
+  # ---------------------------------------------------------------------------
+  # npm
+  #
+  # Grouped on purpose. Ungrouped, every bump rewrites yarn.lock, so the second
+  # PR to merge conflicts with the first and each one has to be rebased in turn
+  # (six open PRs on 2026-09-02 took five merges and a rebase to clear).
+  # Grouping minor/patch into one PR per dependency type makes that a single
+  # lockfile change per week.
+  #
+  # Majors are deliberately NOT grouped - they land as individual PRs so a
+  # Next.js or React major gets read on its own rather than buried in a batch.
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
+    groups:
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-minor-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # ---------------------------------------------------------------------------
+  # GitHub Actions
+  #
+  # ci.yml, claude-code-review.yml and claude.yml pin third-party actions. These
+  # never conflict with each other, so one grouped PR is purely to keep the
+  # queue short.
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      actions:
+        patterns:
+          - "*"
