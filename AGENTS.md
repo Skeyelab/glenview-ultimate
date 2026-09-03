@@ -38,10 +38,10 @@ Brian Carrigan owns Glenview Ultimate and is the client for this site. When the 
 thread and nothing else**. His feature requests and bug reports in that thread are the
 primary source of work on this repo.
 
-Read it with **imsg-read**, not by querying `chat.db` yourself:
+Read it with **imsg-agent**, not by querying `chat.db` yourself:
 
 ```bash
-python3 ~/Documents/GitHub/ericdahl.dev/imsg-read/imsgread.py --contact brian -n 20 --text
+python3 ~/Documents/GitHub/ericdahl.dev/imsg-agent/imsgread.py --contact brian -n 20 --text
 ```
 
 `--contact <name>` resolves through that repo's `contacts.toml`, keeping phone numbers out
@@ -54,7 +54,7 @@ Do not hand-roll the SQL. Two things go wrong every time:
   serialized NSAttributedString. A query reading only `text` comes back blank and looks
   like an empty conversation.
 - `chat.db` holds every conversation on the machine. **Never run an unfiltered time-window
-  query over it.** imsg-read has no code path that reads across threads — it requires a
+  query over it.** imsg-agent has no code path that reads across threads — it requires a
   chat identifier and exits non-zero without one.
 
 Three gotchas that cost real time:
