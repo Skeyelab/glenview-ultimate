@@ -279,10 +279,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/css-tokenizer/-/css-tokenizer-3.0.4.tgz#333fedabc3fd1a8e5d0100013731cf19e6a8c5d3"
   integrity sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==
 
-"@directus/sdk@^20.2.0":
-  version "20.2.0"
-  resolved "https://registry.yarnpkg.com/@directus/sdk/-/sdk-20.2.0.tgz#ac54920ec5114eb8e9433ccc14b7b432bb6eb8d0"
-  integrity sha512-MzS6mjpM/XKr8jGM4DMSNCwLfgN2RNXnStP/fX23a8Nbpkgl6HyiwVPqHZh8DjTdmRMwif2/zJ0sqbfJJeel8g==
+"@directus/sdk@^25.0.1":
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/@directus/sdk/-/sdk-25.0.1.tgz#42f0accf211e1f8fdf8e3eeac2087f7c1618df9d"
+  integrity sha512-7YatQh8aKDN6iIPyXmbUc3HW/jdKveiwFP+oFSKs0/W/IKX+ZpnwsN1NQLI6PpcmU2/rLuYK8knQaQr5F0gKNw==
 
 "@directus/visual-editing@1.1.0":
   version "1.1.0"

@@ -20,7 +20,7 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@directus/sdk": "^20.2.0",
+    "@directus/sdk": "^25.0.1",
     "@directus/visual-editing": "1.1.0",
     "@radix-ui/react-slot": "^1.2.4",
     "marked": "17.0.1",
