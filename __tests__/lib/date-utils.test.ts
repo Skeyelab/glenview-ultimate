@@ -22,6 +22,32 @@ describe("date-utils", () => {
     });
   });
 
+  describe("timezone-free wall clock handling", () => {
+    // The club is entirely in one timezone. Schedule.date is a naive datetime
+    // (no offset), and what an editor types must be exactly what a visitor sees,
+    // regardless of what timezone the server container happens to run in.
+
+    it("parses a naive datetime as literal wall clock, not server-local", () => {
+      const parsed = safeParseDate("2026-09-08T17:00:00");
+      expect(parsed).not.toBeNull();
+      expect(parsed!.toISOString()).toBe("2026-09-08T17:00:00.000Z");
+    });
+
+    it("still honours an explicit offset when one is present", () => {
+      expect(safeParseDate("2026-09-08T17:00:00Z")!.toISOString()).toBe("2026-09-08T17:00:00.000Z");
+    });
+
+    it("renders the typed time back unchanged", () => {
+      const event = { date: "2026-09-08T17:00:00", end_date: "2026-09-08T19:00:00" } as any;
+      expect(formatTimeRange(event)).toBe("5:00 PM – 7:00 PM");
+    });
+
+    it("does not shift the calendar day for an evening event", () => {
+      expect(formatDay("2026-09-08T19:00:00")).toBe("Tuesday");
+      expect(formatDateShort("2026-09-08T19:00:00")).toBe("Sep 8");
+    });
+  });
+
   describe("formatDateRange", () => {
     const mk = (date: string, end?: string | null) =>
       ({ date, end_date: end ?? null } as any);
