@@ -72,6 +72,26 @@ export function describePracticePattern(events: ScheduleEvent[]): string | null 
   return `Practices are ${weekday}s, ${time}${where}`;
 }
 
+/**
+ * Splits events into future-or-now and past, by end_date falling back to date.
+ *
+ * Both Season Timeline and Season Calendar rendered every event ever entered,
+ * so a finished Spring season (Richardson Park, 10am-12pm) sat directly above
+ * the current Fall one (Flick Park, 5-7pm) with identical styling - a decoy a
+ * parent scanning for "what time is practice" could easily grab by mistake.
+ * Callers show `future` by default and put `past` behind a disclosure.
+ */
+export function partitionByDate(events: ScheduleEvent[]): { future: ScheduleEvent[]; past: ScheduleEvent[] } {
+  const now = Date.now();
+  const future: ScheduleEvent[] = [];
+  const past: ScheduleEvent[] = [];
+  for (const event of events) {
+    const date = safeParseDate(event.end_date ?? event.date);
+    (date && date.getTime() >= now ? future : past).push(event);
+  }
+  return { future, past };
+}
+
 export function groupEventsByMonth(events: ScheduleEvent[]): MonthlyEventGroup[] {
   const formatter = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
   const buckets = new Map<string, { label: string; events: ScheduleEvent[] }>();

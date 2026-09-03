@@ -1,6 +1,6 @@
 import React from "react";
 import { getSchedule } from "@/lib/directus";
-import { selectUpcomingEvents, groupEventsByMonth, describePracticePattern } from "@/lib/schedule-utils";
+import { selectUpcomingEvents, groupEventsByMonth, describePracticePattern, partitionByDate } from "@/lib/schedule-utils";
 import { ScheduleHeader } from "@/components/schedule/schedule-header";
 import { UpcomingEventsCard } from "@/components/schedule/upcoming-events-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
@@ -12,17 +12,21 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
   const schedule = await getSchedule();
   const { events } = schedule;
   const upcomingEvents = selectUpcomingEvents(events);
-  // selectUpcomingEvents caps at 3; the pattern needs every upcoming practice.
-  const upcomingAll = events.filter((event) => {
-    const date = new Date(event.end_date ?? event.date);
-    return !Number.isNaN(date.getTime()) && date.getTime() >= Date.now();
-  });
   // No fallback to events.slice(0, n): that returned the OLDEST events on file,
   // so a finished season rendered its first practice as "Up Next". An empty list
   // lets UpcomingEventsCard show its honest "coming soon" message instead.
   const upcomingDisplay = upcomingEvents;
-  const monthlyGroups = groupEventsByMonth(events);
-  const practicePattern = describePracticePattern(upcomingAll);
+
+  // Season Timeline and Season Calendar previously rendered every event ever
+  // entered, so a finished Spring season (Richardson Park, 10am-12pm) sat
+  // directly above the current Fall one (Flick Park, 5-7pm) with identical
+  // styling - a decoy a parent scanning for "what time is practice" could
+  // easily grab by mistake. Both now default to future events; past ones sit
+  // behind a <details> disclosure rather than disappearing outright.
+  const { future: futureEvents, past: pastEvents } = partitionByDate(events);
+  const practicePattern = describePracticePattern(futureEvents);
+  const futureMonthlyGroups = groupEventsByMonth(futureEvents);
+  const pastMonthlyGroups = groupEventsByMonth(pastEvents);
 
   return (
     <div className="space-y-8">
@@ -39,9 +43,29 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
           since UpcomingEventsCard no longer has a partner to sit beside. */}
       <UpcomingEventsCard events={upcomingDisplay} />
 
-      <SeasonTimeline events={events} />
+      <SeasonTimeline events={futureEvents} />
+      {pastEvents.length > 0 && (
+        <details className="card">
+          <summary className="cursor-pointer text-white/80 hover:text-white">
+            Show {pastEvents.length} past {pastEvents.length === 1 ? "event" : "events"}
+          </summary>
+          <div className="mt-6">
+            <SeasonTimeline events={pastEvents} title="Past Events" />
+          </div>
+        </details>
+      )}
 
-      <SeasonCalendar groups={monthlyGroups} />
+      <SeasonCalendar groups={futureMonthlyGroups} />
+      {pastMonthlyGroups.length > 0 && (
+        <details className="card">
+          <summary className="cursor-pointer text-white/80 hover:text-white">
+            Show {pastEvents.length} past {pastEvents.length === 1 ? "event" : "events"}
+          </summary>
+          <div className="mt-6">
+            <SeasonCalendar groups={pastMonthlyGroups} title="Past Events" subtitle="" />
+          </div>
+        </details>
+      )}
     </div>
   );
 }
