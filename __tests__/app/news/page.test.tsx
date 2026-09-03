@@ -37,8 +37,8 @@ describe('NewsIndex', () => {
 
   it('should render with fetched posts', async () => {
     const mockPosts = [
-      { id: '1', title: 'Post 1', slug: 'post-1' },
-      { id: '2', title: 'Post 2', slug: 'post-2' },
+      { id: 1, title: 'Post 1', slug: 'post-1', published_at: '2026-01-01', content: 'Body 1' },
+      { id: 2, title: 'Post 2', slug: 'post-2', published_at: '2026-01-02', content: 'Body 2' },
     ];
 
     getNewsList.mockResolvedValue(mockPosts);

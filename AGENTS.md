@@ -179,6 +179,44 @@ Directus Visual Editing (`@directus/visual-editing`) activates only when `?visua
 
 ---
 
+### claude-review silently skips when a PR edits its own workflow
+
+`claude-code-action` refuses to run when the PR changes `.github/workflows/`,
+logging `Skipping action due to workflow validation` — and then **reports the
+check as passing**. A `claude-review` that completes in ~10 seconds did not
+review anything; a real review takes minutes.
+
+This matters when changing the workflow itself: the green check on that PR
+proves nothing, and the change can only be verified from a later PR that leaves
+the workflow alone.
+
+### The claude workflows authenticate with a subscription token
+
+Both `claude-code-review.yml` and `claude.yml` use
+`claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}`, which draws
+on a Claude subscription rather than billing Anthropic API usage. Generate it
+with `claude setup-token`.
+
+Set it by piping, not by relying on the prompt — `gh secret set NAME` with no
+stdin silently stores an **empty** secret, and the workflow then fails in a way
+that looks like a pass:
+
+```bash
+printf '%s' '<token>' | gh secret set CLAUDE_CODE_OAUTH_TOKEN
+```
+
+GitHub masks a populated secret as `***` in run logs. A blank value there means
+the secret is empty.
+
+### Dependabot runs cannot see Actions secrets
+
+Dependabot-triggered workflows read from a separate secret store, so
+`secrets.*` resolve empty and the review job fails in seconds. `claude-review`
+is skipped for `dependabot[bot]` for that reason — see
+`.github/workflows/claude-code-review.yml`.
+
+---
+
 ## Code Conventions
 
 ### Component structure
