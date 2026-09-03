@@ -25,7 +25,7 @@ vi.mock('@/lib/directus', () => ({
 }))
 
 describe('HomePage (integration)', () => {
-  const mockPartners = [{ id: 'p1', name: 'Partner 1', url: 'https://p1.test', logo: 'logo-id' }]
+  const mockPartners = [{ id: 1, name: 'Partner 1', url: 'https://p1.test', logo: 'logo-id' }]
   const mockSchedule = {
     highlights: [],
     events: [
@@ -44,6 +44,7 @@ describe('HomePage (integration)', () => {
   } as any
   const mockWebsite = {
     id: 1,
+    site_name: 'Glenview Ultimate',
     hero_title: 'Custom Hero',
     hero_block: '<p>Welcome to Glenview Ultimate</p>',
     hero_cta_label: 'Sign Up',
