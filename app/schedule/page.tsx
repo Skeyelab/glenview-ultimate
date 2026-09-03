@@ -25,6 +25,11 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
   // behind a <details> disclosure rather than disappearing outright.
   const { future: futureEvents, past: pastEvents } = partitionByDate(events);
   const practicePattern = describePracticePattern(futureEvents);
+  // Same fallback pattern as app/sitemap.ts. webcal:// rather than https://:
+  // that scheme is what gets Apple/Google Calendar to offer a live
+  // subscription instead of a one-time "Add Event" import dialog.
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.glenview-ultimate.org").replace(/\/+$/, "");
+  const subscribeHref = `webcal://${baseUrl.replace(/^https?:\/\//, "")}/schedule.ics`;
   const futureMonthlyGroups = groupEventsByMonth(futureEvents);
   const pastMonthlyGroups = groupEventsByMonth(pastEvents);
 
@@ -35,6 +40,10 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
       {practicePattern && (
         <p className="text-lg font-medium text-white">{practicePattern}</p>
       )}
+
+      <a href={subscribeHref} className="inline-block text-sm font-medium text-white underline underline-offset-4 hover:text-white/80">
+        Subscribe to calendar
+      </a>
 
       {/* Season Highlights was cut from this page (kept on the homepage):
           two independent reviews found it duplicated Up Next with less detail
