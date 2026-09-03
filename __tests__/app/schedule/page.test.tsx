@@ -39,31 +39,26 @@ describe('SchedulePage (integration)', () => {
     expect(screen.queryByText(/Next Key Date/i)).not.toBeInTheDocument()
   })
 
-  it('renders schedule header, upcoming events, highlights, timeline, and calendar with real components', async () => {
+  it('renders schedule header, upcoming events, timeline, and calendar with real components', async () => {
     const page = await SchedulePage()
     render(page)
 
     expect(screen.getByRole('heading', { level: 1, name: /spring 2026 season/i })).toBeInTheDocument()
     expect(screen.getByText(/Season 2026/i)).toBeInTheDocument()
-    // Highlights now come from the date-filtered event list rather than the
-    // deprecated `highlights` string array, so the fixture's 'Highlight 1'/'2'
-    // strings are deliberately no longer rendered.
-    expect(screen.queryByText('Highlight 1')).not.toBeInTheDocument()
     expect(screen.getAllByText('Championship Game').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Practice Session').length).toBeGreaterThan(0)
     expect(screen.getByText(/Season Calendar/)).toBeInTheDocument()
   })
 
-  it('does not list past events under Season Highlights', async () => {
-    // #181 filtered the homepage highlights but this page reads a different
-    // field - schedule.highlights, built with no date filter - so finished
-    // events were rendering as current alongside upcoming ones.
-    vi.setSystemTime(new Date('2030-01-01T00:00:00Z'))
-
+  it('does not render a Season Highlights section at all', async () => {
+    // Two independent reviews agreed this block should be cut from /schedule
+    // entirely, not just have its date bug fixed: it duplicates Up Next with
+    // less detail (no day, no time, no badge) and serves neither of the two
+    // tasks a parent has on this page. It stays on the homepage as a separate,
+    // marketing-flavored component.
     render(await SchedulePage())
 
-    expect(screen.queryByText(/Highlight 1/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Highlight 2/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Season Highlights/i)).not.toBeInTheDocument()
   })
 
   it('states the recurring practice pattern near the top', async () => {

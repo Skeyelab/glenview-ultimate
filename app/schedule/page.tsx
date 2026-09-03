@@ -1,9 +1,8 @@
 import React from "react";
 import { getSchedule } from "@/lib/directus";
-import { selectUpcomingEvents, groupEventsByMonth, selectUpcomingHighlights, describePracticePattern } from "@/lib/schedule-utils";
+import { selectUpcomingEvents, groupEventsByMonth, describePracticePattern } from "@/lib/schedule-utils";
 import { ScheduleHeader } from "@/components/schedule/schedule-header";
 import { UpcomingEventsCard } from "@/components/schedule/upcoming-events-card";
-import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
 import { SeasonCalendar } from "@/components/schedule/season-calendar";
 
@@ -33,14 +32,12 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
         <p className="text-lg font-medium text-white">{practicePattern}</p>
       )}
 
-      <section className="grid-2">
-        <UpcomingEventsCard events={upcomingDisplay} />
-        {/* `events` rather than the deprecated `highlights` string array: that
-            array is built with no date filter, so finished events rendered as
-            current. selectUpcomingHighlights is the same helper the homepage
-            uses, and it also gives badges and locations instead of bare text. */}
-        <SeasonHighlightsCard events={selectUpcomingHighlights(events)} />
-      </section>
+      {/* Season Highlights was cut from this page (kept on the homepage):
+          two independent reviews found it duplicated Up Next with less detail
+          and served neither of the two tasks a parent has here (when's
+          practice / what's coming up). grid-2 dropped to a single column
+          since UpcomingEventsCard no longer has a partner to sit beside. */}
+      <UpcomingEventsCard events={upcomingDisplay} />
 
       <SeasonTimeline events={events} />
 
