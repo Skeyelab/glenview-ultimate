@@ -1,6 +1,6 @@
 import React from "react";
 import type { ScheduleEvent } from "@/lib/directus";
-import { formatDateRange, safeParseDate } from "@/lib/date-utils";
+import { formatDateRange, formatTimeRange, safeParseDate } from "@/lib/date-utils";
 import { EventTypeBadge } from "./event-badge";
 
 interface NextKeyDateProps {
@@ -14,6 +14,7 @@ export function NextKeyDate({ event, title = "Next Key Date", className = "" }: 
 
   // A past event is not a "next" key date. When a season ends and the new one
   // has no rows yet, this hides rather than presenting a stale date as upcoming.
+  const timeRange = formatTimeRange(event);
   const eventDate = safeParseDate(event.end_date ?? event.date);
   if (!eventDate || eventDate.getTime() < Date.now()) return null;
 
@@ -23,7 +24,9 @@ export function NextKeyDate({ event, title = "Next Key Date", className = "" }: 
       <div className="space-y-1.5">
         <EventTypeBadge type={event.event_type} size="sm" />
         <p className="font-semibold text-white leading-snug">{event.title}</p>
-        <p className="text-xs text-white/60">{formatDateRange(event)}</p>
+        <p className="text-xs text-white/70">{formatDateRange(event)}</p>
+        {timeRange && <p className="text-xs font-medium text-white/90">{timeRange}</p>}
+        {event.location && <p className="text-xs text-white/70">{event.location}</p>}
       </div>
     </div>
   );

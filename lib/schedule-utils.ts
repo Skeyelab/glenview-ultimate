@@ -1,5 +1,5 @@
 import type { ScheduleEvent } from "./directus";
-import { safeParseDate } from "./date-utils";
+import { safeParseDate, formatTimeRange } from "./date-utils";
 import type { MonthlyEventGroup } from "@/components/schedule/season-calendar";
 
 export function selectUpcomingEvents(events: ScheduleEvent[]): ScheduleEvent[] {
@@ -35,6 +35,61 @@ export function selectUpcomingHighlights(events: ScheduleEvent[], limit = MAX_HI
       return da - db;
     })
     .slice(0, limit);
+}
+
+/**
+ * One-line summary of the recurring practice, or null when it does not recur.
+ *
+ * Every upcoming practice is currently the same weekday, time and place, so a
+ * sentence answers "when is practice" better than a list the reader has to
+ * infer the pattern from. Returns null the moment practices vary, rather than
+ * stating something that is only mostly true.
+ */
+export function describePracticePattern(events: ScheduleEvent[]): string | null {
+  const practices = events.filter((event) => event.event_type === "practice");
+  if (practices.length === 0) return null;
+
+  const weekdays = new Set<string>();
+  const times = new Set<string>();
+  const locations = new Set<string>();
+
+  for (const practice of practices) {
+    const date = safeParseDate(practice.date);
+    if (!date) return null;
+    weekdays.add(new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(date));
+    const range = formatTimeRange(practice);
+    if (!range) return null;
+    times.add(range);
+    locations.add(practice.location ?? "");
+  }
+
+  if (weekdays.size !== 1 || times.size !== 1 || locations.size !== 1) return null;
+
+  const [weekday] = [...weekdays];
+  const [time] = [...times];
+  const [location] = [...locations];
+  const where = location ? `, at ${location}` : "";
+  return `Practices are ${weekday}s, ${time}${where}`;
+}
+
+/**
+ * Splits events into future-or-now and past, by end_date falling back to date.
+ *
+ * Both Season Timeline and Season Calendar rendered every event ever entered,
+ * so a finished Spring season (Richardson Park, 10am-12pm) sat directly above
+ * the current Fall one (Flick Park, 5-7pm) with identical styling - a decoy a
+ * parent scanning for "what time is practice" could easily grab by mistake.
+ * Callers show `future` by default and put `past` behind a disclosure.
+ */
+export function partitionByDate(events: ScheduleEvent[]): { future: ScheduleEvent[]; past: ScheduleEvent[] } {
+  const now = Date.now();
+  const future: ScheduleEvent[] = [];
+  const past: ScheduleEvent[] = [];
+  for (const event of events) {
+    const date = safeParseDate(event.end_date ?? event.date);
+    (date && date.getTime() >= now ? future : past).push(event);
+  }
+  return { future, past };
 }
 
 export function groupEventsByMonth(events: ScheduleEvent[]): MonthlyEventGroup[] {

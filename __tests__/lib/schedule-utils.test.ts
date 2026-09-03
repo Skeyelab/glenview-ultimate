@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, vi } from 'vitest'
-import { selectUpcomingEvents, groupEventsByMonth, selectUpcomingHighlights } from "@/lib/schedule-utils";
+import { selectUpcomingEvents, groupEventsByMonth, selectUpcomingHighlights, partitionByDate } from "@/lib/schedule-utils";
 
 describe("schedule-utils", () => {
   beforeEach(() => {
@@ -23,6 +23,40 @@ describe("schedule-utils", () => {
       const result = selectUpcomingEvents(events);
       expect(result.map((e) => e.id)).toEqual([2, 3, 4]);
       expect(result).toHaveLength(3);
+    });
+  });
+
+  describe("partitionByDate", () => {
+    it("splits events into future (inclusive) and past by end_date, falling back to date", () => {
+      const events = [
+        { id: 1, date: "2026-02-28T12:00:00.000Z", end_date: null },      // past
+        { id: 2, date: "2026-03-01T12:00:00.000Z", end_date: null },      // now, inclusive -> future
+        { id: 3, date: "2026-02-01T12:00:00.000Z", end_date: "2026-03-02T12:00:00.000Z" }, // ends in future
+        { id: 4, date: "2026-04-01T12:00:00.000Z", end_date: null },      // future
+      ] as any[];
+
+      const { future, past } = partitionByDate(events);
+      expect(future.map((e) => e.id)).toEqual([2, 3, 4]);
+      expect(past.map((e) => e.id)).toEqual([1]);
+    });
+
+    it("treats an unparseable date as past, not future", () => {
+      const events = [{ id: 1, date: "not-a-date", end_date: null }] as any[];
+
+      const { future, past } = partitionByDate(events);
+      expect(future).toEqual([]);
+      expect(past.map((e) => e.id)).toEqual([1]);
+    });
+
+    it("preserves input order within each bucket", () => {
+      const events = [
+        { id: 1, date: "2026-04-01T12:00:00.000Z", end_date: null },
+        { id: 2, date: "2026-02-01T12:00:00.000Z", end_date: null },
+        { id: 3, date: "2026-05-01T12:00:00.000Z", end_date: null },
+      ] as any[];
+
+      const { future } = partitionByDate(events);
+      expect(future.map((e) => e.id)).toEqual([1, 3]);
     });
   });
 

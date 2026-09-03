@@ -1,9 +1,8 @@
 import React from "react";
 import { getSchedule } from "@/lib/directus";
-import { selectUpcomingEvents, groupEventsByMonth } from "@/lib/schedule-utils";
+import { selectUpcomingEvents, groupEventsByMonth, describePracticePattern, partitionByDate } from "@/lib/schedule-utils";
 import { ScheduleHeader } from "@/components/schedule/schedule-header";
 import { UpcomingEventsCard } from "@/components/schedule/upcoming-events-card";
-import { SeasonHighlightsCard } from "@/components/schedule/highlights-card";
 import { SeasonTimeline } from "@/components/schedule/season-timeline";
 import { SeasonCalendar } from "@/components/schedule/season-calendar";
 
@@ -17,20 +16,56 @@ export default async function SchedulePage(): Promise<React.JSX.Element> {
   // so a finished season rendered its first practice as "Up Next". An empty list
   // lets UpcomingEventsCard show its honest "coming soon" message instead.
   const upcomingDisplay = upcomingEvents;
-  const monthlyGroups = groupEventsByMonth(events);
+
+  // Season Timeline and Season Calendar previously rendered every event ever
+  // entered, so a finished Spring season (Richardson Park, 10am-12pm) sat
+  // directly above the current Fall one (Flick Park, 5-7pm) with identical
+  // styling - a decoy a parent scanning for "what time is practice" could
+  // easily grab by mistake. Both now default to future events; past ones sit
+  // behind a <details> disclosure rather than disappearing outright.
+  const { future: futureEvents, past: pastEvents } = partitionByDate(events);
+  const practicePattern = describePracticePattern(futureEvents);
+  const futureMonthlyGroups = groupEventsByMonth(futureEvents);
+  const pastMonthlyGroups = groupEventsByMonth(pastEvents);
 
   return (
     <div className="space-y-8">
       <ScheduleHeader schedule={schedule} events={events} featuredEvent={upcomingDisplay[0]} />
 
-      <section className="grid-2">
-        <UpcomingEventsCard events={upcomingDisplay} />
-        <SeasonHighlightsCard highlights={schedule.highlights} />
-      </section>
+      {practicePattern && (
+        <p className="text-lg font-medium text-white">{practicePattern}</p>
+      )}
 
-      <SeasonTimeline events={events} />
+      {/* Season Highlights was cut from this page (kept on the homepage):
+          two independent reviews found it duplicated Up Next with less detail
+          and served neither of the two tasks a parent has here (when's
+          practice / what's coming up). grid-2 dropped to a single column
+          since UpcomingEventsCard no longer has a partner to sit beside. */}
+      <UpcomingEventsCard events={upcomingDisplay} />
 
-      <SeasonCalendar groups={monthlyGroups} />
+      <SeasonTimeline events={futureEvents} />
+      {pastEvents.length > 0 && (
+        <details className="card">
+          <summary className="cursor-pointer text-white/80 hover:text-white">
+            Show {pastEvents.length} past {pastEvents.length === 1 ? "event" : "events"}
+          </summary>
+          <div className="mt-6">
+            <SeasonTimeline events={pastEvents} title="Past Events" />
+          </div>
+        </details>
+      )}
+
+      <SeasonCalendar groups={futureMonthlyGroups} />
+      {pastMonthlyGroups.length > 0 && (
+        <details className="card">
+          <summary className="cursor-pointer text-white/80 hover:text-white">
+            Show {pastEvents.length} past {pastEvents.length === 1 ? "event" : "events"}
+          </summary>
+          <div className="mt-6">
+            <SeasonCalendar groups={pastMonthlyGroups} title="Past Events" subtitle="" />
+          </div>
+        </details>
+      )}
     </div>
   );
 }
