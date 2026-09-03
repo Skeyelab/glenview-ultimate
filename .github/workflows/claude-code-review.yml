@@ -13,7 +13,7 @@ on:
 jobs:
   claude-review:
     # Dependabot-triggered runs read from GitHub's separate Dependabot secret
-    # store, so secrets.ANTHROPIC_API_KEY is empty and the action fails in
+    # store, so the auth secret is empty and the action fails in
     # seconds without reviewing anything. Reviewing a version bump adds little
     # anyway, so skip rather than leave a permanent red X on every bump.
     if: github.actor != 'dependabot[bot]'
@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -40,7 +40,7 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
