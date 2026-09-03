@@ -127,8 +127,19 @@ Data flow: page component → `lib/directus.ts` helper (batched with `Promise.al
 | `Registrations` | Write-only from API route |
 
 ### Asset URLs
-- **Server components**: call `getDirectusAssetUrl(fileId, opts)` — returns direct URL with `access_token`.
-- **Client components**: call `getDirectusAssetUrl(fileId, opts, true)` (pass `forceProxy = true`) — returns `/api/assets/<id>` proxy URL. Skipping `forceProxy` on client components causes hydration mismatches because the server inlines a token-bearing URL but the client can't reproduce it.
+`getDirectusAssetUrl(fileId, opts)` **always** returns the `/api/assets/<id>` proxy URL, in
+both server and client components. There is no `forceProxy` argument any more.
+
+**Never reintroduce a token-bearing asset URL.** These URLs are rendered into public HTML,
+and `next/image` passes them through as a query parameter, so `?access_token=…` ends up
+readable by anyone who views source. That happened: the static token was public, and it
+could read the `Registrations` collection (parent names, emails, phone numbers, children's
+names) until read was revoked from the API policy.
+
+`app/api/assets/[...path]/route.ts` attaches the token server-side and forwards any
+transform params, so transforms still work and nothing sensitive reaches the browser. One
+URL for both rendering contexts also removes the hydration-mismatch trap that `forceProxy`
+existed to work around.
 
 ### CMS fallbacks
 `lib/constants.ts` holds fallback hero copy. `DEFAULT_SCHEDULE` in `lib/directus.ts` is the hardcoded 2026 season used when Directus is unconfigured or returns no events. Always prefer CMS data; fallbacks are last resort.
