@@ -46,12 +46,15 @@ describe('getNavLinks', () => {
     vi.mocked(directus.hasNewsArticles).mockResolvedValue(false)
     vi.mocked(directus.hasTeamPhotos).mockResolvedValue(false)
 
-    expect(hrefs(await getNavLinks())).toEqual(['/', '/about', '/what-is-ultimate', '/schedule'])
+    expect(hrefs(await getNavLinks())).toEqual([
+      '/', '/about', '/what-is-ultimate', '/schedule', 'https://www.customink.com/fundraising/glenview-ultimate',
+    ])
   })
 
   it('preserves the declared order', async () => {
     expect(hrefs(await getNavLinks())).toEqual([
       '/', '/about', '/what-is-ultimate', '/news', '/schedule', '/team-photos',
+      'https://www.customink.com/fundraising/glenview-ultimate',
     ])
   })
 
