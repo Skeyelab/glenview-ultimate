@@ -7,6 +7,7 @@ const FOOTER_LINKS = [
   { href: "/schedule", label: "Schedule" },
   { href: "/what-is-ultimate", label: "What is Ultimate?" },
   { href: "/register", label: "Register" },
+  { href: "https://www.customink.com/fundraising/glenview-ultimate", label: "Shop" },
 ];
 
 export function Footer(): React.JSX.Element {
