@@ -21,10 +21,10 @@ describe('Footer', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('should link to the Custom Ink store', () => {
+  it('should link to the shop page', () => {
     render(<Footer />);
 
-    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', 'https://www.customink.com/fundraising/glenview-ultimate');
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/shop');
   });
 
   it('should have footer element with correct classes', () => {

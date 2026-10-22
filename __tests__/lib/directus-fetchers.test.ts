@@ -81,6 +81,22 @@ describe('directus fetchers', () => {
       expect(captured.sort).toEqual(['-season_year', 'sort']);
     });
 
+    it('getShopItems requests only active items in sort order', async () => {
+      let captured: any = null;
+      mockRequest.mockImplementation(async (arg: any) => {
+        if (arg?.collection === 'ShopItems') {
+          captured = arg.params;
+          return [{ id: 1, title: 'Retro T-Shirt', url: 'https://example.com/retro', sort: 1, active: true }];
+        }
+        return [];
+      });
+
+      const { getShopItems } = await import('@/lib/directus');
+      await expect(getShopItems()).resolves.toHaveLength(1);
+      expect(captured.filter).toEqual({ active: { _eq: true } });
+      expect(captured.sort).toEqual(['sort']);
+    });
+
     it('getNewsList returns list from client', async () => {
       const items = [
         { id: 1, slug: 'a', title: 'A', published_at: '2026-01-01T00:00:00Z', content: 'x' },
