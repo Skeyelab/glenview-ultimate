@@ -1,3 +1,6 @@
+/** Brian's Custom Ink fundraising store. Each ShopItems row links to one campaign in it. */
+export const SHOP_STORE_URL = "https://www.customink.com/fundraising/glenview-ultimate";
+
 export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
 
 export const DEFAULT_CLUB_DESCRIPTION =
