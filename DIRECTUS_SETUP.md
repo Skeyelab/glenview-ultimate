@@ -152,6 +152,7 @@ Registration form submissions.
 - `children` (json, nullable) - Array of child objects
 - `notes` (text, nullable)
 - `marketing_opt_in` (boolean, nullable)
+- `status` (string, dropdown, default `new`) - One of: `new`, `pending`, `registered`, `suspected_spam`. The site sets `suspected_spam` when its bot checks trip (see `lib/register-guard.ts`); review and delete or reset those by hand
 - `date_created` (timestamp, auto-generated)
 
 **Child Object Structure:**

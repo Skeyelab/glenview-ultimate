@@ -6,6 +6,7 @@ import { beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { RegistrationForm } from '@/components/register/registration-form';
 import { sampleParent1, sampleParent2, sampleChild1, sampleChild2, sampleNotes } from '@/__tests__/fixtures/registration';
 import { buildRegistrationPayload } from '@/lib/register-utils';
+import { HONEYPOT_FIELD } from '@/lib/register-guard';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -120,6 +121,33 @@ describe('RegistrationForm', () => {
       notes: expectedPayload.notes,
       marketing_opt_in: expectedPayload.marketing_opt_in,
     });
+  });
+
+  it('sends an empty honeypot and the time the form was open', async () => {
+    const user = userEvent.setup();
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) } as Response);
+    const { container } = render(<RegistrationForm />);
+
+    const emptyTextboxes = screen.getAllByDisplayValue('');
+    await user.type(emptyTextboxes[0], sampleParent1.name);
+    await user.type(emptyTextboxes[1], sampleParent1.email);
+    await user.type(emptyTextboxes[3], sampleChild1.full_name);
+    await user.click(screen.getByRole('button', { name: /Submit Registration/i }));
+
+    await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); }, { container });
+    const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    expect(callBody[HONEYPOT_FIELD]).toBe('');
+    expect(typeof callBody.form_elapsed_ms).toBe('number');
+    expect(callBody.form_elapsed_ms).toBeGreaterThanOrEqual(0);
+  });
+
+  it('keeps the honeypot out of reach of keyboard and screen reader users', () => {
+    const { container } = render(<RegistrationForm />);
+    const honeypot = container.querySelector(`input[name="${HONEYPOT_FIELD}"]`);
+
+    expect(honeypot).toHaveAttribute('tabindex', '-1');
+    expect(honeypot).toHaveAttribute('autocomplete', 'off');
+    expect(honeypot?.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
   it('shows success message on successful submission', async () => {

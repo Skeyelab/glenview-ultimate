@@ -175,9 +175,25 @@ previously claimed the registration form used Cloudflare Turnstile. It does not.
 `grep -rin turnstile app components lib` returns nothing — there is no widget in
 `registration-form.tsx` and no server-side verification in `app/api/register/route.ts`.
 
-**`POST /api/register` currently has no bot or spam protection.** The env vars are
-vestigial; the build does not need them. Do not assume the endpoint is protected, and
-do not re-add the claim to this file without also adding the implementation.
+The Turnstile env vars are vestigial; the build does not need them.
+
+### Registration bot protection (`lib/register-guard.ts`)
+`POST /api/register` has three light checks, none of which a parent sees:
+
+- **Honeypot**: an off-screen input named `hp_field_x7`. The name is deliberately
+  meaningless, because browser autofill fills inputs called `website`, `url`, `company`
+  and so on. Do not rename it to anything descriptive.
+- **Fill time**: the form sends `form_elapsed_ms` (elapsed since mount, not a timestamp,
+  so a wrong phone clock does not matter). Under 3 seconds counts as a bot. A missing
+  value is *not* a signal: pages loaded before a deploy submit without it.
+- **Rate limit**: 20 submissions per hour per IP, keyed on the first `x-forwarded-for`
+  entry. Requests without the header are not limited. The limiter is in memory, which
+  only works because the site runs as one container.
+
+A tripped honeypot or fill-time check does **not** reject the request. The registration
+is saved with `status: "suspected_spam"` and the response is the normal success, so a
+misjudged parent is never lost and a bot learns nothing. Only the rate limit returns an
+error (429). This is not strong protection; it stops naive bots.
 
 ### `export const dynamic = 'force-dynamic'`
 The homepage has this directive. `DEFAULT_REVALIDATE_SECONDS = 0` in `lib/config.ts` signals the same intent for other pages. The site does not use static generation by default.
