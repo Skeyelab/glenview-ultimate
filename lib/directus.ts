@@ -185,6 +185,7 @@ export interface RegistrationInsert {
   children?: RegistrationChild[] | null;
   notes?: string | null;
   marketing_opt_in?: boolean | null;
+  status?: string | null;
 }
 
 export interface Registration extends RegistrationInsert {

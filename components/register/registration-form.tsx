@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Parent, Child } from "@/lib/register-types";
 import { buildRegistrationPayload, parseApiError } from "@/lib/register-utils";
+import { HONEYPOT_FIELD } from "@/lib/register-guard";
 import { ParentFormSection } from "./parent-form-section";
 import { ChildFormSection } from "./child-form-section";
 
@@ -20,6 +21,13 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
   const [status, setStatus] = useState<string | null>(null);
   const isSubmitting = status === SUBMITTING_STATUS;
   const [errorField, setErrorField] = useState<string | null>(null);
+  // Bot signals for /api/register; see lib/register-guard.ts.
+  const honeypotRef = useRef<HTMLInputElement | null>(null);
+  const mountedAtRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
 
   const trackEvent = React.useCallback((eventName: string, data?: Record<string, unknown>): void => {
     if (typeof window === "undefined") return;
@@ -93,6 +101,11 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
     });
     try {
       const payload = buildRegistrationPayload(parents, children, notes, marketing_opt_in);
+      payload[HONEYPOT_FIELD] = honeypotRef.current?.value ?? "";
+      // Elapsed time rather than a timestamp, so a phone with a wrong clock still reads right.
+      if (mountedAtRef.current !== null) {
+        payload.form_elapsed_ms = Date.now() - mountedAtRef.current;
+      }
 
       const res = await fetch("/api/register", {
         method: "POST",
@@ -176,6 +189,20 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps): React.JSX
           Submit Registration
         </button>
         {status && <span className="text-sm text-white/90">{status}</span>}
+      </div>
+
+      {/* Honeypot: off-screen rather than display:none, which some bots skip. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: "1px", height: "1px", overflow: "hidden" }}>
+        <label htmlFor={HONEYPOT_FIELD}>Leave this field empty</label>
+        <input
+          id={HONEYPOT_FIELD}
+          name={HONEYPOT_FIELD}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+          ref={honeypotRef}
+        />
       </div>
     </form>
   );

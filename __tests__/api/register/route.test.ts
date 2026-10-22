@@ -16,7 +16,9 @@ vi.mock('next/server', () => {
     constructor(url: string, init?: { method?: string; headers?: Record<string, string>; body?: string }) {
       this.url = url
       this.method = init?.method || 'GET'
-      this.headers = new Map()
+      this.headers = new Map(
+        Object.entries(init?.headers ?? {}).map(([key, value]) => [key.toLowerCase(), value])
+      )
       this._body = init?.body
     }
     async json(): Promise<unknown> {
@@ -50,12 +52,15 @@ import { NextRequest } from 'next/server'
 import { submitRegistration } from '@/lib/directus'
 // eslint-disable-next-line import/first -- Jest mocks must be before imports
 import type { DirectusError } from '@directus/sdk'
+// eslint-disable-next-line import/first -- Jest mocks must be before imports
+import { HONEYPOT_FIELD, MIN_FILL_MS, REGISTER_RATE_LIMIT, SUSPECTED_SPAM_STATUS, registerRateLimiter } from '@/lib/register-guard'
 
 describe('/api/register', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
     vi.clearAllMocks()
+    registerRateLimiter.reset()
     process.env = {
       ...originalEnv,
       DIRECTUS_URL: 'https://directus.example.com',
@@ -67,11 +72,13 @@ describe('/api/register', () => {
     process.env = originalEnv
   })
 
-  const createRequest = (body: any) => new NextRequest('http://localhost/api/register', {
+  const createRequest = (body: any, headers: Record<string, string> = {}) => new NextRequest('http://localhost/api/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...headers },
       body: JSON.stringify(body),
     })
+
+  const validBody = { parent1_name: 'Test Parent', parent1_email: 'test@example.com' }
 
   describe('Directus integration', () => {
 
@@ -146,6 +153,60 @@ describe('/api/register', () => {
       expect(response.status).toBe(200)
       expect(data.ok).toBe(true)
       expect(data.data.id).toBe(123)
+    })
+  })
+
+  describe('bot protection', () => {
+    beforeEach(() => {
+      ;(submitRegistration as Mock).mockResolvedValue({ id: 1 })
+    })
+
+    it('saves a submission without guard fields as a normal registration', async () => {
+      const response = await POST(createRequest(validBody))
+
+      expect(response.status).toBe(200)
+      expect(submitRegistration).toHaveBeenCalledWith(validBody)
+    })
+
+    it('strips the guard fields before saving a human submission', async () => {
+      await POST(createRequest({ ...validBody, [HONEYPOT_FIELD]: '', form_elapsed_ms: MIN_FILL_MS + 1 }))
+
+      expect(submitRegistration).toHaveBeenCalledWith(validBody)
+    })
+
+    it('saves a filled honeypot as suspected spam and still reports success', async () => {
+      const response = await POST(createRequest({ ...validBody, [HONEYPOT_FIELD]: 'https://spam.example', form_elapsed_ms: 60_000 }))
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.ok).toBe(true)
+      expect(submitRegistration).toHaveBeenCalledWith({ ...validBody, status: SUSPECTED_SPAM_STATUS })
+    })
+
+    it('saves a too-fast submission as suspected spam', async () => {
+      await POST(createRequest({ ...validBody, [HONEYPOT_FIELD]: '', form_elapsed_ms: MIN_FILL_MS - 1 }))
+
+      expect(submitRegistration).toHaveBeenCalledWith({ ...validBody, status: SUSPECTED_SPAM_STATUS })
+    })
+
+    it('returns 429 with an error message once an IP passes the limit', async () => {
+      const headers = { 'X-Forwarded-For': '203.0.113.7, 10.0.0.1' }
+      for (let i = 0; i < REGISTER_RATE_LIMIT; i++) {
+        expect((await POST(createRequest(validBody, headers))).status).toBe(200)
+      }
+
+      const response = await POST(createRequest(validBody, headers))
+      const data = await response.json()
+
+      expect(response.status).toBe(429)
+      expect(data.error).toMatch(/Too many registrations/)
+      expect(submitRegistration).toHaveBeenCalledTimes(REGISTER_RATE_LIMIT)
+    })
+
+    it('does not rate limit requests without a forwarding header', async () => {
+      for (let i = 0; i <= REGISTER_RATE_LIMIT; i++) {
+        expect((await POST(createRequest(validBody))).status).toBe(200)
+      }
     })
   })
 })

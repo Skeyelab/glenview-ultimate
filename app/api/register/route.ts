@@ -3,6 +3,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { submitRegistration } from "@/lib/directus";
+import {
+  HONEYPOT_FIELD,
+  SUSPECTED_SPAM_STATUS,
+  clientIp,
+  detectBot,
+  registerRateLimiter,
+} from "@/lib/register-guard";
 
 const MIN_HTTP_ERROR_STATUS = 400;
 const MAX_HTTP_ERROR_STATUS = 599;
@@ -24,15 +31,30 @@ const registrationSchema = z.object({
   children: z.array(childSchema).max(3).optional(),
   notes: z.string().optional(),
   marketing_opt_in: z.boolean().optional(),
+  [HONEYPOT_FIELD]: z.string().optional(),
+  form_elapsed_ms: z.number().optional(),
 });
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const ip = clientIp(req.headers.get("x-forwarded-for"));
+  if (ip && !registerRateLimiter.allow(ip)) {
+    return NextResponse.json(
+      { error: "Too many registrations from your network. Please try again in an hour." },
+      { status: 429 }
+    );
+  }
+
   const parseResult = registrationSchema.safeParse(await req.json());
   if (!parseResult.success) {
     const errorMessage = parseResult.error.issues[0]?.message ?? "Invalid registration payload";
     return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
-  const payload = parseResult.data;
+  const { [HONEYPOT_FIELD]: honeypot, form_elapsed_ms: elapsedMs, ...registration } = parseResult.data;
+
+  // A suspected bot still gets saved, flagged for review, and gets the same
+  // success response, so a misjudged parent is never lost and a bot learns nothing.
+  const botReason = detectBot({ honeypot, elapsedMs });
+  const payload = botReason ? { ...registration, status: SUSPECTED_SPAM_STATUS } : registration;
 
   try {
     const data = await submitRegistration(payload);
