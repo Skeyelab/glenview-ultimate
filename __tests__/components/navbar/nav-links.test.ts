@@ -6,7 +6,7 @@ describe('NAV_LINKS', () => {
     expect(NAV_LINKS).toContainEqual({ href: '/team-photos', label: 'Team Photos' })
   })
 
-  it('includes a Shop entry pointing at the Custom Ink store', () => {
-    expect(NAV_LINKS).toContainEqual({ href: 'https://www.customink.com/fundraising/glenview-ultimate', label: 'Shop' })
+  it('includes a Shop entry pointing at /shop', () => {
+    expect(NAV_LINKS).toContainEqual({ href: '/shop', label: 'Shop' })
   })
 })

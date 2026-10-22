@@ -90,6 +90,17 @@ export interface TeamPhoto {
   active?: boolean | null;
 }
 
+export interface ShopItem {
+  id: number;
+  title: string;
+  url: string;
+  image?: string | null;
+  price_text?: string | null;
+  description?: string | null;
+  sort?: number | null;
+  active?: boolean | null;
+}
+
 export interface Website {
   id: number;
   site_name: string;
@@ -110,6 +121,7 @@ export interface DirectusSchema {
   WhatIsUltimate: WhatIsUltimate[];
   WhatIsUltimateVideos: WhatIsUltimateVideo[];
   TeamPhotos: TeamPhoto[];
+  ShopItems: ShopItem[];
   Registrations: Registration[];
   Website: Website[];
 }
@@ -404,6 +416,19 @@ export function hasTeamPhotos(): Promise<boolean> {
       }),
     );
     return data.length > 0;
+  });
+}
+
+export function getShopItems(): Promise<ShopItem[]> {
+  return withDirectus<ShopItem[]>([], async (client) => {
+    const items = await client.request(
+      readItems("ShopItems", {
+        fields: ["id", "title", "url", "image", "price_text", "description", "sort", "active"],
+        filter: { active: { _eq: true } },
+        sort: ["sort"],
+      }),
+    );
+    return items;
   });
 }
 

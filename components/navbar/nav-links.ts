@@ -10,6 +10,6 @@ export const NAV_LINKS: readonly NavLinkItem[] = [
   { href: "/news", label: "News" },
   { href: "/schedule", label: "Schedule" },
   { href: "/team-photos", label: "Team Photos" },
-  { href: "https://www.customink.com/fundraising/glenview-ultimate", label: "Shop" },
+  { href: "/shop", label: "Shop" },
 ];
 

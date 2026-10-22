@@ -22,6 +22,7 @@ import {
   getWhatIsUltimate,
   getWhatIsUltimateVideos,
   getTeamPhotos,
+  getShopItems,
   getNewsList,
   getDirectusAssetUrl,
 } from "../lib/directus";
@@ -48,7 +49,7 @@ async function main(): Promise<void> {
   }
   console.log(`Directus smoke test against ${process.env.DIRECTUS_URL}\n`);
 
-  const [team, partners, schedule, website, about, wiu, videos, photos, news] = await Promise.all([
+  const [team, partners, schedule, website, about, wiu, videos, photos, shopItems, news] = await Promise.all([
     getTeam(),
     getPartners(),
     getSchedule(),
@@ -57,6 +58,7 @@ async function main(): Promise<void> {
     getWhatIsUltimate(),
     getWhatIsUltimateVideos(),
     getTeamPhotos(),
+    getShopItems(),
     getNewsList(5),
   ]);
 
@@ -67,10 +69,11 @@ async function main(): Promise<void> {
   check("getWhatIsUltimate", wiu !== null, wiu ? "returned a record" : "null");
   check("getTeamPhotos", photos.length > 0, `${photos.length} photos`);
 
-  // News and videos are legitimately allowed to be empty; only assert the call
+  // News, videos and shop items are legitimately allowed to be empty; only assert the call
   // completed and returned an array, which is what an SDK break would violate.
   check("getNewsList", Array.isArray(news), `${news.length} articles`);
   check("getWhatIsUltimateVideos", Array.isArray(videos), `${videos.length} videos`);
+  check("getShopItems", Array.isArray(shopItems), `${shopItems.length} items`);
 
   // The schedule has a 5-event hardcoded fallback. More than that proves we are
   // reading the CMS rather than DEFAULT_SCHEDULE.

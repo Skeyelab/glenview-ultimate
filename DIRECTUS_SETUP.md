@@ -106,6 +106,21 @@ YouTube videos for educational content.
 - `sort` (integer, nullable) - Sort order
 - `active` (boolean, nullable) - Whether video is active
 
+### ShopItems
+
+Merch shown on `/shop`. Each row is one Custom Ink fundraising campaign; checkout
+happens on Custom Ink, which has no API or embed.
+
+**Fields:**
+- `id` (integer, primary key, auto-increment)
+- `title` (string, required) - e.g., "2026 Retro T-Shirt"
+- `url` (string, required) - The campaign's own Custom Ink link, not the store root
+- `image` (file, nullable) - Directus file field; landscape works best (cropped to 4:3)
+- `price_text` (string, nullable) - Free text, e.g., "$25" or "From $22"
+- `description` (text, nullable)
+- `sort` (integer, nullable) - Sort order
+- `active` (boolean, nullable) - Uncheck when a campaign closes to hide it without a deploy
+
 ### Website
 
 Site-wide configuration.
@@ -159,6 +174,8 @@ The static token should have read access to:
 - About
 - WhatIsUltimate
 - WhatIsUltimateVideos
+- TeamPhotos
+- ShopItems
 - Website
 
 And create access to:
@@ -222,6 +239,8 @@ The webhook automatically maps Directus collections to Next.js pages:
 - `Schedule` → `/schedule`, `/` (home page)
 - `Partners` → `/` (home page)
 - `News` → `/news`, `/news/[slug]` (when slug is provided)
+- `TeamPhotos` → `/team-photos`
+- `ShopItems` → `/shop`
 
 ### Fallback Revalidation
 
