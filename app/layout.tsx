@@ -25,8 +25,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={lexend.variable}>
       <body className={`${lexend.className} min-h-dvh antialiased bg-brand-green text-white`}>
         <Script
-          src="https://umami.glenview-ultimate.org/script.js"
-          data-website-id="c374c9b6-a4c4-4c42-837e-681db5fb70f0"
+          src="https://umami.ericdahl.dev/script.js"
+          data-website-id="0acb9e68-9e67-4738-84fb-6ec391a26786"
           strategy="afterInteractive"
         />
         <a href="#main-content" className="skip-link">Skip to content</a>
